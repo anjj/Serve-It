@@ -1,0 +1,27 @@
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+
+async function checkAdmin() {
+  const session = await getServerSession(authOptions);
+  return session && (session.user as any).isAdmin;
+}
+
+export async function GET() {
+  if (!(await checkAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const customers = await prisma.customer.findMany({ orderBy: { name: "asc" } });
+  return NextResponse.json({ customers });
+}
+
+export async function POST(req: Request) {
+  if (!(await checkAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { name, slug } = await req.json();
+  if (!name || !slug) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  try {
+    const customer = await prisma.customer.create({ data: { name, slug } });
+    return NextResponse.json({ customer });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
