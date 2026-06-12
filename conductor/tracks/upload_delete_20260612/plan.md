@@ -6,9 +6,9 @@ This plan tracks the tasks required to implement manual file uploading and delet
 
 ## Phase 1: Test Runner Setup & Backend Endpoints
 
-- [ ] Task: Set up Vitest testing environment
-    - [ ] Install vitest, happy-dom, and configure vitest.config.ts
-    - [ ] Create a basic test configuration check to verify the test command executes correctly
+- [x] Task: Set up Vitest testing environment (bfb289c)
+    - [x] Install vitest, happy-dom, and configure vitest.config.ts
+    - [x] Create a basic test configuration check to verify the test command executes correctly
 - [ ] Task: Create POST handler for workspace files API
     - [ ] Write tests for POST workspace files endpoint validating input, access control, and storage integration
     - [ ] Implement POST handler in src/app/api/workspace/[customer_slug]/files/route.ts
