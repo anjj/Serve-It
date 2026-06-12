@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { uploadHtmlFile } from "@/lib/storage";
+import { uploadHtmlFile, deleteFile } from "@/lib/storage";
 
 export async function GET(req: Request, { params }: { params: Promise<{ customer_slug: string }> }) {
   const session = await getServerSession(authOptions);
@@ -70,6 +70,40 @@ export async function POST(req: Request, { params }: { params: Promise<{ custome
     });
 
     return NextResponse.json({ success: true, file: newFile });
+  } catch (error: any) {
+    return NextResponse.json({ error: "Internal Server Error", details: error.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request, { params }: { params: Promise<{ customer_slug: string }> }) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const resolvedParams = await params;
+  const customer_slug = resolvedParams.customer_slug;
+  const userId = (session.user as any).id;
+  const isAdmin = (session.user as any).isAdmin;
+
+  try {
+    const customer = await prisma.customer.findUnique({ where: { slug: customer_slug }, include: { users: { where: { userId } } } });
+    if (!customer) return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
+    if (!isAdmin && customer.users.length === 0) return NextResponse.json({ error: "Access denied" }, { status: 403 });
+
+    const data = await req.json();
+    const { fileId } = data;
+    if (!fileId) {
+      return NextResponse.json({ error: "Missing fileId" }, { status: 400 });
+    }
+
+    const file = await prisma.file.findUnique({ where: { id: fileId } });
+    if (!file || file.customerId !== customer.id) {
+      return NextResponse.json({ error: "File not found" }, { status: 404 });
+    }
+
+    await deleteFile(file.storagePath);
+    await prisma.file.delete({ where: { id: fileId } });
+
+    return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: "Internal Server Error", details: error.message }, { status: 500 });
   }
