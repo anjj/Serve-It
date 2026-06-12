@@ -12,9 +12,9 @@ This plan tracks the tasks required to implement manual file uploading and delet
 - [x] Task: Create POST handler for workspace files API (7b0f98a)
     - [x] Write tests for POST workspace files endpoint validating input, access control, and storage integration
     - [x] Implement POST handler in src/app/api/workspace/[customer_slug]/files/route.ts
-- [ ] Task: Create DELETE handler for workspace files API
-    - [ ] Write tests for DELETE workspace files endpoint verifying database deletion and storage cleanup
-    - [ ] Implement DELETE handler in src/app/api/workspace/[customer_slug]/files/route.ts
+- [x] Task: Create DELETE handler for workspace files API (e59ff92)
+    - [x] Write tests for DELETE workspace files endpoint verifying database deletion and storage cleanup
+    - [x] Implement DELETE handler in src/app/api/workspace/[customer_slug]/files/route.ts
 - [ ] Task: Conductor - User Manual Verification 'Test Runner Setup & Backend Endpoints' (Protocol in workflow.md)
 
 ---
