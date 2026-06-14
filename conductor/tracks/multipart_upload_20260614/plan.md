@@ -4,7 +4,7 @@ This plan details the steps required to transition the file upload handlers and 
 
 ---
 
-## Phase 1: Test Updates & Backend Endpoint Refactoring
+## Phase 1: Test Updates & Backend Endpoint Refactoring [checkpoint: 07fc2e6]
 
 - [x] Task: Update backend unit tests to request multipart/form-data (fd1dbcc)
     - [x] Modify tests in src/test/api/workspace/[customer_slug]/files/route.test.ts to use FormData payload mocks
