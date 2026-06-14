@@ -120,7 +120,7 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "No fields to update provided" }, { status: 400 });
     }
 
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
 
     if (hasTitle) {
       updateData.title = title;
