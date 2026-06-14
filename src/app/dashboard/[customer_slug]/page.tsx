@@ -4,7 +4,8 @@ import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import Navbar from "@/components/Navbar";
-import { Search, Tag } from "lucide-react";
+import { Search, Tag, Upload } from "lucide-react";
+import UploadModal from "@/components/UploadModal";
 
 type File = { id: string; title: string; slug: string; tags: string[]; createdAt: string; };
 
@@ -22,6 +23,7 @@ export default function WorkspaceDashboard() {
   const [selectedTag, setSelectedTag] = useState<string>("");
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [error, setError] = useState("");
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
 
   const fetchFiles = useCallback(async () => {
     setLoading(true);
@@ -92,21 +94,31 @@ export default function WorkspaceDashboard() {
             />
           </div>
 
-          {availableTags.length > 0 && (
-            <div className="flex items-center gap-2">
-              <Tag className="h-5 w-5 text-gray-400" />
-              <select
-                value={selectedTag}
-                onChange={(e) => setSelectedTag(e.target.value)}
-                className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white"
-              >
-                <option value="">All Tags</option>
-                {availableTags.map(tag => (
-                  <option key={tag} value={tag}>{tag}</option>
-                ))}
-              </select>
-            </div>
-          )}
+          <div className="flex gap-2">
+            {availableTags.length > 0 && (
+              <div className="flex items-center gap-2">
+                <Tag className="h-5 w-5 text-gray-400" />
+                <select
+                  value={selectedTag}
+                  onChange={(e) => setSelectedTag(e.target.value)}
+                  className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white text-gray-900"
+                >
+                  <option value="">All Tags</option>
+                  {availableTags.map(tag => (
+                    <option key={tag} value={tag}>{tag}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <button
+              onClick={() => setIsUploadOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+            >
+              <Upload className="h-4 w-4" />
+              <span>Upload File</span>
+            </button>
+          </div>
         </div>
 
         {filteredFiles.length === 0 ? (
@@ -139,6 +151,13 @@ export default function WorkspaceDashboard() {
           </div>
         )}
       </main>
+
+      <UploadModal
+        isOpen={isUploadOpen}
+        onClose={() => setIsUploadOpen(false)}
+        onSuccess={fetchFiles}
+        customerSlug={customer_slug || ""}
+      />
     </div>
   );
 }
