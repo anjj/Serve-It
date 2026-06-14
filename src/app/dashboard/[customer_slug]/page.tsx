@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import Navbar from "@/components/Navbar";
-import { Search, Tag, Upload } from "lucide-react";
+import { Search, Tag, Upload, Trash2 } from "lucide-react";
 import UploadModal from "@/components/UploadModal";
 
 type File = { id: string; title: string; slug: string; tags: string[]; createdAt: string; };
@@ -48,6 +48,29 @@ export default function WorkspaceDashboard() {
     }
     setLoading(false);
   }, [customer_slug]);
+
+  const handleDelete = async (fileId: string) => {
+    if (!confirm("Are you sure you want to delete this file?")) return;
+    try {
+      const res = await fetch(`/api/workspace/${customer_slug}/files`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ fileId }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || "Failed to delete file.");
+        return;
+      }
+
+      await fetchFiles();
+    } catch (err) {
+      alert("An error occurred while deleting the file.");
+    }
+  };
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/auth/signin");
@@ -141,9 +164,18 @@ export default function WorkspaceDashboard() {
 
                   <div className="mt-4 flex justify-between items-center">
                     <span className="text-xs text-gray-400">{new Date(file.createdAt).toLocaleDateString()}</span>
-                    <a href={`/s/${customer_slug}/${file.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700">
-                      View Document
-                    </a>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleDelete(file.id)}
+                        className="inline-flex items-center p-1.5 border border-transparent text-xs font-medium rounded text-red-600 hover:bg-red-50 focus:outline-none"
+                        aria-label="Delete File"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                      <a href={`/s/${customer_slug}/${file.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700">
+                        View Document
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
