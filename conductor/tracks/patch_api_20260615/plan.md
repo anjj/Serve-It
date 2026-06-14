@@ -16,7 +16,7 @@
 
 ## Phase 2: Endpoint Implementation & Verification - Green Phase
 
-- [ ] Task: Implement the PATCH request handler for programmatic API
+- [~] Task: Implement the PATCH request handler for programmatic API
     - [ ] Add PATCH method export in src/app/api/v1/files/route.ts
     - [ ] Authenticate request using Bearer API Key and verify customer workspace is active
     - [ ] Parse request body as multipart/form-data using req.formData()
