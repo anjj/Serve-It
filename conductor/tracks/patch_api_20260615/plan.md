@@ -16,16 +16,16 @@
 
 ## Phase 2: Endpoint Implementation & Verification - Green Phase
 
-- [~] Task: Implement the PATCH request handler for programmatic API
-    - [ ] Add PATCH method export in src/app/api/v1/files/route.ts
-    - [ ] Authenticate request using Bearer API Key and verify customer workspace is active
-    - [ ] Parse request body as multipart/form-data using req.formData()
-    - [ ] Extract slug and find the existing file in the database; return 404 if not found
-    - [ ] Extract title, tags, metadata, and file; validate that at least one update field is present
-    - [ ] Handle file content upload/overwrite in Supabase using uploadHtmlFile (upsert)
-    - [ ] Update file record metadata and updatedAt in Prisma database
-    - [ ] Return 200 OK with success indicator, updated file, and public URL
-- [ ] Task: Verify functionality and run checks
-    - [ ] Run test suite to verify that all new and existing tests pass (Green Phase)
-    - [ ] Run ESLint to verify no code quality violations
+- [x] Task: Implement the PATCH request handler for programmatic API (49cd49d)
+    - [x] Add PATCH method export in src/app/api/v1/files/route.ts
+    - [x] Authenticate request using Bearer API Key and verify customer workspace is active
+    - [x] Parse request body as multipart/form-data using req.formData()
+    - [x] Extract slug and find the existing file in the database; return 404 if not found
+    - [x] Extract title, tags, metadata, and file; validate that at least one update field is present
+    - [x] Handle file content upload/overwrite in Supabase using uploadHtmlFile (upsert)
+    - [x] Update file record metadata and updatedAt in Prisma database
+    - [x] Return 200 OK with success indicator, updated file, and public URL
+- [x] Task: Verify functionality and run checks (49cd49d)
+    - [x] Run test suite to verify that all new and existing tests pass (Green Phase)
+    - [x] Run ESLint to verify no code quality violations
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Endpoint Implementation & Verification - Green Phase' (Protocol in workflow.md)
