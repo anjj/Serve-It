@@ -71,3 +71,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Internal server error", details: error.message }, { status: 500 });
   }
 }
+
+export async function PATCH(req: Request) {
+  return NextResponse.json({ error: "Not Implemented" }, { status: 501 });
+}
