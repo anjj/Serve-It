@@ -2,16 +2,16 @@
 
 ## Phase 1: Test-Driven Development (TDD) - Red Phase
 
-- [ ] Task: Define and write failing unit tests for the PATCH endpoint
-    - [ ] Add failing unit tests to src/test/api/v1/files/route.test.ts for 401 Unauthorized (missing/invalid Bearer token)
-    - [ ] Add failing unit tests for 403 Forbidden (invalid API key or inactive customer workspace)
-    - [ ] Add failing unit tests for 400 Bad Request (missing slug parameter in payload)
-    - [ ] Add failing unit tests for 400 Bad Request (no fields to update provided)
-    - [ ] Add failing unit tests for 404 Not Found (file with specified slug does not exist in workspace)
-    - [ ] Add failing unit tests for 200 OK (successful update of metadata only: title, tags, and/or custom metadata)
-    - [ ] Add failing unit tests for 200 OK (successful update of file content only: overwriting in Supabase storage)
-    - [ ] Add failing unit tests for 200 OK (successful update of both metadata and file content)
-    - [ ] Run vitest to confirm all new test cases fail (Red Phase)
+- [x] Task: Define and write failing unit tests for the PATCH endpoint (6c7193d)
+    - [x] Add failing unit tests to src/test/api/v1/files/route.test.ts for 401 Unauthorized (missing/invalid Bearer token)
+    - [x] Add failing unit tests for 403 Forbidden (invalid API key or inactive customer workspace)
+    - [x] Add failing unit tests for 400 Bad Request (missing slug parameter in payload)
+    - [x] Add failing unit tests for 400 Bad Request (no fields to update provided)
+    - [x] Add failing unit tests for 404 Not Found (file with specified slug does not exist in workspace)
+    - [x] Add failing unit tests for 200 OK (successful update of metadata only: title, tags, and/or custom metadata)
+    - [x] Add failing unit tests for 200 OK (successful update of file content only: overwriting in Supabase storage)
+    - [x] Add failing unit tests for 200 OK (successful update of both metadata and file content)
+    - [x] Run vitest to confirm all new test cases fail (Red Phase)
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Test-Driven Development (TDD) - Red Phase' (Protocol in workflow.md)
 
 ## Phase 2: Endpoint Implementation & Verification - Green Phase
