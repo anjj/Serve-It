@@ -24,7 +24,7 @@ This plan tracks the tasks required to implement manual file uploading and delet
 - [x] Task: Create Upload UI component in the dashboard (61695d8)
     - [x] Write tests for the File Upload form component validating submission and input handlers
     - [x] Implement the File Upload UI panel/modal inside src/app/dashboard/[customer_slug]/page.tsx
-- [ ] Task: Add Deletion UI flow to dashboard card list
-    - [ ] Write tests for the file deletion button click handler and confirmation flow
-    - [ ] Implement Trash icon and delete action trigger inside src/app/dashboard/[customer_slug]/page.tsx
+- [x] Task: Add Deletion UI flow to dashboard card list (ac81e7f)
+    - [x] Write tests for the file deletion button click handler and confirmation flow
+    - [x] Implement Trash icon and delete action trigger inside src/app/dashboard/[customer_slug]/page.tsx
 - [ ] Task: Conductor - User Manual Verification 'Workspace Dashboard UI' (Protocol in workflow.md)
