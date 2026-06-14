@@ -1,8 +1,0 @@
-{
-  "track_id": "upload_delete_20260612",
-  "type": "feature",
-  "status": "new",
-  "created_at": "2026-06-12T21:48:17Z",
-  "updated_at": "2026-06-12T21:48:17Z",
-  "description": "Implement file upload and deletion in the workspace dashboard"
-}

@@ -4,4 +4,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+- [x] **Track: Project Archaeology: Discovered domains and generated DDD documentation**
+  *Link: [./tracks/project_archaeology_20260614/](./tracks/project_archaeology_20260614/)*
+
 No active tracks.

@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Serve-it
 
-## Getting Started
+Serve-it is a high-performance, multi-tenant file sharing and serving platform. It enables organizations to create isolated workspaces, manage assets securely, assign API keys for automated ingestion, and serve HTML pages via custom short URLs.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🛠️ Technology Stack
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat-square&logo=typescript&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-16.2.9-black?style=flat-square&logo=next.js&logoColor=white)
+![React](https://img.shields.io/badge/React-19.2.4-blue?style=flat-square&logo=react&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=flat-square&logo=tailwindcss&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-5.22.0-2D3748?style=flat-square&logo=prisma&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-Storage-3ECF8E?style=flat-square&logo=supabase&logoColor=white)
+![NextAuth](https://img.shields.io/badge/NextAuth.js-v4-5C2D91?style=flat-square&logo=nextauth&logoColor=white)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📖 Domain Documentation
 
-## Learn More
+The application's core functionality is organized into distinct business domains. Explore the documentation below:
 
-To learn more about Next.js, take a look at the following resources:
+1. **[Authentication Domain](./docs/domains/auth.md)**: Manages SSO session configurations, NextAuth integration, and developer login overrides.
+2. **[Workspaces & Multi-Tenancy](./docs/domains/workspaces.md)**: Explains workspace separation, tenant isolation logic, and platform role authorizations.
+3. **[File Management & Storage](./docs/domains/files.md)**: Outlines file upload modal workflows, validation requirements, and storage bucket bindings.
+4. **[Document Serving Layer](./docs/domains/serving.md)**: Details the dynamic short URL serving router, HTTP content types, and cache control policies.
+5. **[API Keys & Programmatic Ingestion](./docs/domains/apikeys.md)**: Covers cryptographically secure API key generation, secure SHA-256 database hashing, and Bearer token ingestion endpoints.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚀 Getting Started
 
-## Deploy on Vercel
+### 1. Prerequisites
+- Docker & Docker Compose
+- Node.js (v20+)
+- pnpm
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 2. Startup
+1. Run local dependencies:
+   ```bash
+   docker compose up -d
+   ```
+2. Run Prisma migrations & seed database:
+   ```bash
+   npx prisma db push
+   npx prisma db seed
+   ```
+3. Run the Next.js development server:
+   ```bash
+   pnpm run dev
+   ```
+4. Access the sign-in page at `http://localhost:3000/auth/signin` and click "Bypass: Sign in as Developer Admin".
