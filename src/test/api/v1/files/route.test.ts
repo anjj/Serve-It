@@ -274,6 +274,8 @@ describe('PATCH /api/v1/files', () => {
       },
     } as any);
 
+    vi.mocked(prisma.file.findUnique).mockResolvedValueOnce({ id: 'file-1' } as any);
+
     const formData = new FormData();
     formData.append('slug', 'test-file'); // only slug provided
 
