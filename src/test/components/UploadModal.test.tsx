@@ -80,18 +80,19 @@ describe('UploadModal Component', () => {
         '/api/workspace/test-customer/files',
         expect.objectContaining({
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
         })
       );
     });
 
     // Verify request body contains file contents
     const lastFetchCallArgs = mockFetch.mock.calls[0];
-    const requestBody = JSON.parse(lastFetchCallArgs[1].body);
-    expect(requestBody.title).toBe('My Document');
-    expect(requestBody.slug).toBe('my-doc');
-    expect(requestBody.file).toBe('<h1>hello</h1>');
-    expect(requestBody.tags).toEqual(['test', 'doc']);
+    const formData = lastFetchCallArgs[1].body as FormData;
+    expect(formData.get('title')).toBe('My Document');
+    expect(formData.get('slug')).toBe('my-doc');
+    expect(formData.get('tags')).toBe('test, doc');
+    const fileObj = formData.get('file') as File;
+    expect(fileObj).toBeInstanceOf(File);
+    expect(fileObj.name).toBe('test.html');
 
     await waitFor(() => {
       expect(defaultProps.onSuccess).toHaveBeenCalled();

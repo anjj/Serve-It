@@ -49,31 +49,17 @@ export default function UploadModal({ isOpen, onClose, onSuccess, customerSlug }
     setLoading(true);
 
     try {
-      // Read file content
-      const fileContent = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (event) => resolve(event.target?.result as string);
-        reader.onerror = (err) => reject(err);
-        reader.readAsText(file);
-      });
-
-      // Parse tags
-      const tagsArray = tags
-        .split(",")
-        .map((t) => t.trim())
-        .filter((t) => t.length > 0);
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("slug", slug);
+      formData.append("file", file);
+      if (tags) {
+        formData.append("tags", tags);
+      }
 
       const res = await fetch(`/api/workspace/${customerSlug}/files`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          slug,
-          file: fileContent,
-          tags: tagsArray,
-        }),
+        body: formData,
       });
 
       const data = await res.json();
