@@ -12,7 +12,7 @@
     - [x] Add failing unit tests for 200 OK (successful update of file content only: overwriting in Supabase storage)
     - [x] Add failing unit tests for 200 OK (successful update of both metadata and file content)
     - [x] Run vitest to confirm all new test cases fail (Red Phase)
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Test-Driven Development (TDD) - Red Phase' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 1: Test-Driven Development (TDD) - Red Phase' (Protocol in workflow.md)
 
 ## Phase 2: Endpoint Implementation & Verification - Green Phase
 
