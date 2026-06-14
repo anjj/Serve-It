@@ -1,8 +1,0 @@
-{
-  "track_id": "multipart_upload_20260614",
-  "type": "feature",
-  "status": "new",
-  "created_at": "2026-06-14T23:58:30Z",
-  "updated_at": "2026-06-14T23:58:30Z",
-  "description": "Change File post Upload instead pure HTML into JSON, File Upload of Complex HTML"
-}
