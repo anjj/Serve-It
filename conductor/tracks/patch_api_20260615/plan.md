@@ -14,7 +14,7 @@
     - [x] Run vitest to confirm all new test cases fail (Red Phase)
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Test-Driven Development (TDD) - Red Phase' (Protocol in workflow.md)
 
-## Phase 2: Endpoint Implementation & Verification - Green Phase
+## Phase 2: Endpoint Implementation & Verification - Green Phase [checkpoint: a5e9b26]
 
 - [x] Task: Implement the PATCH request handler for programmatic API (49cd49d)
     - [x] Add PATCH method export in src/app/api/v1/files/route.ts
@@ -28,4 +28,4 @@
 - [x] Task: Verify functionality and run checks (49cd49d)
     - [x] Run test suite to verify that all new and existing tests pass (Green Phase)
     - [x] Run ESLint to verify no code quality violations
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Endpoint Implementation & Verification - Green Phase' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Endpoint Implementation & Verification - Green Phase' (Protocol in workflow.md)
