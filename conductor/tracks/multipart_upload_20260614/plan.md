@@ -17,13 +17,13 @@ This plan details the steps required to transition the file upload handlers and 
 
 ---
 
-## Phase 2: Frontend Integration & Complex File Verification
+## Phase 2: Frontend Integration & Complex File Verification [checkpoint: ea2ce13]
 
-- [ ] Task: Update frontend unit tests for UploadModal to assert FormData submission
-    - [ ] Modify src/test/components/UploadModal.test.tsx to mock and assert FormData request structure
-- [ ] Task: Refactor UploadModal component to submit FormData
-    - [ ] Modify src/components/UploadModal.tsx to compile inputs to a FormData object and post it to the workspace files endpoint
-- [ ] Task: Verify complex HTML presentation upload and serving
-    - [ ] Run a test scripting or manual ingestion command uploading golive_ai_framework_presentation.html via multipart POST
-    - [ ] Verify the presentation serves and renders correctly at /s/[customer_slug]/[file_slug]
-- [ ] Task: Conductor - User Manual Verification 'Frontend Integration & Complex File Verification' (Protocol in workflow.md)
+- [x] Task: Update frontend unit tests for UploadModal to assert FormData submission (af87a04)
+    - [x] Modify src/test/components/UploadModal.test.tsx to mock and assert FormData request structure
+- [x] Task: Refactor UploadModal component to submit FormData (af87a04)
+    - [x] Modify src/components/UploadModal.tsx to compile inputs to a FormData object and post it to the workspace files endpoint
+- [x] Task: Verify complex HTML presentation upload and serving (af87a04)
+    - [x] Run a test scripting or manual ingestion command uploading golive_ai_framework_presentation.html via multipart POST
+    - [x] Verify the presentation serves and renders correctly at /s/[customer_slug]/[file_slug]
+- [x] Task: Conductor - User Manual Verification 'Frontend Integration & Complex File Verification' (Protocol in workflow.md)
