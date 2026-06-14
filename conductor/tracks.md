@@ -9,5 +9,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Documentation API Upload Files with Multipart & PATCH File**
+- [x] **Track: Documentation API Upload Files with Multipart & PATCH File**
 *Link: [./tracks/patch_api_20260615/](./tracks/patch_api_20260615/)*
