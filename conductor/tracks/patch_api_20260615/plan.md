@@ -1,6 +1,6 @@
 # Implementation Plan - Programmatic API File Updates (PATCH /api/v1/files)
 
-## Phase 1: Test-Driven Development (TDD) - Red Phase
+## Phase 1: Test-Driven Development (TDD) - Red Phase [checkpoint: e5d5eb5]
 
 - [x] Task: Define and write failing unit tests for the PATCH endpoint (6c7193d)
     - [x] Add failing unit tests to src/test/api/v1/files/route.test.ts for 401 Unauthorized (missing/invalid Bearer token)
@@ -12,7 +12,7 @@
     - [x] Add failing unit tests for 200 OK (successful update of file content only: overwriting in Supabase storage)
     - [x] Add failing unit tests for 200 OK (successful update of both metadata and file content)
     - [x] Run vitest to confirm all new test cases fail (Red Phase)
-- [~] Task: Conductor - User Manual Verification 'Phase 1: Test-Driven Development (TDD) - Red Phase' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Test-Driven Development (TDD) - Red Phase' (Protocol in workflow.md)
 
 ## Phase 2: Endpoint Implementation & Verification - Green Phase
 
