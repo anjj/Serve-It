@@ -61,6 +61,7 @@ Workspace members can upload documents directly from their dashboards. The syste
 
 ### Core Components
 - **API Router**: `/api/workspace/[customer_slug]/files/route.ts` (Handles `GET`, `POST`, and `DELETE` requests).
+- **Programmatic API Router**: `/api/v1/files/route.ts` (Handles `POST` uploads and `PATCH` updates).
 - **Storage Wrapper**: [storage.ts](file:///home/andres.julian/github/serve-it/src/lib/storage.ts) (Wraps Supabase SDK calls `uploadHtmlFile`, `downloadFile`, and `deleteFile`).
 - **Upload Component**: [UploadModal.tsx](file:///home/andres.julian/github/serve-it/src/components/UploadModal.tsx).
 - **Workspace Dashboard**: [page.tsx](file:///home/andres.julian/github/serve-it/src/app/dashboard/[customer_slug]/page.tsx).

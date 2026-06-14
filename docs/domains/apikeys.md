@@ -5,7 +5,7 @@ This domain governs automated, programmatic interactions with the workspace, ena
 ---
 
 ## 1. How It Works (Non-Technical Summary)
-Developers can request API keys for their workspaces. The system generates a cryptographically secure key prefixed with `sk_serve_` and shows it **once** to the developer. The database only retains a secure SHA-256 hash of the key. External systems can send programmatic `POST` requests to upload HTML files by passing their API key as a Bearer Token.
+Developers can request API keys for their workspaces. The system generates a cryptographically secure key prefixed with `sk_serve_` and shows it **once** to the developer. The database only retains a secure SHA-256 hash of the key. External systems can send programmatic `POST` requests to upload HTML files, or `PATCH` requests to update existing files and metadata, by passing their API key as a Bearer Token.
 
 ---
 
@@ -47,7 +47,7 @@ Developers can request API keys for their workspaces. The system generates a cry
 
 ### Core Components
 - **API Key Generation Router**: `/api/admin/apikeys/route.ts` (Handles `POST`).
-- **Programmatic Ingestion Router**: `/api/v1/files/route.ts` (Handles `POST` uploads).
+- **Programmatic Ingestion Router**: `/api/v1/files/route.ts` (Handles `POST` uploads and `PATCH` updates).
 
 ### API Key Constraints & Hashing Scheme
 1. **Uniqueness & Entropy**: API keys are built using 32 bytes of secure random bytes, formatted as hex (`64` characters).
