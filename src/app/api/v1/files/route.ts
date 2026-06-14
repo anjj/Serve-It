@@ -17,9 +17,47 @@ export async function POST(req: Request) {
     const customer = apiKeyRecord.customer;
     if (!customer.isActive) return NextResponse.json({ error: "Customer workspace is inactive" }, { status: 403 });
 
-    const data = await req.json();
-    const { title, slug, file, tags, metadata } = data;
-    if (!title || !file || !slug) return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    const formData = await req.formData();
+    const title = formData.get("title") as string;
+    const slug = formData.get("slug") as string;
+    const fileEntry = formData.get("file");
+    const tagsRaw = formData.get("tags") as string;
+    const metadataRaw = formData.get("metadata") as string;
+
+    if (!title || !slug || !fileEntry) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    let file = "";
+    if (fileEntry instanceof File) {
+      file = await fileEntry.text();
+    } else if (typeof fileEntry === "string") {
+      file = fileEntry;
+    } else {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    if (!file) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    let tags: string[] = [];
+    if (tagsRaw) {
+      try {
+        tags = JSON.parse(tagsRaw);
+      } catch {
+        tags = tagsRaw.split(",").map(t => t.trim()).filter(Boolean);
+      }
+    }
+
+    let metadata = {};
+    if (metadataRaw) {
+      try {
+        metadata = JSON.parse(metadataRaw);
+      } catch {
+        // Fallback
+      }
+    }
 
     const existingFile = await prisma.file.findUnique({ where: { customerId_slug: { customerId: customer.id, slug } } });
     if (existingFile) return NextResponse.json({ error: "A file with this slug already exists for this customer" }, { status: 409 });

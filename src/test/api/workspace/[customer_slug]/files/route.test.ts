@@ -33,9 +33,13 @@ describe('POST /api/workspace/[customer_slug]/files', () => {
 
   it('should return 401 if unauthorized (no session)', async () => {
     vi.mocked(getServerSession).mockResolvedValueOnce(null);
+    const formData = new FormData();
+    formData.append('title', 'Test');
+    formData.append('slug', 'test-file');
+    formData.append('file', new File(['<html></html>'], 'test-file.html', { type: 'text/html' }));
     const req = new Request('http://localhost/api/workspace/test-customer/files', {
       method: 'POST',
-      body: JSON.stringify({ title: 'Test', slug: 'test-file', file: '<html></html>' }),
+      body: formData,
     });
     const res = await POST(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
     expect(res.status).toBe(401);
@@ -49,9 +53,13 @@ describe('POST /api/workspace/[customer_slug]/files', () => {
     });
     vi.mocked(prisma.customer.findUnique).mockResolvedValueOnce(null);
 
+    const formData = new FormData();
+    formData.append('title', 'Test');
+    formData.append('slug', 'test-file');
+    formData.append('file', new File(['<html></html>'], 'test-file.html', { type: 'text/html' }));
     const req = new Request('http://localhost/api/workspace/test-customer/files', {
       method: 'POST',
-      body: JSON.stringify({ title: 'Test', slug: 'test-file', file: '<html></html>' }),
+      body: formData,
     });
     const res = await POST(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
     expect(res.status).toBe(404);
@@ -73,9 +81,13 @@ describe('POST /api/workspace/[customer_slug]/files', () => {
       users: [], // No mapping for user-1
     } as any);
 
+    const formData = new FormData();
+    formData.append('title', 'Test');
+    formData.append('slug', 'test-file');
+    formData.append('file', new File(['<html></html>'], 'test-file.html', { type: 'text/html' }));
     const req = new Request('http://localhost/api/workspace/test-customer/files', {
       method: 'POST',
-      body: JSON.stringify({ title: 'Test', slug: 'test-file', file: '<html></html>' }),
+      body: formData,
     });
     const res = await POST(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
     expect(res.status).toBe(403);
@@ -97,9 +109,11 @@ describe('POST /api/workspace/[customer_slug]/files', () => {
       users: [{ userId: 'user-1' }],
     } as any);
 
+    const formData = new FormData();
+    formData.append('title', 'Test'); // missing slug and file
     const req = new Request('http://localhost/api/workspace/test-customer/files', {
       method: 'POST',
-      body: JSON.stringify({ title: 'Test' }), // missing slug and file
+      body: formData,
     });
     const res = await POST(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
     expect(res.status).toBe(400);
@@ -122,9 +136,13 @@ describe('POST /api/workspace/[customer_slug]/files', () => {
     } as any);
     vi.mocked(prisma.file.findUnique).mockResolvedValueOnce({ id: 'file-1' } as any);
 
+    const formData = new FormData();
+    formData.append('title', 'Test');
+    formData.append('slug', 'test-file');
+    formData.append('file', new File(['<html></html>'], 'test-file.html', { type: 'text/html' }));
     const req = new Request('http://localhost/api/workspace/test-customer/files', {
       method: 'POST',
-      body: JSON.stringify({ title: 'Test', slug: 'test-file', file: '<html></html>' }),
+      body: formData,
     });
     const res = await POST(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
     expect(res.status).toBe(409);
@@ -159,9 +177,14 @@ describe('POST /api/workspace/[customer_slug]/files', () => {
       updatedAt: new Date(),
     });
 
+    const formData = new FormData();
+    formData.append('title', 'Test');
+    formData.append('slug', 'test-file');
+    formData.append('file', new File(['<html></html>'], 'test-file.html', { type: 'text/html' }));
+    formData.append('tags', 'test');
     const req = new Request('http://localhost/api/workspace/test-customer/files', {
       method: 'POST',
-      body: JSON.stringify({ title: 'Test', slug: 'test-file', file: '<html></html>', tags: ['test'] }),
+      body: formData,
     });
     const res = await POST(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
     expect(res.status).toBe(200);

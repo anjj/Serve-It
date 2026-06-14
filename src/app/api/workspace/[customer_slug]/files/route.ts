@@ -39,10 +39,46 @@ export async function POST(req: Request, { params }: { params: Promise<{ custome
     if (!customer) return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
     if (!isAdmin && customer.users.length === 0) return NextResponse.json({ error: "Access denied" }, { status: 403 });
 
-    const data = await req.json();
-    const { title, slug, file, tags, metadata } = data;
-    if (!title || !slug || !file) {
+    const formData = await req.formData();
+    const title = formData.get("title") as string;
+    const slug = formData.get("slug") as string;
+    const fileEntry = formData.get("file");
+    const tagsRaw = formData.get("tags") as string;
+    const metadataRaw = formData.get("metadata") as string;
+
+    if (!title || !slug || !fileEntry) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    let file = "";
+    if (fileEntry instanceof File) {
+      file = await fileEntry.text();
+    } else if (typeof fileEntry === "string") {
+      file = fileEntry;
+    } else {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    if (!file) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    let tags: string[] = [];
+    if (tagsRaw) {
+      try {
+        tags = JSON.parse(tagsRaw);
+      } catch {
+        tags = tagsRaw.split(",").map(t => t.trim()).filter(Boolean);
+      }
+    }
+
+    let metadata = {};
+    if (metadataRaw) {
+      try {
+        metadata = JSON.parse(metadataRaw);
+      } catch {
+        // Fallback
+      }
     }
 
     const existingFile = await prisma.file.findUnique({
