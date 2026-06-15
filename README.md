@@ -37,7 +37,12 @@ The application's core functionality is organized into distinct business domains
 - pnpm
 
 ### 2. Startup
-1. Run local dependencies:
+1. Environment Setup:
+   Copy the example environment variables file and fill in your values, particularly for Microsoft Entra ID (Azure AD) if you wish to test SSO.
+   ```bash
+   cp .env.example .env
+   ```
+2. Run local dependencies:
    ```bash
    docker compose up -d
    ```
@@ -50,4 +55,18 @@ The application's core functionality is organized into distinct business domains
    ```bash
    pnpm run dev
    ```
-4. Access the sign-in page at `http://localhost:3000/auth/signin` and click "Bypass: Sign in as Developer Admin".
+4. Access the sign-in page at `http://localhost:3000/auth/signin`. In development mode, you can click "Bypass: Sign in as Developer Admin" to skip SSO. Otherwise, use Microsoft Entra ID with the configured `.env` credentials.
+
+---
+
+## 🔐 Microsoft Entra ID (Azure AD) SSO Setup
+
+To enable login with Microsoft Entra ID, you must configure your application in the Azure Portal and provide the credentials in your `.env` file.
+
+1. Register a new application in Microsoft Entra ID.
+2. Under "Authentication", add a Web redirect URI pointing to: `http://localhost:3000/api/auth/callback/azure-ad` (or your production URL).
+3. Under "Certificates & secrets", create a new client secret.
+4. Update your `.env` file with the copied values:
+   - `AZURE_AD_CLIENT_ID`: Application (client) ID
+   - `AZURE_AD_CLIENT_SECRET`: Your generated client secret
+   - `AZURE_AD_TENANT_ID`: Directory (tenant) ID (Providing this restricts login to users from your specific tenant).
