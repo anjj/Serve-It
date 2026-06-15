@@ -1,8 +1,8 @@
 FROM node:20-alpine AS base
+RUN npm i -g pnpm
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
-RUN npm i -g pnpm
 COPY package.json pnpm-lock.yaml* ./
 RUN pnpm i --frozen-lockfile
 FROM base AS builder
