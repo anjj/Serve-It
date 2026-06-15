@@ -1,4 +1,9 @@
-# Serve-it
+<div align="center">
+
+<img src="./docs/serve-it.png" width="600" alt="Serve-it Logo" />
+
+</div>
+
 
 Serve-it is a high-performance, multi-tenant file sharing and serving platform. It enables organizations to create isolated workspaces, manage assets securely, assign API keys for automated ingestion, and serve HTML pages via custom short URLs.
 
@@ -6,14 +11,14 @@ Serve-it is a high-performance, multi-tenant file sharing and serving platform. 
 
 ## 🛠️ Technology Stack
 
-![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat-square&logo=typescript&logoColor=white)
-![Next.js](https://img.shields.io/badge/Next.js-16.2.9-black?style=flat-square&logo=next.js&logoColor=white)
-![React](https://img.shields.io/badge/React-19.2.4-blue?style=flat-square&logo=react&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=flat-square&logo=tailwindcss&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=flat-square&logo=postgresql&logoColor=white)
-![Prisma](https://img.shields.io/badge/Prisma-5.22.0-2D3748?style=flat-square&logo=prisma&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-Storage-3ECF8E?style=flat-square&logo=supabase&logoColor=white)
-![NextAuth](https://img.shields.io/badge/NextAuth.js-v4-5C2D91?style=flat-square&logo=nextauth&logoColor=white)
+   ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat-square&logo=typescript&logoColor=white)
+   ![Next.js](https://img.shields.io/badge/Next.js-16.2.9-black?style=flat-square&logo=next.js&logoColor=white)
+   ![React](https://img.shields.io/badge/React-19.2.4-blue?style=flat-square&logo=react&logoColor=white)
+   ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=flat-square&logo=tailwindcss&logoColor=white)
+   ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+   ![Prisma](https://img.shields.io/badge/Prisma-5.22.0-2D3748?style=flat-square&logo=prisma&logoColor=white)
+   ![Supabase](https://img.shields.io/badge/Supabase-Storage-3ECF8E?style=flat-square&logo=supabase&logoColor=white)
+   ![NextAuth](https://img.shields.io/badge/NextAuth.js-v4-5C2D91?style=flat-square&logo=nextauth&logoColor=white)
 
 ---
 
