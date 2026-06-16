@@ -32,7 +32,12 @@ describe('UploadModal Component', () => {
     expect(screen.getByLabelText(/url slug/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/tags/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/select html file/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /upload/i })).toBeInTheDocument();
+    const uploadBtn = screen.getByRole('button', { name: /upload/i });
+    expect(uploadBtn).toBeInTheDocument();
+    expect(uploadBtn).toHaveClass('bg-zinc-900');
+    
+    const modalContainer = screen.getByText('Upload HTML Document').parentElement;
+    expect(modalContainer).toHaveClass('dark:bg-[#121827]');
   });
 
   it('validates required fields on submit', async () => {

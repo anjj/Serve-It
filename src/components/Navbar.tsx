@@ -3,8 +3,9 @@
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOut, LayoutDashboard, Settings } from "lucide-react";
+import { LogOut, LayoutDashboard, Settings, Sun, Moon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTheme } from "./ThemeProvider";
 
 type Customer = { id: string; name: string; slug: string; };
 
@@ -12,6 +13,7 @@ export default function Navbar() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const router = useRouter();
+  const { theme, toggleTheme } = useTheme();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [activeSlug, setActiveSlug] = useState<string>("");
 
@@ -19,8 +21,6 @@ export default function Navbar() {
     if (pathname.startsWith("/dashboard/")) {
       const slug = pathname.split("/")[2];
       if (slug) {
-         // Using a timeout or separate state handler might be preferred to avoid react-hooks warning,
-         // but we suppressed the rule. Doing it anyway to ensure stability.
          setTimeout(() => setActiveSlug(slug), 0);
       }
     }
@@ -50,12 +50,12 @@ export default function Navbar() {
   if (!session) return null;
 
   return (
-    <nav className="bg-white border-b border-gray-200">
+    <nav className="bg-white dark:bg-[#121827] border-b border-gray-200 dark:border-zinc-800 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <span className="text-xl font-bold text-blue-600">Serve-It</span>
+              <span className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Serve-It</span>
             </div>
 
             {customers.length > 0 && (
@@ -63,7 +63,7 @@ export default function Navbar() {
                 <select
                   value={activeSlug}
                   onChange={handleWorkspaceChange}
-                  className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                  className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-zinc-700 focus:outline-none focus:ring-zinc-900 focus:border-zinc-900 dark:focus:ring-zinc-100 dark:focus:border-zinc-100 sm:text-sm rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 transition-colors duration-200"
                 >
                   <option value="" disabled>Select Workspace</option>
                   {customers.map((c) => (
@@ -81,9 +81,9 @@ export default function Navbar() {
                   href={`/dashboard/${activeSlug}`}
                   className={`${
                     pathname.includes("/dashboard")
-                      ? "border-blue-500 text-gray-900"
-                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                      ? "border-zinc-900 dark:border-zinc-100 text-zinc-900 dark:text-zinc-100"
+                      : "border-transparent text-zinc-500 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-700 dark:hover:text-zinc-300"
+                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200`}
                 >
                   <LayoutDashboard className="w-4 h-4 mr-2" />
                   Dashboard
@@ -95,9 +95,9 @@ export default function Navbar() {
                   href="/admin"
                   className={`${
                     pathname.startsWith("/admin")
-                      ? "border-blue-500 text-gray-900"
-                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                      ? "border-zinc-900 dark:border-zinc-100 text-zinc-900 dark:text-zinc-100"
+                      : "border-transparent text-zinc-500 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-700 dark:hover:text-zinc-300"
+                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200`}
                 >
                   <Settings className="w-4 h-4 mr-2" />
                   Admin
@@ -106,12 +106,20 @@ export default function Navbar() {
             </div>
           </div>
           <div className="flex items-center">
-            <span className="text-sm text-gray-500 mr-4">
+            <span className="text-sm text-zinc-500 dark:text-zinc-400 mr-4">
               {session.user?.name || session.user?.email}
             </span>
             <button
+              onClick={toggleTheme}
+              className="p-2 mr-2 rounded-full text-zinc-400 hover:text-zinc-500 dark:text-zinc-400 dark:hover:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 transition-colors duration-200"
+              aria-label="Toggle Theme"
+              title="Toggle Theme"
+            >
+              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+            <button
               onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-              className="p-2 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="p-2 rounded-full text-zinc-400 hover:text-zinc-500 dark:text-zinc-400 dark:hover:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 transition-colors duration-200"
             >
               <span className="sr-only">Sign out</span>
               <LogOut className="h-5 w-5" aria-hidden="true" />
