@@ -19,9 +19,9 @@
 - [x] Task: Refactor Dashboard and Sign-In pages to black & white accent (4a5d99a)
     - [x] Update page tests to expect neutral/black/white styled buttons and input rings (Red Phase)
     - [x] Refactor styles in `src/app/dashboard/[customer_slug]/page.tsx` and `src/app/auth/signin/page.tsx` (Green Phase)
-- [ ] Task: Refactor Admin Pages to black & white accent
-    - [ ] Update admin page tests to check neutral styles instead of blue accents (Red Phase)
-    - [ ] Refactor styles in `src/app/admin/customers/page.tsx` and `src/app/admin/users/page.tsx` (Green Phase)
+- [x] Task: Refactor Admin Pages to black & white accent (dd70d97)
+    - [x] Update admin page tests to check neutral styles instead of blue accents (Red Phase)
+    - [x] Refactor styles in `src/app/admin/customers/page.tsx` and `src/app/admin/users/page.tsx` (Green Phase)
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Theme Toggle UI and Black & White Accent Redesign' (Protocol in workflow.md)
 
 ## Phase 3: Dark Mode Styling (Charcoal / Slate Palette)
