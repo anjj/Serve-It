@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
+import { Key } from "lucide-react";
 
 type User = { id: string; name: string | null; email: string | null; isAdmin: boolean };
 type Customer = { id: string; name: string };
 type UserCustomer = { customer: Customer };
-type UserWithWorkspaces = User & { customers: UserCustomer[] };
+type UserWithWorkspaces = User & { customers: UserCustomer[]; apiKeys?: { id: string }[] };
 
 export default function UsersPage() {
   const [users, setUsers] = useState<UserWithWorkspaces[]>([]);
@@ -72,7 +73,15 @@ export default function UsersPage() {
               <li key={u.id} className="px-6 py-4">
                 <div className="flex justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{u.name || "Unknown"} ({u.email})</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium text-gray-900">{u.name || "Unknown"} ({u.email})</p>
+                      {u.apiKeys && u.apiKeys.length > 0 && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800" title="API Key Generated">
+                          <Key className="w-3 h-3 text-green-600" />
+                          Key Generated
+                        </span>
+                      )}
+                    </div>
                     <div className="mt-1 flex items-center gap-2">
                        <span className="text-sm text-gray-500">Admin:</span>
                        <button
