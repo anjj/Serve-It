@@ -17,3 +17,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: User API Key Indicator in Admin Panel**
   *Link: [./tracks/user_api_key_indicator_20260616/](./tracks/user_api_key_indicator_20260616/)*
 
+---
+
+- [ ] **Track: black-ui-design**
+*Link: [./tracks/black_ui_design_20260616/](./tracks/black_ui_design_20260616/)*
