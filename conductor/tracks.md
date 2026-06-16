@@ -19,5 +19,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: black-ui-design**
+- [x] **Track: black-ui-design**
 *Link: [./tracks/black_ui_design_20260616/](./tracks/black_ui_design_20260616/)*
