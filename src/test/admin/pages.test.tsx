@@ -38,6 +38,7 @@ describe('Admin Pages', () => {
     const createBtn = await screen.findByRole('button', { name: /create customer/i });
     expect(createBtn).toBeInTheDocument();
     expect(createBtn).toHaveClass('bg-zinc-900');
+    expect(createBtn.closest('.max-w-4xl')).toHaveClass('dark:text-zinc-100');
   });
 
   it('renders UsersPage with neutral button styling', async () => {
@@ -45,5 +46,6 @@ describe('Admin Pages', () => {
     const assignBtn = await screen.findByRole('button', { name: /assign/i });
     expect(assignBtn).toBeInTheDocument();
     expect(assignBtn).toHaveClass('bg-zinc-900');
+    expect(assignBtn.closest('.max-w-5xl')).toHaveClass('dark:text-zinc-100');
   });
 });

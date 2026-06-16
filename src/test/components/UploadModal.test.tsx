@@ -35,6 +35,9 @@ describe('UploadModal Component', () => {
     const uploadBtn = screen.getByRole('button', { name: /upload/i });
     expect(uploadBtn).toBeInTheDocument();
     expect(uploadBtn).toHaveClass('bg-zinc-900');
+    
+    const modalContainer = screen.getByText('Upload HTML Document').parentElement;
+    expect(modalContainer).toHaveClass('dark:bg-[#121827]');
   });
 
   it('validates required fields on submit', async () => {
