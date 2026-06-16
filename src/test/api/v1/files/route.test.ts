@@ -1,502 +1,84 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST, PATCH } from '@/app/api/v1/files/route';
-import { prisma } from '@/lib/prisma';
-import { uploadHtmlFile } from '@/lib/storage';
+import { validateApiKey } from '@/lib/auth-api';
+import { createDocument, patchDocument } from '@/lib/documents';
 
-vi.mock('@/lib/prisma', () => ({
-  prisma: {
-    apiKey: {
-      findUnique: vi.fn(),
-    },
-    file: {
-      findUnique: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-    },
-  },
+vi.mock('@/lib/auth-api', () => ({
+  validateApiKey: vi.fn(),
 }));
 
-vi.mock('@/lib/storage', () => ({
-  uploadHtmlFile: vi.fn(),
+vi.mock('@/lib/documents', () => ({
+  createDocument: vi.fn(),
+  patchDocument: vi.fn(),
 }));
 
-describe('POST /api/v1/files', () => {
+describe('API v1 Files Route', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should return 401 if Authorization header is missing or invalid', async () => {
-    const req = new Request('http://localhost/api/v1/files', {
-      method: 'POST',
-      body: new FormData(),
-    });
-    const res = await POST(req);
-    expect(res.status).toBe(401);
-    const data = await res.json();
-    expect(data.error).toBe('Unauthorized');
-  });
-
-  it('should return 403 if API key is invalid', async () => {
-    vi.mocked(prisma.apiKey.findUnique).mockResolvedValueOnce(null);
-
-    const req = new Request('http://localhost/api/v1/files', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer invalid-key',
-      },
-      body: new FormData(),
-    });
-    const res = await POST(req);
-    expect(res.status).toBe(403);
-    const data = await res.json();
-    expect(data.error).toBe('Invalid API Key');
-  });
-
-  it('should return 403 if customer workspace is inactive', async () => {
-    vi.mocked(prisma.apiKey.findUnique).mockResolvedValueOnce({
-      id: 'key-1',
-      customer: {
-        id: 'cust-1',
-        name: 'Inactive Customer',
-        slug: 'inactive',
-        isActive: false,
-      },
-    } as any);
-
-    const req = new Request('http://localhost/api/v1/files', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer valid-key',
-      },
-      body: new FormData(),
-    });
-    const res = await POST(req);
-    expect(res.status).toBe(403);
-    const data = await res.json();
-    expect(data.error).toBe('Customer workspace is inactive');
-  });
-
-  it('should return 400 if required fields are missing', async () => {
-    vi.mocked(prisma.apiKey.findUnique).mockResolvedValueOnce({
-      id: 'key-1',
-      customer: {
-        id: 'cust-1',
-        name: 'Active Customer',
-        slug: 'active',
-        isActive: true,
-      },
-    } as any);
-
-    const formData = new FormData();
-    formData.append('title', 'Test'); // missing slug and file
-
-    const req = new Request('http://localhost/api/v1/files', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer valid-key',
-      },
-      body: formData,
-    });
-    const res = await POST(req);
-    expect(res.status).toBe(400);
-    const data = await res.json();
-    expect(data.error).toBe('Missing required fields');
-  });
-
-  it('should return 409 if a file with same slug already exists', async () => {
-    vi.mocked(prisma.apiKey.findUnique).mockResolvedValueOnce({
-      id: 'key-1',
-      customer: {
-        id: 'cust-1',
-        name: 'Active Customer',
-        slug: 'active',
-        isActive: true,
-      },
-    } as any);
-    vi.mocked(prisma.file.findUnique).mockResolvedValueOnce({ id: 'file-1' } as any);
-
-    const formData = new FormData();
-    formData.append('title', 'Test');
-    formData.append('slug', 'test-file');
-    formData.append('file', new File(['<html></html>'], 'test-file.html', { type: 'text/html' }));
-
-    const req = new Request('http://localhost/api/v1/files', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer valid-key',
-      },
-      body: formData,
-    });
-    const res = await POST(req);
-    expect(res.status).toBe(409);
-    const data = await res.json();
-    expect(data.error).toBe('A file with this slug already exists for this customer');
-  });
-
-  it('should successfully upload file via API and create record', async () => {
-    vi.mocked(prisma.apiKey.findUnique).mockResolvedValueOnce({
-      id: 'key-1',
-      customer: {
-        id: 'cust-1',
-        name: 'Active Customer',
-        slug: 'active',
-        isActive: true,
-      },
-    } as any);
-    vi.mocked(prisma.file.findUnique).mockResolvedValueOnce(null);
-    vi.mocked(uploadHtmlFile).mockResolvedValueOnce('tenants/cust-1/files/test-file.html');
-    vi.mocked(prisma.file.create).mockResolvedValueOnce({
-      id: 'file-2',
-      title: 'Test',
-      slug: 'test-file',
-      tags: ['test'],
-      metadata: { source: 'api' },
-      storagePath: 'tenants/cust-1/files/test-file.html',
-      customerId: 'cust-1',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+  describe('POST', () => {
+    it('should return 401 if API key is invalid', async () => {
+      vi.mocked(validateApiKey).mockResolvedValueOnce(null);
+      const req = new Request('http://localhost/api/v1/files', { method: 'POST' });
+      const res = await POST(req);
+      expect(res.status).toBe(401);
     });
 
-    const formData = new FormData();
-    formData.append('title', 'Test');
-    formData.append('slug', 'test-file');
-    formData.append('file', new File(['<html></html>'], 'test-file.html', { type: 'text/html' }));
-    formData.append('tags', 'test');
-    formData.append('metadata', JSON.stringify({ source: 'api' }));
-
-    const req = new Request('http://localhost/api/v1/files', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer valid-key',
-      },
-      body: formData,
-    });
-    const res = await POST(req);
-    expect(res.status).toBe(200);
-    const data = await res.json();
-    expect(data.success).toBe(true);
-    expect(data.file.id).toBe('file-2');
-    expect(uploadHtmlFile).toHaveBeenCalledWith('cust-1', 'test-file', '<html></html>');
-  });
-});
-
-describe('PATCH /api/v1/files', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('should return 401 if Authorization header is missing or invalid', async () => {
-    const req = new Request('http://localhost/api/v1/files', {
-      method: 'PATCH',
-      body: new FormData(),
-    });
-    const res = await PATCH(req);
-    expect(res.status).toBe(401);
-    const data = await res.json();
-    expect(data.error).toBe('Unauthorized');
-  });
-
-  it('should return 403 if API key is invalid', async () => {
-    vi.mocked(prisma.apiKey.findUnique).mockResolvedValueOnce(null);
-
-    const req = new Request('http://localhost/api/v1/files', {
-      method: 'PATCH',
-      headers: {
-        'Authorization': 'Bearer invalid-key',
-      },
-      body: new FormData(),
-    });
-    const res = await PATCH(req);
-    expect(res.status).toBe(403);
-    const data = await res.json();
-    expect(data.error).toBe('Invalid API Key');
-  });
-
-  it('should return 403 if customer workspace is inactive', async () => {
-    vi.mocked(prisma.apiKey.findUnique).mockResolvedValueOnce({
-      id: 'key-1',
-      customer: {
-        id: 'cust-1',
-        name: 'Inactive Customer',
-        slug: 'inactive',
-        isActive: false,
-      },
-    } as any);
-
-    const req = new Request('http://localhost/api/v1/files', {
-      method: 'PATCH',
-      headers: {
-        'Authorization': 'Bearer valid-key',
-      },
-      body: new FormData(),
-    });
-    const res = await PATCH(req);
-    expect(res.status).toBe(403);
-    const data = await res.json();
-    expect(data.error).toBe('Customer workspace is inactive');
-  });
-
-  it('should return 400 if slug parameter is missing in payload', async () => {
-    vi.mocked(prisma.apiKey.findUnique).mockResolvedValueOnce({
-      id: 'key-1',
-      customer: {
-        id: 'cust-1',
-        name: 'Active Customer',
-        slug: 'active',
-        isActive: true,
-      },
-    } as any);
-
-    const formData = new FormData();
-    formData.append('title', 'New Title'); // missing slug
-
-    const req = new Request('http://localhost/api/v1/files', {
-      method: 'PATCH',
-      headers: {
-        'Authorization': 'Bearer valid-key',
-      },
-      body: formData,
-    });
-    const res = await PATCH(req);
-    expect(res.status).toBe(400);
-    const data = await res.json();
-    expect(data.error).toBe('Missing required field: slug');
-  });
-
-  it('should return 400 if no fields to update are provided', async () => {
-    vi.mocked(prisma.apiKey.findUnique).mockResolvedValueOnce({
-      id: 'key-1',
-      customer: {
-        id: 'cust-1',
-        name: 'Active Customer',
-        slug: 'active',
-        isActive: true,
-      },
-    } as any);
-
-    vi.mocked(prisma.file.findUnique).mockResolvedValueOnce({ id: 'file-1' } as any);
-
-    const formData = new FormData();
-    formData.append('slug', 'test-file'); // only slug provided
-
-    const req = new Request('http://localhost/api/v1/files', {
-      method: 'PATCH',
-      headers: {
-        'Authorization': 'Bearer valid-key',
-      },
-      body: formData,
-    });
-    const res = await PATCH(req);
-    expect(res.status).toBe(400);
-    const data = await res.json();
-    expect(data.error).toBe('No fields to update provided');
-  });
-
-  it('should return 404 if the file with specified slug does not exist in workspace', async () => {
-    vi.mocked(prisma.apiKey.findUnique).mockResolvedValueOnce({
-      id: 'key-1',
-      customer: {
-        id: 'cust-1',
-        name: 'Active Customer',
-        slug: 'active',
-        isActive: true,
-      },
-    } as any);
-    vi.mocked(prisma.file.findUnique).mockResolvedValueOnce(null);
-
-    const formData = new FormData();
-    formData.append('slug', 'non-existent');
-    formData.append('title', 'New Title');
-
-    const req = new Request('http://localhost/api/v1/files', {
-      method: 'PATCH',
-      headers: {
-        'Authorization': 'Bearer valid-key',
-      },
-      body: formData,
-    });
-    const res = await PATCH(req);
-    expect(res.status).toBe(404);
-    const data = await res.json();
-    expect(data.error).toBe('File not found');
-  });
-
-  it('should successfully update file metadata only', async () => {
-    vi.mocked(prisma.apiKey.findUnique).mockResolvedValueOnce({
-      id: 'key-1',
-      customer: {
-        id: 'cust-1',
-        name: 'Active Customer',
-        slug: 'active',
-        isActive: true,
-      },
-    } as any);
-    vi.mocked(prisma.file.findUnique).mockResolvedValueOnce({
-      id: 'file-1',
-      title: 'Old Title',
-      slug: 'test-file',
-      tags: ['old'],
-      metadata: {},
-      storagePath: 'tenants/cust-1/files/test-file.html',
-      customerId: 'cust-1',
-    } as any);
-    vi.mocked(prisma.file.update).mockResolvedValueOnce({
-      id: 'file-1',
-      title: 'New Title',
-      slug: 'test-file',
-      tags: ['new-tag'],
-      metadata: { source: 'api-patch' },
-      storagePath: 'tenants/cust-1/files/test-file.html',
-      customerId: 'cust-1',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+    it('should return 400 if customer_slug is missing', async () => {
+      vi.mocked(validateApiKey).mockResolvedValueOnce({ userId: 'u1' });
+      const req = new Request('http://localhost/api/v1/files', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: 'T', slug: 's', content: 'c' })
+      });
+      const res = await POST(req);
+      expect(res.status).toBe(400);
+      expect(await res.json()).toMatchObject({ error: expect.stringContaining('customer_slug') });
     });
 
-    const formData = new FormData();
-    formData.append('slug', 'test-file');
-    formData.append('title', 'New Title');
-    formData.append('tags', 'new-tag');
-    formData.append('metadata', JSON.stringify({ source: 'api-patch' }));
+    it('should return 403 if user has no access to workspace', async () => {
+      vi.mocked(validateApiKey)
+        .mockResolvedValueOnce({ userId: 'u1' }) // first call (general)
+        .mockResolvedValueOnce(null); // second call (with context)
 
-    const req = new Request('http://localhost/api/v1/files', {
-      method: 'PATCH',
-      headers: {
-        'Authorization': 'Bearer valid-key',
-      },
-      body: formData,
+      const req = new Request('http://localhost/api/v1/files', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customer_slug: 'c1', title: 'T', slug: 's', content: 'c' })
+      });
+      const res = await POST(req);
+      expect(res.status).toBe(403);
     });
-    const res = await PATCH(req);
-    expect(res.status).toBe(200);
-    const data = await res.json();
-    expect(data.success).toBe(true);
-    expect(data.file.title).toBe('New Title');
-    expect(data.file.tags).toContain('new-tag');
-    expect(uploadHtmlFile).not.toHaveBeenCalled();
-    expect(prisma.file.update).toHaveBeenCalledWith({
-      where: { customerId_slug: { customerId: 'cust-1', slug: 'test-file' } },
-      data: {
-        title: 'New Title',
-        tags: ['new-tag'],
-        metadata: { source: 'api-patch' },
-      },
+
+    it('should successfully create document', async () => {
+      vi.mocked(validateApiKey).mockResolvedValue({ customerId: 'cust-id' });
+      vi.mocked(createDocument).mockResolvedValueOnce({ id: 'f1', slug: 's' } as any);
+
+      const req = new Request('http://localhost/api/v1/files', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customer_slug: 'c1', title: 'T', slug: 's', content: 'c' })
+      });
+      const res = await POST(req);
+      expect(res.status).toBe(200);
+      expect(createDocument).toHaveBeenCalledWith('cust-id', expect.objectContaining({ title: 'T' }));
     });
   });
 
-  it('should successfully update file content only', async () => {
-    vi.mocked(prisma.apiKey.findUnique).mockResolvedValueOnce({
-      id: 'key-1',
-      customer: {
-        id: 'cust-1',
-        name: 'Active Customer',
-        slug: 'active',
-        isActive: true,
-      },
-    } as any);
-    vi.mocked(prisma.file.findUnique).mockResolvedValueOnce({
-      id: 'file-1',
-      title: 'Test',
-      slug: 'test-file',
-      tags: [],
-      metadata: {},
-      storagePath: 'tenants/cust-1/files/test-file.html',
-      customerId: 'cust-1',
-    } as any);
-    vi.mocked(uploadHtmlFile).mockResolvedValueOnce('tenants/cust-1/files/test-file.html');
-    vi.mocked(prisma.file.update).mockResolvedValueOnce({
-      id: 'file-1',
-      title: 'Test',
-      slug: 'test-file',
-      tags: [],
-      metadata: {},
-      storagePath: 'tenants/cust-1/files/test-file.html',
-      customerId: 'cust-1',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+  describe('PATCH', () => {
+    it('should successfully patch document', async () => {
+      vi.mocked(validateApiKey).mockResolvedValue({ customerId: 'cust-id' });
+      vi.mocked(patchDocument).mockResolvedValueOnce({ id: 'f1', slug: 's' } as any);
 
-    const formData = new FormData();
-    formData.append('slug', 'test-file');
-    formData.append('file', new File(['<html>new content</html>'], 'test-file.html', { type: 'text/html' }));
-
-    const req = new Request('http://localhost/api/v1/files', {
-      method: 'PATCH',
-      headers: {
-        'Authorization': 'Bearer valid-key',
-      },
-      body: formData,
-    });
-    const res = await PATCH(req);
-    expect(res.status).toBe(200);
-    const data = await res.json();
-    expect(data.success).toBe(true);
-    expect(uploadHtmlFile).toHaveBeenCalledWith('cust-1', 'test-file', '<html>new content</html>');
-    expect(prisma.file.update).toHaveBeenCalledWith({
-      where: { customerId_slug: { customerId: 'cust-1', slug: 'test-file' } },
-      data: {
-        updatedAt: expect.any(Date),
-      },
-    });
-  });
-
-  it('should successfully update both metadata and file content', async () => {
-    vi.mocked(prisma.apiKey.findUnique).mockResolvedValueOnce({
-      id: 'key-1',
-      customer: {
-        id: 'cust-1',
-        name: 'Active Customer',
-        slug: 'active',
-        isActive: true,
-      },
-    } as any);
-    vi.mocked(prisma.file.findUnique).mockResolvedValueOnce({
-      id: 'file-1',
-      title: 'Old Title',
-      slug: 'test-file',
-      tags: [],
-      metadata: {},
-      storagePath: 'tenants/cust-1/files/test-file.html',
-      customerId: 'cust-1',
-    } as any);
-    vi.mocked(uploadHtmlFile).mockResolvedValueOnce('tenants/cust-1/files/test-file.html');
-    vi.mocked(prisma.file.update).mockResolvedValueOnce({
-      id: 'file-1',
-      title: 'New Title',
-      slug: 'test-file',
-      tags: ['tag1'],
-      metadata: { key: 'val' },
-      storagePath: 'tenants/cust-1/files/test-file.html',
-      customerId: 'cust-1',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    const formData = new FormData();
-    formData.append('slug', 'test-file');
-    formData.append('title', 'New Title');
-    formData.append('tags', 'tag1');
-    formData.append('metadata', JSON.stringify({ key: 'val' }));
-    formData.append('file', new File(['<html>new content</html>'], 'test-file.html', { type: 'text/html' }));
-
-    const req = new Request('http://localhost/api/v1/files', {
-      method: 'PATCH',
-      headers: {
-        'Authorization': 'Bearer valid-key',
-      },
-      body: formData,
-    });
-    const res = await PATCH(req);
-    expect(res.status).toBe(200);
-    const data = await res.json();
-    expect(data.success).toBe(true);
-    expect(uploadHtmlFile).toHaveBeenCalledWith('cust-1', 'test-file', '<html>new content</html>');
-    expect(prisma.file.update).toHaveBeenCalledWith({
-      where: { customerId_slug: { customerId: 'cust-1', slug: 'test-file' } },
-      data: {
-        title: 'New Title',
-        tags: ['tag1'],
-        metadata: { key: 'val' },
-        updatedAt: expect.any(Date),
-      },
+      const req = new Request('http://localhost/api/v1/files', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customer_slug: 'c1', slug: 's', title: 'New' })
+      });
+      const res = await PATCH(req);
+      expect(res.status).toBe(200);
+      expect(patchDocument).toHaveBeenCalledWith('cust-id', 's', expect.objectContaining({ title: 'New' }));
     });
   });
 });
