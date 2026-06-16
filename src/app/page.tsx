@@ -38,7 +38,7 @@ export default function Home() {
           </p>
           <div className="flex items-center gap-4">
             <Link
-              href="#"
+              href="https://github.com/anjj/serve-it"
               className="flex items-center gap-2 hover:text-zinc-900 transition-colors"
             >
               <FaGithub className="w-4 h-4" />
