@@ -9,8 +9,8 @@
     - [x] Create `conductor/skills/init/SKILL.md`
 - [x] Task: Create AI Agent rules file [3b240c0]
     - [x] Create `conductor/agent-rules.md` detailing collaboration, state sharing, and handoff protocols between Gemini and Jules
-- [ ] Task: Create master `GEMINI.md` in repository root
-    - [ ] Create `GEMINI.md` linking to `conductor/` guidelines and `conductor/agent-rules.md`
+- [x] Task: Create master `GEMINI.md` in repository root [f3e13dc]
+    - [x] Create `GEMINI.md` linking to `conductor/` guidelines and `conductor/agent-rules.md`
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Shared Skills Setup' (Protocol in workflow.md)
 
 ## Phase 2: Index and Graph Integration
