@@ -10,9 +10,9 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Theme Infrastructure and CSS Variables' (Protocol in workflow.md)
 
 ## Phase 2: Theme Toggle UI and Black & White Accent Redesign (Light Theme)
-- [ ] Task: Add theme toggle component in Navbar
-    - [ ] Write unit tests for the theme toggle trigger (Red Phase)
-    - [ ] Implement theme toggle trigger (sun/moon icons) in `src/components/Navbar.tsx` (Green Phase)
+- [x] Task: Add theme toggle component in Navbar (5e8b5cd)
+    - [x] Write unit tests for the theme toggle trigger (Red Phase)
+    - [x] Implement theme toggle trigger (sun/moon icons) in `src/components/Navbar.tsx` (Green Phase)
 - [ ] Task: Refactor Navbar and UploadModal to black & white accent
     - [ ] Update tests in `UploadModal.test.tsx` and `Navbar.test.tsx` to assert new black/white classes and behavior (Red Phase)
     - [ ] Replace `blue-*` classes with `zinc-*`/`black`/`white` style tokens in `src/components/Navbar.tsx` and `src/components/UploadModal.tsx` (Green Phase)
