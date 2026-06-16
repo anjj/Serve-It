@@ -7,16 +7,16 @@ Welcome, AI Agent! This repository is configured with a structured development w
 ## 1. Project Context & Rules
 
 All core specifications, guidelines, and rules are located under the `conductor/` directory. Before writing any code, you must read:
-- **Project Context & Tech Stack:** [conductor/index.md](file:///home/andres.julian/github/serve-it/conductor/index.md)
-- **Workflow & TDD Guidelines:** [conductor/workflow.md](file:///home/andres.julian/github/serve-it/conductor/workflow.md)
-- **AI Agent Collaboration Rules:** [conductor/agent-rules.md](file:///home/andres.julian/github/serve-it/conductor/agent-rules.md)
+- **Project Context & Tech Stack:** [conductor/index.md](./conductor/index.md)
+- **Workflow & TDD Guidelines:** [conductor/workflow.md](./conductor/workflow.md)
+- **AI Agent Collaboration Rules:** [conductor/agent-rules.md](./conductor/agent-rules.md)
 
 ---
 
 ## 2. Active Tracks & Tasks
 
 To check current development tracks, status, or to start a new track:
-- **Tracks Registry:** [conductor/tracks.md](file:///home/andres.julian/github/serve-it/conductor/tracks.md)
+- **Tracks Registry:** [conductor/tracks.md](./conductor/tracks.md)
 
 ---
 

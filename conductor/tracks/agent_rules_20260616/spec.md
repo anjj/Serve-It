@@ -11,7 +11,7 @@ This track introduces clear, shareable guidelines and local agent rules within t
    - Define roles and boundaries for Gemini and Jules.
    - Specify cooperation, handoff protocols, git hygiene, and how state is communicated during task execution.
 3. **Repository-Level Skills (`conductor/skills/`):**
-   - Copy the `ddd-conductor` skills (`ddd-nextjs`, `ddd-generic`, `doc-driven-planning`, `doc-driven-review`, `init`) into `conductor/skills/`.
+   - Copy the `ddd-conductor` skills (`doc-driven-planning`, `doc-driven-review`) into `conductor/skills/`.
    - Update instructions to clarify that agents must load and follow these skills.
 
 ## Non-Functional Requirements
@@ -21,7 +21,7 @@ This track introduces clear, shareable guidelines and local agent rules within t
 ## Acceptance Criteria
 - [ ] `GEMINI.md` exists in the repository root and links to the Conductor documentation.
 - [ ] `conductor/agent-rules.md` is present and details collaboration/handoff protocols between Gemini and Jules.
-- [ ] The `conductor/skills/` directory contains all 5 `ddd-conductor` skills (`ddd-nextjs`, `ddd-generic`, `doc-driven-planning`, `doc-driven-review`, `init`).
+- [ ] The `conductor/skills/` directory contains the `ddd-conductor` planning and review skills (`doc-driven-planning`, `doc-driven-review`).
 - [ ] `conductor/index.md` is updated to register the new files.
 - [ ] `graphify update .` is executed and runs successfully.
 
