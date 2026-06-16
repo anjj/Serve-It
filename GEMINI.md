@@ -1,6 +1,6 @@
 # Gemini & Jules AI Developer Workspace
 
-Welcome, AI Agent! This repository is configured with a structured development workflow and specific collaboration protocols that you MUST follow.
+This repository is configured with a structured development workflow and specific collaboration protocols that you MUST follow.
 
 ---
 
@@ -31,4 +31,3 @@ To check current development tracks, status, or to start a new track:
    - Commit code with conventional commit messages.
    - Attach a Git Note summary to the commit.
    - Update the plan file task status to `[x]` with the commit SHA and commit the plan.
-4. **Synchronize Graph:** Run `graphify update .` to keep the AST reference graph current.

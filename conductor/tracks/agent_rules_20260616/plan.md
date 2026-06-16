@@ -13,6 +13,6 @@
 ## Phase 2: Index and Graph Integration
 - [x] Task: Register new files in Conductor index [9e4de2c]
     - [x] Update `conductor/index.md` to reference `GEMINI.md`, `agent-rules.md`, and the copied skills
-- [ ] Task: Run graphify update to index all new files
+- [~] Task: Run graphify update to index all new files
     - [ ] Execute `graphify update .` to update the knowledge graph
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Index and Graph Integration' (Protocol in workflow.md)
