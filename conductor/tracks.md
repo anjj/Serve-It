@@ -9,5 +9,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Gemini & Jules Agent Rules**
+- [x] **Track: Gemini & Jules Agent Rules**
 *Link: [./tracks/agent_rules_20260616/](./tracks/agent_rules_20260616/)*
