@@ -1,13 +1,13 @@
 # Implementation Plan - Black & White Theme and Dark Mode (black-ui-design)
 
-## Phase 1: Theme Infrastructure and CSS Variables
-- [ ] Task: Set up ThemeProvider and core infrastructure
-    - [ ] Write unit tests for ThemeProvider component (Red Phase)
-    - [ ] Implement `src/components/ThemeProvider.tsx` and wrap app in `src/components/Providers.tsx` (Green Phase)
-- [ ] Task: Configure CSS variables and Tailwind colors
-    - [ ] Write/verify theme-aware test assertions
-    - [ ] Update `src/app/globals.css` with dark mode variables, background, foreground, and border color rules (Green Phase)
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Theme Infrastructure and CSS Variables' (Protocol in workflow.md)
+## Phase 1: Theme Infrastructure and CSS Variables [checkpoint: 11923a9]
+- [x] Task: Set up ThemeProvider and core infrastructure
+    - [x] Write unit tests for ThemeProvider component (Red Phase)
+    - [x] Implement `src/components/ThemeProvider.tsx` and wrap app in `src/components/Providers.tsx` (Green Phase)
+- [x] Task: Configure CSS variables and Tailwind colors
+    - [x] Write/verify theme-aware test assertions
+    - [x] Update `src/app/globals.css` with dark mode variables, background, foreground, and border color rules (Green Phase)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Theme Infrastructure and CSS Variables' (Protocol in workflow.md)
 
 ## Phase 2: Theme Toggle UI and Black & White Accent Redesign (Light Theme)
 - [ ] Task: Add theme toggle component in Navbar
