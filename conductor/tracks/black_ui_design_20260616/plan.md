@@ -9,7 +9,7 @@
     - [x] Update `src/app/globals.css` with dark mode variables, background, foreground, and border color rules (Green Phase)
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Theme Infrastructure and CSS Variables' (Protocol in workflow.md)
 
-## Phase 2: Theme Toggle UI and Black & White Accent Redesign (Light Theme)
+## Phase 2: Theme Toggle UI and Black & White Accent Redesign (Light Theme) [checkpoint: ac8b297]
 - [x] Task: Add theme toggle component in Navbar (5e8b5cd)
     - [x] Write unit tests for the theme toggle trigger (Red Phase)
     - [x] Implement theme toggle trigger (sun/moon icons) in `src/components/Navbar.tsx` (Green Phase)
@@ -22,7 +22,7 @@
 - [x] Task: Refactor Admin Pages to black & white accent (dd70d97)
     - [x] Update admin page tests to check neutral styles instead of blue accents (Red Phase)
     - [x] Refactor styles in `src/app/admin/customers/page.tsx` and `src/app/admin/users/page.tsx` (Green Phase)
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Theme Toggle UI and Black & White Accent Redesign' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Theme Toggle UI and Black & White Accent Redesign' (Protocol in workflow.md)
 
 ## Phase 3: Dark Mode Styling (Charcoal / Slate Palette)
 - [ ] Task: Implement dark mode styles for global layouts
