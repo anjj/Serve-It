@@ -16,9 +16,9 @@
 - [x] Task: Refactor Navbar and UploadModal to black & white accent (817cd2f)
     - [x] Update tests in `UploadModal.test.tsx` and `Navbar.test.tsx` to assert new black/white classes and behavior (Red Phase)
     - [x] Replace `blue-*` classes with `zinc-*`/`black`/`white` style tokens in `src/components/Navbar.tsx` and `src/components/UploadModal.tsx` (Green Phase)
-- [ ] Task: Refactor Dashboard and Sign-In pages to black & white accent
-    - [ ] Update page tests to expect neutral/black/white styled buttons and input rings (Red Phase)
-    - [ ] Refactor styles in `src/app/dashboard/[customer_slug]/page.tsx` and `src/app/auth/signin/page.tsx` (Green Phase)
+- [x] Task: Refactor Dashboard and Sign-In pages to black & white accent (4a5d99a)
+    - [x] Update page tests to expect neutral/black/white styled buttons and input rings (Red Phase)
+    - [x] Refactor styles in `src/app/dashboard/[customer_slug]/page.tsx` and `src/app/auth/signin/page.tsx` (Green Phase)
 - [ ] Task: Refactor Admin Pages to black & white accent
     - [ ] Update admin page tests to check neutral styles instead of blue accents (Red Phase)
     - [ ] Refactor styles in `src/app/admin/customers/page.tsx` and `src/app/admin/users/page.tsx` (Green Phase)
