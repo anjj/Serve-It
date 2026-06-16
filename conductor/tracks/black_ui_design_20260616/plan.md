@@ -13,9 +13,9 @@
 - [x] Task: Add theme toggle component in Navbar (5e8b5cd)
     - [x] Write unit tests for the theme toggle trigger (Red Phase)
     - [x] Implement theme toggle trigger (sun/moon icons) in `src/components/Navbar.tsx` (Green Phase)
-- [ ] Task: Refactor Navbar and UploadModal to black & white accent
-    - [ ] Update tests in `UploadModal.test.tsx` and `Navbar.test.tsx` to assert new black/white classes and behavior (Red Phase)
-    - [ ] Replace `blue-*` classes with `zinc-*`/`black`/`white` style tokens in `src/components/Navbar.tsx` and `src/components/UploadModal.tsx` (Green Phase)
+- [x] Task: Refactor Navbar and UploadModal to black & white accent (817cd2f)
+    - [x] Update tests in `UploadModal.test.tsx` and `Navbar.test.tsx` to assert new black/white classes and behavior (Red Phase)
+    - [x] Replace `blue-*` classes with `zinc-*`/`black`/`white` style tokens in `src/components/Navbar.tsx` and `src/components/UploadModal.tsx` (Green Phase)
 - [ ] Task: Refactor Dashboard and Sign-In pages to black & white accent
     - [ ] Update page tests to expect neutral/black/white styled buttons and input rings (Red Phase)
     - [ ] Refactor styles in `src/app/dashboard/[customer_slug]/page.tsx` and `src/app/auth/signin/page.tsx` (Green Phase)
