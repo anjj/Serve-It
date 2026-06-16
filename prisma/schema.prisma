@@ -42,10 +42,10 @@ model User {
   emailVerified DateTime?
   image         String?
   isAdmin       Boolean   @default(false)
+
   accounts      Account[]
   sessions      Session[]
   customers     UserCustomer[]
-  apiKeys       ApiKey[]
 }
 
 model VerificationToken {
@@ -58,29 +58,28 @@ model VerificationToken {
 
 // Application models
 model Customer {
-  id           String   @id @default(cuid())
-  name         String
-  slug         String   @unique
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
   passwordHash String
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  users   UserCustomer[]
-  files   File[]
-  apiKeys ApiKey[]
+  users     UserCustomer[]
+  files     File[]
+  apiKeys   ApiKey[]
 }
 
 model ApiKey {
   id         String   @id @default(cuid())
   keyHash    String   @unique
   name       String
-  customerId String?
-  userId     String?
+  customerId String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 }
 
 model UserCustomer {
@@ -89,24 +88,24 @@ model UserCustomer {
   customerId String
   createdAt  DateTime @default(now())
 
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   @@unique([userId, customerId])
 }
 
 model File {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String
-  tags        String[]
-  metadata    Json?
-  storagePath String
-  customerId  String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  title        String
+  slug         String
+  tags         String[]
+  metadata     Json?
+  storagePath  String
+  customerId   String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customer     Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   @@unique([customerId, slug])
 }

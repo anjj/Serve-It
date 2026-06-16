@@ -15,7 +15,6 @@ export async function POST(req: Request) {
     if (!apiKeyRecord) return NextResponse.json({ error: "Invalid API Key" }, { status: 403 });
 
     const customer = apiKeyRecord.customer;
-    if (!customer) return NextResponse.json({ error: "API Key not associated with a customer" }, { status: 403 });
     if (!customer.isActive) return NextResponse.json({ error: "Customer workspace is inactive" }, { status: 403 });
 
     const formData = await req.formData();
@@ -85,7 +84,6 @@ export async function PATCH(req: Request) {
     if (!apiKeyRecord) return NextResponse.json({ error: "Invalid API Key" }, { status: 403 });
 
     const customer = apiKeyRecord.customer;
-    if (!customer) return NextResponse.json({ error: "API Key not associated with a customer" }, { status: 403 });
     if (!customer.isActive) return NextResponse.json({ error: "Customer workspace is inactive" }, { status: 403 });
 
     const formData = await req.formData();

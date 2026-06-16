@@ -12,11 +12,6 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [selectedWorkspaces, setSelectedWorkspaces] = useState<Record<string, string>>({});
 
-  // API Key Generation State
-  const [generatingKeyFor, setGeneratingKeyFor] = useState<string | null>(null);
-  const [newKeyName, setNewKeyName] = useState("");
-  const [displayedKey, setDisplayedKey] = useState<{ userId: string; key: string } | null>(null);
-
   const fetchData = async () => {
     setLoading(true);
     const [usersRes, customersRes] = await Promise.all([fetch("/api/admin/users"), fetch("/api/admin/customers")]);
@@ -45,21 +40,6 @@ export default function UsersPage() {
   const handleToggleAdmin = async (userId: string, currentStatus: boolean) => {
     await fetch("/api/admin/users/role", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId, isAdmin: !currentStatus }) });
     fetchData();
-  };
-
-  const handleGenerateKey = async (userId: string) => {
-    if (!newKeyName) return;
-    const res = await fetch("/api/admin/apikeys", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: newKeyName, userId }),
-    });
-    const data = await res.json();
-    if (data.success) {
-      setDisplayedKey({ userId, key: data.key });
-      setGeneratingKeyFor(null);
-      setNewKeyName("");
-    }
   };
 
   return (
@@ -102,49 +82,6 @@ export default function UsersPage() {
                           <button type="button" onClick={() => handleRevoke(u.id, uc.customer.id)} className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-blue-400 hover:bg-blue-200 hover:text-blue-500 focus:outline-none">&times;</button>
                         </span>
                       ))}
-                    </div>
-
-                    <div className="mt-4 flex flex-col items-end gap-2 border-t pt-4 w-full">
-                      {generatingKeyFor === u.id ? (
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="text"
-                            placeholder="Key Label (e.g. My Key)"
-                            value={newKeyName}
-                            onChange={(e) => setNewKeyName(e.target.value)}
-                            className="border border-gray-300 rounded px-2 py-1 text-sm"
-                          />
-                          <button
-                            onClick={() => handleGenerateKey(u.id)}
-                            className="bg-green-600 text-white px-2 py-1 rounded text-sm hover:bg-green-700"
-                          >
-                            Save
-                          </button>
-                          <button
-                            onClick={() => setGeneratingKeyFor(null)}
-                            className="text-gray-500 text-sm hover:text-gray-700"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => setGeneratingKeyFor(u.id)}
-                          className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded border text-sm hover:bg-gray-200"
-                        >
-                          Generate API Key
-                        </button>
-                      )}
-
-                      {displayedKey?.userId === u.id && (
-                        <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm max-w-sm">
-                          <p className="font-bold text-yellow-800 mb-1">Save this key now! It will not be shown again.</p>
-                          <code className="block bg-yellow-100 p-2 rounded break-all">{displayedKey.key}</code>
-                          <button onClick={() => setDisplayedKey(null)} className="mt-2 text-yellow-800 underline text-xs">
-                            Dismiss
-                          </button>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
