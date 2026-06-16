@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import WorkspaceDashboard from '@/app/dashboard/[customer_slug]/page';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 vi.mock('next/navigation', () => ({
   useParams: () => ({ customer_slug: 'test-customer' }),
@@ -53,7 +54,11 @@ describe('WorkspaceDashboard Page', () => {
       return { ok: false, status: 404 };
     });
 
-    render(<WorkspaceDashboard />);
+    render(
+      <ThemeProvider>
+        <WorkspaceDashboard />
+      </ThemeProvider>
+    );
 
     // Wait for the files to render
     const fileTitle = await screen.findByText('Delete Me');
@@ -62,6 +67,10 @@ describe('WorkspaceDashboard Page', () => {
     // Check for delete button
     const deleteBtn = screen.getByRole('button', { name: /delete file/i });
     expect(deleteBtn).toBeInTheDocument();
+
+    // Check that the Upload File button has neutral styling
+    const uploadFileBtn = screen.getByRole('button', { name: /upload file/i });
+    expect(uploadFileBtn).toHaveClass('bg-zinc-900');
 
     // Mock window.confirm to return true (confirm)
     const originalConfirm = window.confirm;
