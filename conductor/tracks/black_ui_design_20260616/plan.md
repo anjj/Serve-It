@@ -24,14 +24,14 @@
     - [x] Refactor styles in `src/app/admin/customers/page.tsx` and `src/app/admin/users/page.tsx` (Green Phase)
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Theme Toggle UI and Black & White Accent Redesign' (Protocol in workflow.md)
 
-## Phase 3: Dark Mode Styling (Charcoal / Slate Palette)
-- [ ] Task: Implement dark mode styles for global layouts
-    - [ ] Write tests checking dark mode layout class rendering (Red Phase)
-    - [ ] Apply `dark:bg-[#0B0F19]`, `dark:text-zinc-100`, etc., in root layout and navbar (Green Phase)
-- [ ] Task: Implement dark mode styles for Dashboard and UploadModal
-    - [ ] Write tests checking dark mode classes for file cards, modal containers, and inputs (Red Phase)
-    - [ ] Implement `dark:` Tailwind classes in `src/app/dashboard/[customer_slug]/page.tsx` and `src/components/UploadModal.tsx` (Green Phase)
-- [ ] Task: Implement dark mode styles for Admin Views and Sign-in
-    - [ ] Write tests checking dark mode class applications on admin components (Red Phase)
-    - [ ] Implement `dark:` Tailwind classes in `src/app/admin/customers/page.tsx`, `src/app/admin/users/page.tsx`, and `src/app/auth/signin/page.tsx` (Green Phase)
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Dark Mode Styling' (Protocol in workflow.md)
+## Phase 3: Dark Mode Styling (Charcoal / Slate Palette) [checkpoint: 6581365]
+- [x] Task: Implement dark mode styles for global layouts
+    - [x] Write tests checking dark mode layout class rendering (Red Phase)
+    - [x] Apply `dark:bg-[#0B0F19]`, `dark:text-zinc-100`, etc., in root layout and navbar (Green Phase)
+- [x] Task: Implement dark mode styles for Dashboard and UploadModal
+    - [x] Write tests checking dark mode classes for file cards, modal containers, and inputs (Red Phase)
+    - [x] Implement `dark:` Tailwind classes in `src/app/dashboard/[customer_slug]/page.tsx` and `src/components/UploadModal.tsx` (Green Phase)
+- [x] Task: Implement dark mode styles for Admin Views and Sign-in
+    - [x] Write tests checking dark mode class applications on admin components (Red Phase)
+    - [x] Implement `dark:` Tailwind classes in `src/app/admin/customers/page.tsx`, `src/app/admin/users/page.tsx`, and `src/app/auth/signin/page.tsx` (Green Phase)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Dark Mode Styling' (Protocol in workflow.md)
