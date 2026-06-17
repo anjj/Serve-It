@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Serve-It", description: "Secure, hig
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 text-gray-900`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground transition-colors duration-200`}>
         <Providers>{children}</Providers>
       </body>
     </html>
