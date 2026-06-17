@@ -24,6 +24,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Fix Entra ID (Azure AD) Login Account Linkage Bug**
+- [x] **Track: Fix Entra ID (Azure AD) Login Account Linkage Bug**
   *Link: [./tracks/fix_entra_login_20260617/](./tracks/fix_entra_login_20260617/)*
 
