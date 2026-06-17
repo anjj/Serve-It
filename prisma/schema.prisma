@@ -47,7 +47,6 @@ model User {
   accounts      Account[]
   sessions      Session[]
   customers     UserCustomer[]
-  apiKeys       ApiKey[]
 }
 
 model VerificationToken {
@@ -63,6 +62,7 @@ model Customer {
   id        String   @id @default(cuid())
   name      String
   slug      String   @unique
+  passwordHash String
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -76,13 +76,11 @@ model ApiKey {
   id         String   @id @default(cuid())
   keyHash    String   @unique
   name       String
-  customerId String?
-  userId     String?
+  customerId String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 }
 
 model UserCustomer {

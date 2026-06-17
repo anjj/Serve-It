@@ -9,6 +9,7 @@ export default function CustomersPage() {
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
+  const [password, setPassword] = useState("");
 
   const [generatingFor, setGeneratingFor] = useState<string | null>(null);
   const [newKeyName, setNewKeyName] = useState("");
@@ -26,8 +27,8 @@ export default function CustomersPage() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch("/api/admin/customers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, slug }) });
-    setName(""); setSlug("");
+    await fetch("/api/admin/customers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, slug, password }) });
+    setName(""); setSlug(""); setPassword("");
     fetchCustomers();
   };
 
@@ -49,7 +50,7 @@ export default function CustomersPage() {
   return (
     <div className="max-w-4xl mx-auto text-zinc-900 dark:text-zinc-100 transition-colors duration-200">
       <h1 className="text-2xl font-bold mb-6">Manage Customers (Tenants)</h1>
-      <form onSubmit={handleCreate} className="bg-white dark:bg-[#121827] p-6 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 mb-8 flex gap-4 items-end transition-colors duration-200">
+      <form onSubmit={handleCreate} className="bg-white dark:bg-[#121827] p-6 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 mb-8 flex gap-4 items-end flex-wrap transition-colors duration-200">
         <div>
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Name</label>
           <input
@@ -67,6 +68,16 @@ export default function CustomersPage() {
             required
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
+            className="mt-1 block w-full border border-gray-300 dark:border-zinc-700 rounded-md shadow-sm py-2 px-3 sm:text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 dark:focus:ring-zinc-100 dark:focus:border-zinc-100 transition-colors duration-200"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Password</label>
+          <input
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="mt-1 block w-full border border-gray-300 dark:border-zinc-700 rounded-md shadow-sm py-2 px-3 sm:text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 dark:focus:ring-zinc-100 dark:focus:border-zinc-100 transition-colors duration-200"
           />
         </div>

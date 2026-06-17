@@ -17,7 +17,6 @@ export default function UsersPage() {
   const [generatingKeyFor, setGeneratingKeyFor] = useState<string | null>(null);
   const [newKeyName, setNewKeyName] = useState("");
   const [displayedKey, setDisplayedKey] = useState<{ userId: string; key: string } | null>(null);
-
   const fetchData = async () => {
     setLoading(true);
     const [usersRes, customersRes] = await Promise.all([fetch("/api/admin/users"), fetch("/api/admin/customers")]);
@@ -46,21 +45,6 @@ export default function UsersPage() {
   const handleToggleAdmin = async (userId: string, currentStatus: boolean) => {
     await fetch("/api/admin/users/role", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId, isAdmin: !currentStatus }) });
     fetchData();
-  };
-
-  const handleGenerateKey = async (userId: string) => {
-    if (!newKeyName) return;
-    const res = await fetch("/api/admin/apikeys", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: newKeyName, userId }),
-    });
-    const data = await res.json();
-    if (data.success) {
-      setDisplayedKey({ userId, key: data.key });
-      setGeneratingKeyFor(null);
-      setNewKeyName("");
-    }
   };
 
   return (
@@ -112,7 +96,6 @@ export default function UsersPage() {
                         </span>
                       ))}
                     </div>
-
                     <div className="mt-4 flex flex-col items-end gap-2 border-t border-gray-200 dark:border-zinc-800 pt-4 w-full">
                       {generatingKeyFor === u.id ? (
                         <div className="flex items-center gap-2">

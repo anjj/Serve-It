@@ -17,6 +17,9 @@ async function main() {
   });
   console.log("Created user:", devUser.email);
 
+  const bcrypt = require("bcryptjs");
+  const testPasswordHash = await bcrypt.hash("testpassword123", 10);
+
   // 2. Create Test Customer
   const testCustomer = await prisma.customer.upsert({
     where: { slug: "test-workspace" },
@@ -24,6 +27,7 @@ async function main() {
     create: {
       name: "Test Workspace",
       slug: "test-workspace",
+      passwordHash: testPasswordHash,
       isActive: true,
     },
   });
