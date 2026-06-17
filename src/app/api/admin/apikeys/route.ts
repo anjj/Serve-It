@@ -8,13 +8,13 @@ export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session || !(session.user as any).isAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { name, customerId, userId } = await req.json();
-  if (!name || (!customerId && !userId)) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  const { name, customerId } = await req.json();
+  if (!name || !customerId) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
 
   try {
     // Generate a secure random API key
     const rawKey = crypto.randomBytes(32).toString('hex');
-    const keyPrefix = "sk_live_serve-it_";
+    const keyPrefix = "sk_serve_";
     const fullKey = `${keyPrefix}${rawKey}`;
 
     // Hash it for DB storage
@@ -24,8 +24,7 @@ export async function POST(req: Request) {
       data: {
         name,
         keyHash,
-        customerId: customerId || null,
-        userId: userId || null
+        customerId
       }
     });
 

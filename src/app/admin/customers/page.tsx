@@ -9,6 +9,7 @@ export default function CustomersPage() {
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
+  const [password, setPassword] = useState("");
 
   const [generatingFor, setGeneratingFor] = useState<string | null>(null);
   const [newKeyName, setNewKeyName] = useState("");
@@ -26,8 +27,8 @@ export default function CustomersPage() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch("/api/admin/customers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, slug }) });
-    setName(""); setSlug("");
+    await fetch("/api/admin/customers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, slug, password }) });
+    setName(""); setSlug(""); setPassword("");
     fetchCustomers();
   };
 
