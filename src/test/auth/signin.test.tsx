@@ -8,6 +8,12 @@ vi.mock('next-auth/react', () => ({
   signIn: vi.fn(),
 }));
 
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => ({
+    get: () => null,
+  }),
+}));
+
 describe('SignIn Page', () => {
   it('renders Entra ID login button with neutral styling', () => {
     render(<SignIn />);
