@@ -25,7 +25,6 @@ export async function POST(req: Request) {
         name,
         keyHash,
         customerId: customerId || null,
-        // @ts-ignore - Schema might have userId but prisma client might need update or it's handled via extensions
         userId: userId || null
       }
     });
