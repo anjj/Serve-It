@@ -1,7 +1,7 @@
 # Implementation Plan: Supabase SaaS Migration
 
 ## Phase 1: Environment and Prisma Configuration
-- [ ] Task: Update environment variables
+- [x] Task: Update environment variables 399720f
     - [ ] Add `DATABASE_URL` for connection pooling (port 6543, pgbouncer=true) to `.env` or `.env.local`
     - [ ] Add `DIRECT_URL` for direct connection (port 5432) to `.env` or `.env.local`
     - [ ] Update `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` to new SaaS project values
