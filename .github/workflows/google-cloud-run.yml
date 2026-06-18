@@ -1,0 +1,170 @@
+name: Google Cloud Run Deployment
+
+on:
+  push:
+    branches: ['**']
+    tags: ['**']
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    if: github.ref_type != 'tag'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm run lint
+
+      - name: Run tests
+        run: npx vitest run
+
+  docker:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+    environment: production
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: 'projects/${{ vars.GOOGLE_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: ${{ vars.GOOGLE_SERVICE_ACCOUNT }}
+          project_id: ${{ vars.GOOGLE_PROJECT_ID }}
+
+      - name: Log in to Google Artifact Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.GOOGLE_REGION }}-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        env:
+          GAR_IMAGE: ${{ format('{0}-docker.pkg.dev/{1}/{2}/serve-it', vars.GOOGLE_REGION, vars.GOOGLE_PROJECT_ID, vars.GOOGLE_ARTIFACT_REPO) }}
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/serve-it
+            ${{ env.GAR_IMAGE }}
+          tags: |
+            type=ref,event=tag
+            type=raw,value=latest
+            type=raw,value=${{ github.sha }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NEXT_PUBLIC_SUPABASE_URL=${{ vars.SUPABASE_URL }}
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+    environment: production
+    needs: docker
+
+    env:
+      PROJECT_ID:  ${{ vars.GOOGLE_PROJECT_ID }}
+      PROJECT_NUMBER: ${{ vars.GOOGLE_PROJECT_NUMBER }}
+      REGION: ${{ vars.GOOGLE_REGION }}
+      ARTIFACT_REPO: ${{ vars.GOOGLE_ARTIFACT_REPO }}
+      SERVICE_NAME: 'serve-it'
+      SERVICE_ACCOUNT: ${{ vars.GOOGLE_SERVICE_ACCOUNT }}
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
+
+    - name: Authenticate to Google Cloud
+      id: auth
+      uses: google-github-actions/auth@v2
+      with:
+        workload_identity_provider: 'projects/${{ env.PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+        service_account: ${{ env.SERVICE_ACCOUNT }}
+        project_id: ${{ env.PROJECT_ID }}
+
+    - name: Deploy to Google Cloud Run
+      uses: google-github-actions/deploy-cloudrun@v2
+      with:
+        service: ${{ env.SERVICE_NAME }}
+        region: ${{ env.REGION }}
+        image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+        flags: '--allow-unauthenticated'
+
+        env_vars: |
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
+          NEXTAUTH_URL=${{ vars.NEXTAUTH_URL }}
+          AZURE_AD_CLIENT_ID=${{ secrets.AZURE_AD_CLIENT_ID }}
+          AZURE_AD_CLIENT_SECRET=${{ secrets.AZURE_AD_CLIENT_SECRET }}
+          AZURE_AD_TENANT_ID=${{ vars.AZURE_AD_TENANT_ID }}
+          SUPABASE_URL=${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_STORAGE_BUCKET=${{ vars.SUPABASE_STORAGE_BUCKET }}

@@ -31,6 +31,7 @@ The application's core functionality is organized into distinct business domains
 3. **[File Management & Storage](./docs/domains/files.md)**: Outlines file upload modal workflows, validation requirements, and storage bucket bindings.
 4. **[Document Serving Layer](./docs/domains/serving.md)**: Details the dynamic short URL serving router, HTTP content types, and cache control policies.
 5. **[API Keys & Programmatic Ingestion](./docs/domains/apikeys.md)**: Covers cryptographically secure API key generation, secure SHA-256 database hashing, and Bearer token ingestion endpoints.
+6. **[Google Cloud Deployment](./docs/deployment.md)**: Guide on deploying the application to Google Cloud Run via GitHub Actions.
 
 ---
 
