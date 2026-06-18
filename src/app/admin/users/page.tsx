@@ -47,6 +47,21 @@ export default function UsersPage() {
     fetchData();
   };
 
+  const handleGenerateKey = async (userId: string) => {
+    if (!newKeyName) return;
+    const res = await fetch("/api/admin/apikeys", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: newKeyName, userId }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setDisplayedKey({ userId, key: data.key });
+      setGeneratingKeyFor(null);
+      setNewKeyName("");
+    }
+  };
+
   return (
     <div className="max-w-5xl mx-auto text-zinc-900 dark:text-zinc-100 transition-colors duration-200">
       <h1 className="text-2xl font-bold mb-6">Users & Mapping</h1>
