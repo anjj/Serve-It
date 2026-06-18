@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { uploadHtmlFile } from "@/lib/storage";
+import { logSecurityEvent } from "@/lib/security-logger";
 import crypto from "crypto";
 
 export async function POST(req: Request) {
@@ -12,7 +13,17 @@ export async function POST(req: Request) {
     const keyHash = crypto.createHash("sha256").update(apiKey).digest("hex");
 
     const apiKeyRecord = await prisma.apiKey.findUnique({ where: { keyHash }, include: { customer: true } });
-    if (!apiKeyRecord) return NextResponse.json({ error: "Invalid API Key" }, { status: 403 });
+    if (!apiKeyRecord) {
+      await logSecurityEvent({
+        actorId: "API_KEY",
+        action: "API_UPLOAD",
+        resource: "/api/v1/files",
+        status: "FAILURE",
+        details: "Invalid API Key",
+        ipAddress: req.headers.get("x-forwarded-for") || "unknown",
+      });
+      return NextResponse.json({ error: "Invalid API Key" }, { status: 403 });
+    }
 
     const customer = apiKeyRecord.customer;
     if (!customer.isActive) return NextResponse.json({ error: "Customer workspace is inactive" }, { status: 403 });
@@ -81,7 +92,17 @@ export async function PATCH(req: Request) {
     const keyHash = crypto.createHash("sha256").update(apiKey).digest("hex");
 
     const apiKeyRecord = await prisma.apiKey.findUnique({ where: { keyHash }, include: { customer: true } });
-    if (!apiKeyRecord) return NextResponse.json({ error: "Invalid API Key" }, { status: 403 });
+    if (!apiKeyRecord) {
+      await logSecurityEvent({
+        actorId: "API_KEY",
+        action: "API_PATCH",
+        resource: "/api/v1/files",
+        status: "FAILURE",
+        details: "Invalid API Key",
+        ipAddress: req.headers.get("x-forwarded-for") || "unknown",
+      });
+      return NextResponse.json({ error: "Invalid API Key" }, { status: 403 });
+    }
 
     const customer = apiKeyRecord.customer;
     if (!customer.isActive) return NextResponse.json({ error: "Customer workspace is inactive" }, { status: 403 });

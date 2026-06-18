@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { downloadFile } from "@/lib/storage";
+import { validateTenantAccess } from "@/lib/tenant-auth";
 
 export async function GET(req: Request, { params }: { params: Promise<{ customer_slug: string; file_slug: string }> }) {
   const session = await getServerSession(authOptions);
@@ -15,21 +16,23 @@ export async function GET(req: Request, { params }: { params: Promise<{ customer
     return NextResponse.redirect(loginUrl);
   }
 
-  const role = (session.user as any).role;
-  const userCustomerSlug = (session.user as any).customer_slug;
-  const userId = (session.user as any).id;
-  const isAdmin = (session.user as any).isAdmin;
+  const authResult = await validateTenantAccess(
+    session.user as any,
+    customer_slug,
+    {
+      ip: req.headers.get("x-forwarded-for") || "unknown",
+      resource: `/s/${customer_slug}/${file_slug}`,
+      action: "VIEW_DOCUMENT"
+    }
+  );
+
+  if (!authResult.authorized) {
+    return new NextResponse(authResult.error, { status: authResult.status });
+  }
+
+  const customer = authResult.customer!;
 
   try {
-    const customer = await prisma.customer.findUnique({ where: { slug: customer_slug }, include: { users: { where: { userId } } } });
-    if (!customer) return new NextResponse("Workspace not found", { status: 404 });
-
-    if (role === "CUSTOMER") {
-      if (userCustomerSlug !== customer_slug) return new NextResponse("Access Denied to Workspace", { status: 403 });
-    } else {
-      if (!isAdmin && customer.users.length === 0) return new NextResponse("Access Denied to Workspace", { status: 403 });
-    }
-
     const file = await prisma.file.findUnique({ where: { customerId_slug: { customerId: customer.id, slug: file_slug } } });
     if (!file) return new NextResponse("File not found", { status: 404 });
 

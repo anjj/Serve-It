@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { uploadHtmlFile, deleteFile } from "@/lib/storage";
+import { validateTenantAccess } from "@/lib/tenant-auth";
 
 export async function GET(req: Request, { params }: { params: Promise<{ customer_slug: string }> }) {
   const session = await getServerSession(authOptions);
@@ -10,25 +11,24 @@ export async function GET(req: Request, { params }: { params: Promise<{ customer
 
   const resolvedParams = await params;
   const customer_slug = resolvedParams.customer_slug;
-  const role = (session.user as any).role;
-  const userCustomerSlug = (session.user as any).customer_slug;
-  const userId = (session.user as any).id;
-  const isAdmin = (session.user as any).isAdmin;
+
+  const authResult = await validateTenantAccess(
+    session.user as any,
+    customer_slug,
+    {
+      ip: req.headers.get("x-forwarded-for") || "unknown",
+      resource: `/api/workspace/${customer_slug}/files`,
+      action: "GET_FILES"
+    }
+  );
+
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+  }
+
+  const customer = authResult.customer!;
 
   try {
-    const customer = await prisma.customer.findUnique({ where: { slug: customer_slug }, include: { users: { where: { userId } } } });
-    if (!customer) return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
-
-    if (role === "CUSTOMER") {
-      if (userCustomerSlug !== customer_slug) {
-        return NextResponse.json({ error: "Access denied" }, { status: 403 });
-      }
-    } else {
-      if (!isAdmin && customer.users.length === 0) {
-        return NextResponse.json({ error: "Access denied" }, { status: 403 });
-      }
-    }
-
     const files = await prisma.file.findMany({ where: { customerId: customer.id }, select: { id: true, title: true, slug: true, tags: true, createdAt: true }, orderBy: { createdAt: "desc" } });
     return NextResponse.json({ files });
   } catch (error) {
@@ -46,14 +46,24 @@ export async function POST(req: Request, { params }: { params: Promise<{ custome
 
   const resolvedParams = await params;
   const customer_slug = resolvedParams.customer_slug;
-  const userId = (session.user as any).id;
-  const isAdmin = (session.user as any).isAdmin;
+
+  const authResult = await validateTenantAccess(
+    session.user as any,
+    customer_slug,
+    {
+      ip: req.headers.get("x-forwarded-for") || "unknown",
+      resource: `/api/workspace/${customer_slug}/files`,
+      action: "UPLOAD_FILE"
+    }
+  );
+
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+  }
+
+  const customer = authResult.customer!;
 
   try {
-    const customer = await prisma.customer.findUnique({ where: { slug: customer_slug }, include: { users: { where: { userId } } } });
-    if (!customer) return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
-    if (!isAdmin && customer.users.length === 0) return NextResponse.json({ error: "Access denied" }, { status: 403 });
-
     const formData = await req.formData();
     const title = formData.get("title") as string;
     const slug = formData.get("slug") as string;
@@ -136,14 +146,24 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ custo
 
   const resolvedParams = await params;
   const customer_slug = resolvedParams.customer_slug;
-  const userId = (session.user as any).id;
-  const isAdmin = (session.user as any).isAdmin;
+
+  const authResult = await validateTenantAccess(
+    session.user as any,
+    customer_slug,
+    {
+      ip: req.headers.get("x-forwarded-for") || "unknown",
+      resource: `/api/workspace/${customer_slug}/files`,
+      action: "DELETE_FILE"
+    }
+  );
+
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+  }
+
+  const customer = authResult.customer!;
 
   try {
-    const customer = await prisma.customer.findUnique({ where: { slug: customer_slug }, include: { users: { where: { userId } } } });
-    if (!customer) return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
-    if (!isAdmin && customer.users.length === 0) return NextResponse.json({ error: "Access denied" }, { status: 403 });
-
     const data = await req.json();
     const { fileId } = data;
     if (!fileId) {

@@ -14,7 +14,7 @@ export default function WorkspaceDashboard() {
   const rawCustomerSlug = params.customer_slug;
   const customer_slug = Array.isArray(rawCustomerSlug) ? rawCustomerSlug[0] : rawCustomerSlug;
 
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   const [files, setFiles] = useState<File[]>([]);
@@ -77,8 +77,20 @@ export default function WorkspaceDashboard() {
   }, [status, router]);
 
   useEffect(() => {
-    if (status === "authenticated" && customer_slug) fetchFiles();
-  }, [status, customer_slug, fetchFiles]);
+    if (status === "authenticated" && customer_slug) {
+      // Basic client-side check to prevent unnecessary API calls and quick UI feedback
+      const role = (session?.user as any)?.role;
+      const userCustomerSlug = (session?.user as any)?.customer_slug;
+
+      if (role === "CUSTOMER" && userCustomerSlug !== customer_slug) {
+        setError("You do not have access to this workspace.");
+        setLoading(false);
+        return;
+      }
+
+      fetchFiles();
+    }
+  }, [status, customer_slug, fetchFiles, session]);
 
   if (status === "loading" || loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
