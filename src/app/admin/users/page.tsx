@@ -18,13 +18,21 @@ export default function UsersPage() {
   const [newKeyName, setNewKeyName] = useState("");
   const [displayedKey, setDisplayedKey] = useState<{ userId: string; key: string } | null>(null);
   const fetchData = async () => {
-    setLoading(true);
-    const [usersRes, customersRes] = await Promise.all([fetch("/api/admin/users"), fetch("/api/admin/customers")]);
-    const usersData = await usersRes.json();
-    const customersData = await customersRes.json();
-    if (usersData.users) setUsers(usersData.users);
-    if (customersData.customers) setCustomers(customersData.customers);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const [usersRes, customersRes] = await Promise.all([fetch("/api/admin/users"), fetch("/api/admin/customers")]);
+      
+      if (!usersRes.ok || !customersRes.ok) throw new Error("Failed to fetch data");
+
+      const usersData = await usersRes.json();
+      const customersData = await customersRes.json();
+      if (usersData.users) setUsers(usersData.users);
+      if (customersData.customers) setCustomers(customersData.customers);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { fetchData(); }, []);

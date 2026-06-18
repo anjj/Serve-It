@@ -16,11 +16,17 @@ export default function CustomersPage() {
   const [displayedKey, setDisplayedKey] = useState<{customerId: string, key: string} | null>(null);
 
   const fetchCustomers = async () => {
-    setLoading(true);
-    const res = await fetch("/api/admin/customers");
-    const data = await res.json();
-    if (data.customers) setCustomers(data.customers);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const res = await fetch("/api/admin/customers");
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
+      if (data.customers) setCustomers(data.customers);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { fetchCustomers(); }, []);
