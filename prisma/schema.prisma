@@ -47,6 +47,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   customers     UserCustomer[]
+  apiKeys       ApiKey[]
 }
 
 model VerificationToken {
@@ -82,6 +83,7 @@ model ApiKey {
   updatedAt  DateTime @updatedAt
 
   customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserCustomer {

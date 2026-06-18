@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 
 function SignInForm() {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl");
+  const callbackUrl = searchParams ? searchParams.get("callbackUrl") : null;
   const [showCustomerLogin, setShowCustomerLogin] = useState(false);
   const [slug, setSlug] = useState("");
   const [password, setPassword] = useState("");
@@ -102,7 +102,7 @@ function SignInForm() {
 
 export default function SignIn() {
   return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
       <SignInForm />
     </Suspense>
   );
