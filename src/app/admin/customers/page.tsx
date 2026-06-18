@@ -52,8 +52,9 @@ export default function CustomersPage() {
       <h1 className="text-2xl font-bold mb-6">Manage Customers (Tenants)</h1>
       <form onSubmit={handleCreate} className="bg-white dark:bg-[#121827] p-6 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 mb-8 flex gap-4 items-end flex-wrap transition-colors duration-200">
         <div>
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Name</label>
+          <label htmlFor="customer-name" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Name</label>
           <input
+            id="customer-name"
             type="text"
             required
             value={name}
@@ -62,8 +63,9 @@ export default function CustomersPage() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Slug</label>
+          <label htmlFor="customer-slug" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Slug</label>
           <input
+            id="customer-slug"
             type="text"
             required
             value={slug}
@@ -72,8 +74,9 @@ export default function CustomersPage() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Password</label>
+          <label htmlFor="customer-password" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Password</label>
           <input
+            id="customer-password"
             type="password"
             required
             value={password}
