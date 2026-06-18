@@ -7,7 +7,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Backend API for Admin Toggling' (Protocol in workflow.md) b4fdb5f
 
 ## Phase 2: UI Implementation for Admin Toggling
-- [ ] Task: Add admin toggle to Users UI
+- [x] Task: Add admin toggle to Users UI c2fbf8d
     - [ ] Write tests: Create failing component tests for the users list to verify the toggle button appears only for admins and displays the correct state.
     - [ ] Implement: Update the user list component to include the toggle button, wire it up to the server action, and implement optimistic UI updates or revalidation.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: UI Implementation for Admin Toggling' (Protocol in workflow.md)
