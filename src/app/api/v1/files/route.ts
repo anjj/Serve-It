@@ -13,6 +13,7 @@ export async function POST(req: Request) {
 
     const apiKeyRecord = await prisma.apiKey.findUnique({ where: { keyHash }, include: { customer: true } });
     if (!apiKeyRecord) return NextResponse.json({ error: "Invalid API Key" }, { status: 403 });
+    if (!apiKeyRecord.customer) return NextResponse.json({ error: "No workspace associated with this API key" }, { status: 403 });
 
     const customer = apiKeyRecord.customer;
     if (!customer.isActive) return NextResponse.json({ error: "Customer workspace is inactive" }, { status: 403 });
@@ -82,6 +83,7 @@ export async function PATCH(req: Request) {
 
     const apiKeyRecord = await prisma.apiKey.findUnique({ where: { keyHash }, include: { customer: true } });
     if (!apiKeyRecord) return NextResponse.json({ error: "Invalid API Key" }, { status: 403 });
+    if (!apiKeyRecord.customer) return NextResponse.json({ error: "No workspace associated with this API key" }, { status: 403 });
 
     const customer = apiKeyRecord.customer;
     if (!customer.isActive) return NextResponse.json({ error: "Customer workspace is inactive" }, { status: 403 });
