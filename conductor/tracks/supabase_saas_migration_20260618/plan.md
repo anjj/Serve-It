@@ -5,7 +5,7 @@
     - [ ] Add `DATABASE_URL` for connection pooling (port 6543, pgbouncer=true) to `.env` or `.env.local`
     - [ ] Add `DIRECT_URL` for direct connection (port 5432) to `.env` or `.env.local`
     - [ ] Update `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` to new SaaS project values
-- [ ] Task: Update Prisma schema configuration
+- [x] Task: Update Prisma schema configuration f951064
     - [ ] Ensure `prisma/schema.prisma` uses `directUrl` pointing to `env("DIRECT_URL")`
     - [ ] Ensure `prisma/schema.prisma` datasource url points to `env("DATABASE_URL")`
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Environment and Prisma Configuration' (Protocol in workflow.md)
