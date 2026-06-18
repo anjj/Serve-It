@@ -31,7 +31,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [~] **Track: Enable Users as Admins**
 *Link: [./tracks/enable_users_as_admins_20260618/](./tracks/enable_users_as_admins_20260618/)*
 
----
-
-- [x] **Track: supabase_saas_migration**
-*Link: [./tracks/supabase_saas_migration_20260618/](./tracks/supabase_saas_migration_20260618/)*
