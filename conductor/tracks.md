@@ -26,8 +26,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: Fix Entra ID (Azure AD) Login Account Linkage Bug**
   *Link: [./tracks/fix_entra_login_20260617/](./tracks/fix_entra_login_20260617/)*
 
----
-
-- [x] **Track: Enable Users as Admins**
-*Link: [./tracks/enable_users_as_admins_20260618/](./tracks/enable_users_as_admins_20260618/)*
-
