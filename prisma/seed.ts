@@ -17,7 +17,7 @@ async function main() {
   });
   console.log("Created user:", devUser.email);
 
-  const bcrypt = require("bcryptjs");
+  const bcrypt = await import("bcryptjs");
   const testPasswordHash = await bcrypt.hash("testpassword123", 10);
 
   // 2. Create Test Customer
