@@ -10,10 +10,10 @@
     - [ ] Ensure `prisma/schema.prisma` datasource url points to `env("DATABASE_URL")`
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Environment and Prisma Configuration' (Protocol in workflow.md) 74cd6f1
 
-## Phase 2: Database Migration & Verification
+## Phase 2: Database Migration & Verification [checkpoint: d2056ee]
 - [x] Task: Apply Prisma migrations to Supabase SaaS
     - [ ] Run `npx prisma db push` or `prisma migrate dev` to establish the schema in the new environment
-- [ ] Task: Verify database connections and application startup
+- [x] Task: Verify database connections and application startup
     - [ ] Write integration test or verify existing tests pass with the new database connection
     - [ ] Start the application locally and ensure it connects to the new database without errors
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Database Migration & Verification' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Database Migration & Verification' (Protocol in workflow.md) d2056ee
