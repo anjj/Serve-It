@@ -1,7 +1,7 @@
 # Implementation Plan: Enable Users as Admins
 
 ## Phase 1: Backend API for Admin Toggling
-- [ ] Task: Implement server action/API for toggling admin status
+- [x] Task: Implement server action/API for toggling admin status 5dc21a4
     - [ ] Write tests: Create failing tests for the new `toggleAdminStatus` server action ensuring only admins can call it, and it correctly updates the database.
     - [ ] Implement: Develop the `toggleAdminStatus` logic (verify session, verify `isAdmin`, update user record).
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Backend API for Admin Toggling' (Protocol in workflow.md)
