@@ -121,18 +121,6 @@ describe('POST /api/workspace/[customer_slug]/files', () => {
     expect(data.error).toBe('Missing required fields');
   });
 
-  it('should return 403 if user is a CUSTOMER', async () => {
-    vi.mocked(getServerSession).mockResolvedValueOnce({
-      user: { id: 'user-1', name: 'John Doe', email: 'john@example.com', role: "CUSTOMER" },
-    });
-    const req = new Request('http://localhost/api/workspace/test-customer/files', {
-      method: 'POST',
-    });
-    const res = await POST(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
-    expect(res.status).toBe(403);
-  });
-
-
   it('should return 409 if a file with same slug already exists', async () => {
     vi.mocked(getServerSession).mockResolvedValueOnce({
       user: { id: 'user-1', name: 'John Doe', email: 'john@example.com' },

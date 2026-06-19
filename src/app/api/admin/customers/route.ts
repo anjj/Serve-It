@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
 
 async function checkAdmin() {
   const session = await getServerSession(authOptions);
@@ -17,11 +16,10 @@ export async function GET() {
 
 export async function POST(req: Request) {
   if (!(await checkAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { name, slug, password } = await req.json();
-  if (!name || !slug || !password) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  const { name, slug } = await req.json();
+  if (!name || !slug) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   try {
-    const passwordHash = await bcrypt.hash(password, 10);
-    const customer = await prisma.customer.create({ data: { name, slug, passwordHash } });
+    const customer = await prisma.customer.create({ data: { name, slug } });
     return NextResponse.json({ customer });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

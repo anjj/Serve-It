@@ -6,8 +6,6 @@ import { useEffect, useState, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import { Search, Tag, Upload, Trash2 } from "lucide-react";
 import UploadModal from "@/components/UploadModal";
-import { Button } from "@/components/Button";
-import { Card } from "@/components/Card";
 
 type File = { id: string; title: string; slug: string; tags: string[]; createdAt: string; };
 
@@ -86,7 +84,7 @@ export default function WorkspaceDashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex flex-col transition-colors duration-200">
+      <div className="min-h-screen bg-gray-50 flex flex-col">
         <Navbar />
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-10 flex items-center justify-center">
           <p className="text-red-500">{error}</p>
@@ -102,7 +100,7 @@ export default function WorkspaceDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col transition-colors duration-200">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -112,8 +110,8 @@ export default function WorkspaceDashboard() {
             </div>
             <input
               type="text"
-              className="block w-full pl-10 pr-3 py-2 border border-border-color rounded-[var(--radius-button)] leading-5 bg-background-alternate placeholder-foreground-muted focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm text-foreground transition-colors duration-200"
-              placeholder="Query files..."
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              placeholder="Search files..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -126,7 +124,7 @@ export default function WorkspaceDashboard() {
                 <select
                   value={selectedTag}
                   onChange={(e) => setSelectedTag(e.target.value)}
-                  className="block w-full pl-3 pr-10 py-2 text-base border border-border-color focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-[var(--radius-button)] bg-background-alternate text-foreground transition-colors duration-200"
+                  className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white text-gray-900"
                 >
                   <option value="">All Tags</option>
                   {availableTags.map(tag => (
@@ -136,49 +134,51 @@ export default function WorkspaceDashboard() {
               </div>
             )}
 
-            <Button
+            <button
               onClick={() => setIsUploadOpen(true)}
-              className="inline-flex items-center gap-2"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
             >
               <Upload className="h-4 w-4" />
-              <span>Secure Upload</span>
-            </Button>
+              <span>Upload File</span>
+            </button>
           </div>
         </div>
 
         {filteredFiles.length === 0 ? (
-          <Card className="text-center py-12">
-            <p className="text-foreground-muted">No files found matching your criteria.</p>
-          </Card>
+          <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+            <p className="text-gray-500">No files found matching your criteria.</p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filteredFiles.map((file) => (
-              <Card key={file.id} className="flex flex-col hover:shadow-md transition-all duration-200">
-                <h3 className="text-lg leading-6 font-medium text-foreground mb-1 truncate" title={file.title}>{file.title}</h3>
-                <p className="text-sm text-foreground-muted mb-4 truncate">/{file.slug}</p>
+              <div key={file.id} className="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+                <div className="px-4 py-5 sm:p-6">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900 mb-1 truncate" title={file.title}>{file.title}</h3>
+                  <p className="text-sm text-gray-500 mb-4 truncate">/{file.slug}</p>
 
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {file.tags.map(tag => (
-                    <span key={tag} className="inline-flex items-center px-2 py-0.5 rounded-[var(--radius-button)] text-xs font-medium bg-background-alternate border border-border-color text-foreground-muted transition-colors duration-200">{tag}</span>
-                  ))}
-                </div>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {file.tags.map(tag => (
+                      <span key={tag} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">{tag}</span>
+                    ))}
+                  </div>
 
-                <div className="mt-auto pt-4 flex justify-between items-center">
-                  <span className="text-xs text-foreground-muted">{new Date(file.createdAt).toLocaleDateString()}</span>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleDelete(file.id)}
-                      className="inline-flex items-center p-1.5 border border-transparent text-xs font-medium rounded text-red-600 hover:bg-red-50 focus:outline-none transition-colors duration-200"
-                      aria-label="Delete File"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                    <a href={`/s/${customer_slug}/${file.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-[var(--radius-button)] shadow-sm text-white bg-primary hover:bg-green-700 transition-colors duration-200">
-                      Access Document
-                    </a>
+                  <div className="mt-4 flex justify-between items-center">
+                    <span className="text-xs text-gray-400">{new Date(file.createdAt).toLocaleDateString()}</span>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleDelete(file.id)}
+                        className="inline-flex items-center p-1.5 border border-transparent text-xs font-medium rounded text-red-600 hover:bg-red-50 focus:outline-none"
+                        aria-label="Delete File"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                      <a href={`/s/${customer_slug}/${file.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700">
+                        View Document
+                      </a>
+                    </div>
                   </div>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         )}

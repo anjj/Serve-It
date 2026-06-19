@@ -12,3 +12,8 @@
 ## Management
 - [Tracks Registry](./tracks.md)
 - [Tracks Directory](./tracks/)
+
+## Agent Workspace
+- [Master Agent Guidelines](../GEMINI.md)
+- [AI Agent Rules](./agent-rules.md)
+- [Local Agent Skills](./skills/)

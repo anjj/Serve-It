@@ -1,8 +1,0 @@
-{
-  "track_id": "deploy_gcp_docker_variables_20260619",
-  "type": "chore",
-  "status": "new",
-  "created_at": "2026-06-19T10:52:05Z",
-  "updated_at": "2026-06-19T10:52:05Z",
-  "description": "Configure GitHub Actions to inject live environment secrets into GCP Cloud Run deployment."
-}

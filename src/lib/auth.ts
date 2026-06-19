@@ -4,7 +4,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import type { NextAuthOptions } from "next-auth";
-import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -37,40 +36,11 @@ export const authOptions: NextAuthOptions = {
                   data: { isAdmin }
                 });
               }
-              return { ...user, role: "FULL" } as any;
+              return user as any;
             },
           }),
         ]
       : []),
-    CredentialsProvider({
-      id: "customer-auth",
-      name: "Customer Portal",
-      credentials: {
-        slug: { label: "Customer Slug", type: "text", placeholder: "acme-corp" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        if (!credentials?.slug || !credentials?.password) return null;
-
-        const customer = await prisma.customer.findUnique({
-          where: { slug: credentials.slug },
-        });
-
-        if (!customer) return null;
-        if (!customer.isActive) return null;
-        if (!customer.passwordHash) return null;
-
-        const isPasswordValid = await bcrypt.compare(credentials.password, customer.passwordHash);
-        if (!isPasswordValid) return null;
-
-        return {
-          id: customer.id,
-          name: customer.name,
-          role: "CUSTOMER",
-          customer_slug: customer.slug,
-        } as any;
-      },
-    }),
     AzureADProvider({
       clientId: process.env.AZURE_AD_CLIENT_ID!,
       clientSecret: process.env.AZURE_AD_CLIENT_SECRET!,
@@ -82,22 +52,14 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = (user as any).role || "FULL";
-        token.isAdmin = (user as any).isAdmin || false;
-        if ((user as any).customer_slug) {
-          token.customer_slug = (user as any).customer_slug;
-        }
+        token.isAdmin = (user as any).isAdmin;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         (session.user as any).id = token.id as string;
-        (session.user as any).role = token.role as string;
         (session.user as any).isAdmin = token.isAdmin as boolean;
-        if (token.customer_slug) {
-          (session.user as any).customer_slug = token.customer_slug as string;
-        }
       }
       return session;
     },
