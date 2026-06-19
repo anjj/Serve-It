@@ -63,15 +63,15 @@ describe('WorkspaceDashboard Page', () => {
     // Wait for the files to render
     const fileTitle = await screen.findByText('Delete Me');
     expect(fileTitle).toBeInTheDocument();
-    expect(fileTitle.closest('.min-h-screen')).toHaveClass('dark:bg-[#0B0F19]');
+    expect(fileTitle.closest('.min-h-screen')).toHaveClass('bg-background');
 
     // Check for delete button
     const deleteBtn = screen.getByRole('button', { name: /delete file/i });
     expect(deleteBtn).toBeInTheDocument();
 
     // Check that the Upload File button has neutral styling
-    const uploadFileBtn = screen.getByRole('button', { name: /upload file/i });
-    expect(uploadFileBtn).toHaveClass('bg-zinc-900');
+    const uploadFileBtn = screen.getByRole('button', { name: /secure upload/i });
+    expect(uploadFileBtn).toHaveClass('bg-primary');
 
     // Mock window.confirm to return true (confirm)
     const originalConfirm = window.confirm;
