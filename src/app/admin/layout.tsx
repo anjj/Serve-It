@@ -25,8 +25,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="flex flex-1 overflow-hidden">
         <aside className="w-64 bg-white border-r border-gray-200 flex-shrink-0">
           <nav className="mt-5 px-2 space-y-1">
-            <Link href="/admin/customers" className={`${pathname.startsWith("/admin/customers") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"} group flex items-center px-2 py-2 text-sm font-medium rounded-md`}>Customers</Link>
-            <Link href="/admin/users" className={`${pathname.startsWith("/admin/users") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"} group flex items-center px-2 py-2 text-sm font-medium rounded-md`}>Users & Mapping</Link>
+              <Link href="/admin/customers" className={`${pathname?.startsWith("/admin/customers") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"} group flex items-center px-2 py-2 text-base font-medium rounded-md`}>
+                Customers
+              </Link>
+              <Link href="/admin/users" className={`${pathname?.startsWith("/admin/users") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"} group flex items-center px-2 py-2 text-base font-medium rounded-md`}>Users & Mapping</Link>
           </nav>
         </aside>
         <main className="flex-1 overflow-y-auto p-8">{children}</main>

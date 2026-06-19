@@ -16,8 +16,8 @@ export default function Navbar() {
   const [activeSlug, setActiveSlug] = useState<string>("");
 
   useEffect(() => {
-    if (pathname.startsWith("/dashboard/")) {
-      const slug = pathname.split("/")[2];
+    if (pathname?.startsWith("/dashboard/")) {
+      const slug = pathname?.split("/")[2];
       if (slug) {
          // Using a timeout or separate state handler might be preferred to avoid react-hooks warning,
          // but we suppressed the rule. Doing it anyway to ensure stability.
@@ -80,7 +80,7 @@ export default function Navbar() {
                 <Link
                   href={`/dashboard/${activeSlug}`}
                   className={`${
-                    pathname.includes("/dashboard")
+                    pathname?.includes("/dashboard")
                       ? "border-blue-500 text-gray-900"
                       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                   } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
@@ -94,7 +94,7 @@ export default function Navbar() {
                 <Link
                   href="/admin"
                   className={`${
-                    pathname.startsWith("/admin")
+                    pathname?.startsWith("/admin")
                       ? "border-blue-500 text-gray-900"
                       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                   } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
