@@ -26,3 +26,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: Fix Entra ID (Azure AD) Login Account Linkage Bug**
   *Link: [./tracks/fix_entra_login_20260617/](./tracks/fix_entra_login_20260617/)*
 
+---
+
+- [ ] **Track: Configure GitHub Actions to inject live environment secrets into GCP Cloud Run deployment**
+  *Link: [./tracks/deploy_gcp_docker_variables_20260619/](./tracks/deploy_gcp_docker_variables_20260619/)*
