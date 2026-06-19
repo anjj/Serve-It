@@ -19,8 +19,8 @@ export default function Navbar() {
   const [activeSlug, setActiveSlug] = useState<string>("");
 
   useEffect(() => {
-    if (pathname.startsWith("/dashboard/")) {
-      const slug = pathname.split("/")[2];
+    if (pathname?.startsWith("/dashboard/")) {
+      const slug = pathname?.split("/")[2];
       if (slug) {
          setTimeout(() => setActiveSlug(slug), 0);
       }
@@ -80,7 +80,7 @@ export default function Navbar() {
                 <Link
                   href={`/dashboard/${activeSlug}`}
                   className={`${
-                    pathname.includes("/dashboard")
+                    pathname?.includes("/dashboard")
                       ? "border-primary text-foreground"
                       : "border-transparent text-foreground-muted hover:border-border-color hover:text-foreground"
                   } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200`}
@@ -94,7 +94,7 @@ export default function Navbar() {
                 <Link
                   href="/admin"
                   className={`${
-                    pathname.startsWith("/admin")
+                    pathname?.startsWith("/admin")
                       ? "border-primary text-foreground"
                       : "border-transparent text-foreground-muted hover:border-border-color hover:text-foreground"
                   } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200`}
