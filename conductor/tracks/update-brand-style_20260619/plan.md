@@ -5,7 +5,7 @@
     - [ ] Write tests to verify font class applications.
     - [ ] Add Montserrat and JetBrains Mono fonts to the Next.js `app/layout.tsx`.
     - [ ] Define the base CSS variables in global CSS mapping to the specified brand colors and layout constraints.
-- [~] Task: Configure Tailwind Settings
+- [x] Task: Configure Tailwind Settings e80ce1b
     - [ ] Update Tailwind configuration to map theme colors (e.g., `primary`, `background`, `ink`) to the CSS variables.
     - [ ] Update Tailwind configuration for typography and default border radii.
 - [ ] Task: Conductor - User Manual Verification 'Core Design System Configuration' (Protocol in workflow.md)
