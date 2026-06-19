@@ -14,7 +14,7 @@
 - [x] Task: Update Button and CTA Components caa718d
     - [ ] Write/update unit tests for Button components to verify correct class application.
     - [ ] Implement style updates to ensure Buttons have 0px border radius and use Pass-Through Green.
-- [ ] Task: Update Card and Code Container Components
+- [x] Task: Update Card and Code Container Components 6dcbf7a
     - [ ] Write/update unit tests for Card and Code Container components.
     - [ ] Implement max 3px border radius, pure white/alternate backgrounds, and minimum 32px padding for Cards.
 - [ ] Task: Implement New Logo Component
