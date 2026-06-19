@@ -14,7 +14,7 @@ function SignInForm() {
   const [slug, setSlug] = useState("");
   const [password, setPassword] = useState("");
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl");
+  const callbackUrl = searchParams ? searchParams.get("callbackUrl") : null;
 
   const handleCustomerLogin = async (e: React.FormEvent) => {
     e.preventDefault();
