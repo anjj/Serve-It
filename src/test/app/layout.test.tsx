@@ -6,7 +6,7 @@ import RootLayout from '@/app/layout';
 
 // Mock next/font/google
 vi.mock('next/font/google', () => ({
-  Montserrat: () => ({ variable: '--font-montserrat' }),
+  Inter: () => ({ variable: '--font-inter' }),
   JetBrains_Mono: () => ({ variable: '--font-jetbrains-mono' }),
   Geist: () => ({ variable: '--font-geist-sans' }),
   Geist_Mono: () => ({ variable: '--font-geist-mono' }),
@@ -18,7 +18,7 @@ vi.mock('@/components/Providers', () => ({
 }));
 
 describe('RootLayout Fonts', () => {
-  it('should apply Montserrat and JetBrains Mono font variables to the body', () => {
+  it('should apply Inter and JetBrains Mono font variables to the body', () => {
     render(
       <RootLayout>
         <div data-testid="test-content">Test Content</div>
@@ -27,7 +27,7 @@ describe('RootLayout Fonts', () => {
 
     const body = screen.getByTestId('test-content').closest('body');
     expect(body).toBeInTheDocument();
-    expect(body?.className).toContain('--font-montserrat');
+    expect(body?.className).toContain('--font-inter');
     expect(body?.className).toContain('--font-jetbrains-mono');
   });
 });
