@@ -5,6 +5,10 @@
 - **Framework:** **Next.js 16** with **React 19** using the App Router (`src/app/`)
 - **Styling:** **Tailwind CSS v4** with `@tailwindcss/postcss` for component styling
 
+## Infrastructure & Deployment
+- **Hosting:** **Google Cloud Run** (Docker containerized)
+- **CI/CD:** **GitHub Actions** with automated deployment and environment secret injection
+
 ## Database & Data Access
 - **Database Engine:** **PostgreSQL**
 - **ORM / Client:** **Prisma Client** (using schema at `prisma/schema.prisma`)
