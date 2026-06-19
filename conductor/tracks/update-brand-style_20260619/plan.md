@@ -26,7 +26,7 @@
 - [x] Task: Apply Styles to Landing Page c432e86
     - [ ] Refactor Landing Page components using the updated design system.
     - [ ] Update any layout tests if necessary.
-- [ ] Task: Apply Styles to Auth Pages
+- [x] Task: Apply Styles to Auth Pages 9450c06
     - [ ] Refactor Auth Pages to adhere to the strict minimalist aesthetic.
 - [ ] Task: Apply Styles to Workspace
     - [ ] Refactor Workspace layout using new background palettes and typography hierarchy.
