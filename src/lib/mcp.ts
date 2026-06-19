@@ -1,22 +1,29 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { AuthContext } from "./auth-api";
 import { prisma } from "./prisma";
 import { createDocument, patchDocument } from "./documents";
 
-// Use global to persist across Next.js HMR in development, and to act as a singleton
+/**
+ * Global session registry for MCP Streamable HTTP transports.
+ * Uses globalThis to persist across Next.js HMR in development.
+ */
 const globalForMCP = globalThis as unknown as {
-  mcpTransports: Map<string, SSEServerTransport> | undefined;
+  mcpSessions: Map<string, StreamableHTTPServerTransport> | undefined;
 };
 
-export const mcpTransports = globalForMCP.mcpTransports ?? new Map<string, SSEServerTransport>();
+export const mcpSessions = globalForMCP.mcpSessions ?? new Map<string, StreamableHTTPServerTransport>();
 
 if (process.env.NODE_ENV !== "production") {
-  globalForMCP.mcpTransports = mcpTransports;
+  globalForMCP.mcpSessions = mcpSessions;
 }
 
-export function createMCPServer(auth: AuthContext, transport: SSEServerTransport) {
+/**
+ * Creates and configures an MCP Server with tools scoped to the authenticated user's permissions.
+ * The server exposes get_customers, post_file, and patch_file tools.
+ */
+export function createMCPServer(auth: AuthContext) {
   const server = new Server(
     {
       name: "serve-it-mcp",
@@ -34,7 +41,7 @@ export function createMCPServer(auth: AuthContext, transport: SSEServerTransport
       tools: [
         {
           name: "get_customers",
-          description: "List customers the user has access to.",
+          description: "List customers (workspaces) the authenticated user has access to.",
           inputSchema: {
             type: "object",
             properties: {},
@@ -82,13 +89,13 @@ export function createMCPServer(auth: AuthContext, transport: SSEServerTransport
     try {
       if (name === "get_customers") {
         if (auth.customerId) {
-          // Customer-level API key
+          // Customer-level API key: return only the bound customer
           const customer = await prisma.customer.findUnique({ where: { id: auth.customerId } });
           return {
             content: [{ type: "text", text: JSON.stringify(customer ? [customer] : []) }],
           };
         } else if (auth.userId) {
-          // User-level API key
+          // User-level API key: return all accessible customers
           if (auth.isAdmin) {
             const customers = await prisma.customer.findMany({ where: { isActive: true } });
             return {
@@ -114,7 +121,7 @@ export function createMCPServer(auth: AuthContext, transport: SSEServerTransport
         const customer_slug = args?.customer_slug as string;
         if (!customer_slug) throw new Error("customer_slug is required");
 
-        // Verify auth for this specific customer
+        // Resolve and verify customer access for the authenticated context
         let activeCustomerId = auth.customerId;
         
         if (!activeCustomerId && auth.userId) {
