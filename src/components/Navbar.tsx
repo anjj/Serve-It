@@ -34,9 +34,6 @@ export default function Navbar() {
         .then((data) => {
           if (data.customers) {
             setCustomers(data.customers);
-            if (!activeSlug && data.customers.length > 0 && pathname === "/dashboard") {
-              router.push(`/dashboard/${data.customers[0].slug}`);
-            }
           }
         });
     }
