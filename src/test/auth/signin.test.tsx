@@ -19,6 +19,6 @@ describe('SignIn Page', () => {
     render(<SignIn />);
     const loginBtn = screen.getByRole('button', { name: /microsoft entra id/i });
     expect(loginBtn).toBeInTheDocument();
-    expect(loginBtn).toHaveClass('bg-zinc-900');
+    expect(loginBtn).toHaveClass('bg-primary');
   });
 });
