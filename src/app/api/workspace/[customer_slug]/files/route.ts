@@ -10,13 +10,24 @@ export async function GET(req: Request, { params }: { params: Promise<{ customer
 
   const resolvedParams = await params;
   const customer_slug = resolvedParams.customer_slug;
+  const role = (session.user as any).role;
+  const userCustomerSlug = (session.user as any).customer_slug;
   const userId = (session.user as any).id;
   const isAdmin = (session.user as any).isAdmin;
 
   try {
     const customer = await prisma.customer.findUnique({ where: { slug: customer_slug }, include: { users: { where: { userId } } } });
     if (!customer) return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
-    if (!isAdmin && customer.users.length === 0) return NextResponse.json({ error: "Access denied" }, { status: 403 });
+
+    if (role === "CUSTOMER") {
+      if (userCustomerSlug !== customer_slug) {
+        return NextResponse.json({ error: "Access denied" }, { status: 403 });
+      }
+    } else {
+      if (!isAdmin && customer.users.length === 0) {
+        return NextResponse.json({ error: "Access denied" }, { status: 403 });
+      }
+    }
 
     const files = await prisma.file.findMany({ where: { customerId: customer.id }, select: { id: true, title: true, slug: true, tags: true, createdAt: true }, orderBy: { createdAt: "desc" } });
     return NextResponse.json({ files });
@@ -28,6 +39,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ customer
 export async function POST(req: Request, { params }: { params: Promise<{ customer_slug: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if ((session.user as any).role === "CUSTOMER") {
+    return NextResponse.json({ error: "Access denied" }, { status: 403 });
+  }
 
   const resolvedParams = await params;
   const customer_slug = resolvedParams.customer_slug;
@@ -114,6 +129,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ custome
 export async function DELETE(req: Request, { params }: { params: Promise<{ customer_slug: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if ((session.user as any).role === "CUSTOMER") {
+    return NextResponse.json({ error: "Access denied" }, { status: 403 });
+  }
 
   const resolvedParams = await params;
   const customer_slug = resolvedParams.customer_slug;
