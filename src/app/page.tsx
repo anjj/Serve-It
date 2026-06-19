@@ -7,8 +7,33 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-white">
       {/* Hero Section */}
-      <main className="w-full min-h-[100vh] flex flex-col items-center justify-center p-6 sm:p-12">
-        <div className="max-w-4xl w-full flex flex-col items-center text-center gap-8">
+      <main className="relative w-full min-h-[100vh] flex flex-col items-center justify-center p-6 sm:p-12 overflow-hidden">
+        {/* Decorative Floating HTML Snippet */}
+        <div className="absolute top-16 right-16 hidden lg:block opacity-30 hover:opacity-80 transition-opacity duration-500 max-w-sm pointer-events-none select-none z-0">
+          <div className="bg-[#0b0f19]/80 backdrop-blur-md border border-[#374151] rounded-[var(--radius-card)] p-5 font-mono text-xs text-[#9ca3af] shadow-2xl">
+            <div className="flex gap-2 mb-4">
+              <div className="w-2.5 h-2.5 rounded-full bg-[#374151]"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-[#374151]"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-[#374151]"></div>
+            </div>
+            <pre className="text-left leading-relaxed">
+              <code>
+                <span className="text-pink-400">&lt;!DOCTYPE</span> <span className="text-orange-300">html</span><span className="text-pink-400">&gt;</span>{'\n'}
+                <span className="text-pink-400">&lt;html</span> <span className="text-orange-300">lang=</span><span className="text-green-300">"en"</span><span className="text-pink-400">&gt;</span>{'\n'}
+                <span className="text-pink-400">&lt;head&gt;</span>{'\n'}
+                {'  '}<span className="text-pink-400">&lt;meta</span> <span className="text-orange-300">name=</span><span className="text-green-300">"server"</span> <span className="text-orange-300">content=</span><span className="text-green-300">"serve-it"</span><span className="text-pink-400">&gt;</span>{'\n'}
+                {'  '}<span className="text-pink-400">&lt;title&gt;</span><span className="text-gray-200">Zero Vector</span><span className="text-pink-400">&lt;/title&gt;</span>{'\n'}
+                <span className="text-pink-400">&lt;/head&gt;</span>{'\n'}
+                <span className="text-pink-400">&lt;body&gt;</span>{'\n'}
+                {'  '}<span className="text-pink-400">&lt;div</span> <span className="text-orange-300">id=</span><span className="text-green-300">"app"</span><span className="text-pink-400">&gt;</span><span className="text-gray-200">Unmodified Truth.</span><span className="text-pink-400">&lt;/div&gt;</span>{'\n'}
+                <span className="text-pink-400">&lt;/body&gt;</span>{'\n'}
+                <span className="text-pink-400">&lt;/html&gt;</span>
+              </code>
+            </pre>
+          </div>
+        </div>
+
+        <div className="relative z-10 max-w-4xl w-full flex flex-col items-center text-center gap-8">
           <Logo className="transform scale-200 origin-center mb-10 mt-6" />
           <h1 className="text-2xl sm:text-3xl font-bold tracking-normal text-foreground mb-4">
             The Unaltered Truth.
