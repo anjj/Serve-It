@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { LogOut, LayoutDashboard, Settings, Sun, Moon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTheme } from "./ThemeProvider";
+import { Logo } from "./Logo";
 
 type Customer = { id: string; name: string; slug: string; };
 
@@ -50,12 +51,14 @@ export default function Navbar() {
   if (!session) return null;
 
   return (
-    <nav className="bg-white dark:bg-[#121827] border-b border-gray-200 dark:border-zinc-800 transition-colors duration-200">
+    <nav className="bg-background border-b border-border-color transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <span className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Serve-It</span>
+              <div className="transform scale-[0.5] sm:scale-75 origin-left">
+                <Logo />
+              </div>
             </div>
 
             {customers.length > 0 && (
@@ -63,7 +66,7 @@ export default function Navbar() {
                 <select
                   value={activeSlug}
                   onChange={handleWorkspaceChange}
-                  className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-zinc-700 focus:outline-none focus:ring-zinc-900 focus:border-zinc-900 dark:focus:ring-zinc-100 dark:focus:border-zinc-100 sm:text-sm rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 transition-colors duration-200"
+                  className="block w-full pl-3 pr-10 py-2 text-base border-border-color focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-[var(--radius-button)] bg-background-alternate text-foreground transition-colors duration-200"
                 >
                   <option value="" disabled>Select Workspace</option>
                   {customers.map((c) => (
@@ -81,8 +84,8 @@ export default function Navbar() {
                   href={`/dashboard/${activeSlug}`}
                   className={`${
                     pathname.includes("/dashboard")
-                      ? "border-zinc-900 dark:border-zinc-100 text-zinc-900 dark:text-zinc-100"
-                      : "border-transparent text-zinc-500 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-700 dark:hover:text-zinc-300"
+                      ? "border-primary text-foreground"
+                      : "border-transparent text-foreground-muted hover:border-border-color hover:text-foreground"
                   } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200`}
                 >
                   <LayoutDashboard className="w-4 h-4 mr-2" />
@@ -95,8 +98,8 @@ export default function Navbar() {
                   href="/admin"
                   className={`${
                     pathname.startsWith("/admin")
-                      ? "border-zinc-900 dark:border-zinc-100 text-zinc-900 dark:text-zinc-100"
-                      : "border-transparent text-zinc-500 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-700 dark:hover:text-zinc-300"
+                      ? "border-primary text-foreground"
+                      : "border-transparent text-foreground-muted hover:border-border-color hover:text-foreground"
                   } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200`}
                 >
                   <Settings className="w-4 h-4 mr-2" />
@@ -106,12 +109,12 @@ export default function Navbar() {
             </div>
           </div>
           <div className="flex items-center">
-            <span className="text-sm text-zinc-500 dark:text-zinc-400 mr-4">
+            <span className="text-sm text-foreground-muted mr-4">
               {session.user?.name || session.user?.email}
             </span>
             <button
               onClick={toggleTheme}
-              className="p-2 mr-2 rounded-full text-zinc-400 hover:text-zinc-500 dark:text-zinc-400 dark:hover:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 transition-colors duration-200"
+              className="p-2 mr-2 rounded-full text-foreground-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200"
               aria-label="Toggle Theme"
               title="Toggle Theme"
             >
@@ -119,7 +122,7 @@ export default function Navbar() {
             </button>
             <button
               onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-              className="p-2 rounded-full text-zinc-400 hover:text-zinc-500 dark:text-zinc-400 dark:hover:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 transition-colors duration-200"
+              className="p-2 rounded-full text-foreground-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200"
             >
               <span className="sr-only">Sign out</span>
               <LogOut className="h-5 w-5" aria-hidden="true" />
