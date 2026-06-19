@@ -6,6 +6,8 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { Logo } from "@/components/Logo";
+import { FaMicrosoft } from "react-icons/fa";
+import { User } from "lucide-react";
 
 function SignInForm() {
   const [showCustomerLogin, setShowCustomerLogin] = useState(false);
@@ -36,13 +38,15 @@ function SignInForm() {
               onClick={() => signIn("azure-ad", { callbackUrl: callbackUrl || "/dashboard" })}
               className="w-full"
             >
-              Authenticate via Entra ID
+              <FaMicrosoft className="mr-2 h-4 w-4" />
+              Microsoft Login
             </Button>
             <Button
               variant="secondary"
               onClick={() => setShowCustomerLogin(true)}
               className="w-full"
             >
+              <User className="mr-2 h-4 w-4" />
               Client Authentication
             </Button>
             {process.env.NODE_ENV === "development" && (
