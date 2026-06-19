@@ -10,7 +10,7 @@ type File = { id: string; title: string; slug: string; tags: string[]; createdAt
 
 export default function CustomerDocumentsPage() {
   const params = useParams();
-  const rawCustomerSlug = params.customer_slug;
+  const rawCustomerSlug = params?.customer_slug;
   const customer_slug = Array.isArray(rawCustomerSlug) ? rawCustomerSlug[0] : rawCustomerSlug;
 
   const { data: session, status } = useSession();

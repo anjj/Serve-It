@@ -1,6 +1,6 @@
 import React from 'react';
 
-export interface CodeContainerProps extends React.HTMLAttributes<HTMLPreElement> {}
+export type CodeContainerProps = React.HTMLAttributes<HTMLPreElement>;
 
 export const CodeContainer = React.forwardRef<HTMLPreElement, CodeContainerProps>(
   ({ className = '', ...props }, ref) => {
