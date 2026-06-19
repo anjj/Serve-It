@@ -48,26 +48,4 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Authenticate to Google Cloud
-        if: github.event_name != 'pull_request'
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
 
-      - name: Deploy to Cloud Run
-        if: github.event_name != 'pull_request'
-        uses: google-github-actions/deploy-cloudrun@v2
-        with:
-          service: 'serve-it'
-          image: '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main'
-          env_vars: |-
-            DATABASE_URL=${{ secrets.DATABASE_URL }}
-            DIRECT_URL=${{ secrets.DIRECT_URL }}
-            NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}
-            NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
-            AZURE_AD_CLIENT_ID=${{ secrets.AZURE_AD_CLIENT_ID }}
-            AZURE_AD_CLIENT_SECRET=${{ secrets.AZURE_AD_CLIENT_SECRET }}
-            AZURE_AD_TENANT_ID=${{ secrets.AZURE_AD_TENANT_ID }}
-            SUPABASE_URL=${{ secrets.SUPABASE_URL }}
-            SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-            SUPABASE_STORAGE_BUCKET=${{ secrets.SUPABASE_STORAGE_BUCKET }}
