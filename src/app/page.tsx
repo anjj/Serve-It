@@ -8,7 +8,7 @@ export default function Home() {
       <main className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12">
         <div className="max-w-2xl w-full flex flex-col items-center text-center gap-8">
           <Logo className="transform scale-200 origin-center mb-10 mt-6" />
-          <h1 className="text-4xl sm:text-6xl font-bold tracking-normal text-foreground mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-normal text-foreground mb-6">
             The Unaltered Truth.
           </h1>
           <p className="text-xl text-foreground-muted mb-8 max-w-2xl mx-auto">
