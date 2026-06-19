@@ -28,12 +28,16 @@
   --color-background-soft: var(--background-soft);
   --color-foreground: var(--foreground);
   --color-foreground-muted: var(--foreground-muted);
+  --color-ink: var(--foreground);
   --color-border-color: var(--border-color);
   --color-border-color-soft: var(--border-color-soft);
   --color-primary: var(--primary);
   
   --font-sans: var(--font-montserrat);
   --font-mono: var(--font-jetbrains-mono);
+
+  --radius-button: 0px;
+  --radius-card: 3px;
 }
 
 body {

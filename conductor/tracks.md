@@ -28,6 +28,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: update-brand-style**
+- [~] **Track: update-brand-style**
 *Link: [./tracks/update-brand-style_20260619/](./tracks/update-brand-style_20260619/)*
 
