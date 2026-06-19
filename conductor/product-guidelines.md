@@ -10,14 +10,13 @@ We communicate with users in a **Professional & Concise** manner.
 ---
 
 ## 2. Visual Theme & Aesthetics
-The product interface follows a **Minimalist Black & White** aesthetic with togglable Dark Mode.
+The product interface follows a **Minimalist Light** aesthetic.
 - **Color Palette:**
   - Background: Clean white (`#FFFFFF`) and light grays (`#F9FAFB` / `#F3F4F6`) to define boundaries.
   - Typography: Ink-dark text (`#111827`) with medium gray secondary text (`#4B5563`).
-  - Accent: Black/white neutral tones (`#111827`/`#FFFFFF`) for primary actions (replacing the previous blue theme).
-  - Dark Mode: Togglable charcoal/slate dark gray theme (background `#0B0F19`, containers/cards `#121827`, text `#F3F4F6`).
+  - Accent: Royal blue (`#2563EB`) or slate indigo (`#4F46E5`) for primary actions, used sparingly.
 - **Typography:** Modern, clean sans-serif (e.g., Geist or Inter) with spacious line heights to enhance readability.
-- **Layout:** Generous spacing, thin borders, and structured grids. Avoid heavy colored headers.
+- **Layout:** Generous spacing, thin borders, and structured grids. Avoid heavy colored headers or dark-mode defaults.
 
 ---
 

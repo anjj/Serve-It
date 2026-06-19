@@ -5,7 +5,7 @@ This domain governs automated, programmatic interactions with the workspace, ena
 ---
 
 ## 1. How It Works (Non-Technical Summary)
-Developers can request API keys for their workspaces. The system generates a cryptographically secure key prefixed with `sk_serve_` and shows it **once** to the developer. The database only retains a secure SHA-256 hash of the key. External systems can send programmatic `POST` requests to upload HTML files, or `PATCH` requests to update existing files and metadata, by passing their API key as a Bearer Token.
+Developers can request API keys for their workspaces or for individual users. The system generates a cryptographically secure key prefixed with `sk_live_serve-it_` and shows it **once** to the developer. The database only retains a secure SHA-256 hash of the key. External systems can send programmatic `POST` requests to upload HTML files, or `PATCH` requests to update existing files and metadata, by passing their API key as a Bearer Token.
 
 ---
 
@@ -17,7 +17,7 @@ Developers can request API keys for their workspaces. The system generates a cry
    [Generate Key Action]
              |
    rawKey = crypto.randomBytes(32)
-   fullKey = "sk_serve_" + rawKey
+   fullKey = "sk_live_serve-it_" + rawKey
              |
    keyHash = sha256(fullKey)
              |
@@ -51,9 +51,9 @@ Developers can request API keys for their workspaces. The system generates a cry
 
 ### API Key Constraints & Hashing Scheme
 1. **Uniqueness & Entropy**: API keys are built using 32 bytes of secure random bytes, formatted as hex (`64` characters).
-2. **One-Time Exposure**: The raw key (`sk_serve_...`) is returned in the HTTP response body exactly once upon creation. It is never displayed or retrievable again.
+2. **One-Time Exposure**: The raw key (`sk_live_serve-it_...`) is returned in the HTTP response body exactly once upon creation. It is never displayed or retrievable again.
 3. **Database Security**: The database only stores `keyHash` (computed using standard SHA-256 hashing in hex format).
-4. **Token Authentication Validation**: Programmatic requests MUST pass the key via `Authorization: Bearer sk_serve_...`. The backend extracts this token, hashes it, and queries the `ApiKey` table.
+4. **Token Authentication Validation**: Programmatic requests MUST pass the key via `Authorization: Bearer sk_live_serve-it_...`. The backend extracts this token, hashes it, and queries the `ApiKey` table.
 
 ---
 

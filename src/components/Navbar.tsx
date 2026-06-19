@@ -3,10 +3,8 @@
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOut, LayoutDashboard, Settings, Sun, Moon } from "lucide-react";
+import { LogOut, LayoutDashboard, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useTheme } from "./ThemeProvider";
-import { Logo } from "./Logo";
 
 type Customer = { id: string; name: string; slug: string; };
 
@@ -14,14 +12,15 @@ export default function Navbar() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const router = useRouter();
-  const { theme, toggleTheme } = useTheme();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [activeSlug, setActiveSlug] = useState<string>("");
 
   useEffect(() => {
-    if (pathname?.startsWith("/dashboard/")) {
-      const slug = pathname?.split("/")[2];
+    if (pathname.startsWith("/dashboard/")) {
+      const slug = pathname.split("/")[2];
       if (slug) {
+         // Using a timeout or separate state handler might be preferred to avoid react-hooks warning,
+         // but we suppressed the rule. Doing it anyway to ensure stability.
          setTimeout(() => setActiveSlug(slug), 0);
       }
     }
@@ -34,6 +33,9 @@ export default function Navbar() {
         .then((data) => {
           if (data.customers) {
             setCustomers(data.customers);
+            if (!activeSlug && data.customers.length > 0 && pathname === "/dashboard") {
+              router.push(`/dashboard/${data.customers[0].slug}`);
+            }
           }
         });
     }
@@ -48,14 +50,12 @@ export default function Navbar() {
   if (!session) return null;
 
   return (
-    <nav className="bg-background border-b border-border-color transition-colors duration-200">
+    <nav className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <div className="transform scale-[0.5] sm:scale-75 origin-left">
-                <Logo />
-              </div>
+              <span className="text-xl font-bold text-blue-600">Serve-It</span>
             </div>
 
             {customers.length > 0 && (
@@ -63,7 +63,7 @@ export default function Navbar() {
                 <select
                   value={activeSlug}
                   onChange={handleWorkspaceChange}
-                  className="block w-full pl-3 pr-10 py-2 text-base border-border-color focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-[var(--radius-button)] bg-background-alternate text-foreground transition-colors duration-200"
+                  className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                 >
                   <option value="" disabled>Select Workspace</option>
                   {customers.map((c) => (
@@ -80,7 +80,7 @@ export default function Navbar() {
                 <Link
                   href={`/dashboard/${activeSlug}`}
                   className={`${
-                    pathname?.includes("/dashboard")
+                    pathname.includes("/dashboard")
                       ? "border-blue-500 text-gray-900"
                       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                   } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
@@ -94,7 +94,7 @@ export default function Navbar() {
                 <Link
                   href="/admin"
                   className={`${
-                    pathname?.startsWith("/admin")
+                    pathname.startsWith("/admin")
                       ? "border-blue-500 text-gray-900"
                       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                   } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
@@ -106,20 +106,12 @@ export default function Navbar() {
             </div>
           </div>
           <div className="flex items-center">
-            <span className="text-sm text-foreground-muted mr-4">
+            <span className="text-sm text-gray-500 mr-4">
               {session.user?.name || session.user?.email}
             </span>
             <button
-              onClick={toggleTheme}
-              className="p-2 mr-2 rounded-full text-foreground-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200"
-              aria-label="Toggle Theme"
-              title="Toggle Theme"
-            >
-              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </button>
-            <button
               onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-              className="p-2 rounded-full text-foreground-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200"
+              className="p-2 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               <span className="sr-only">Sign out</span>
               <LogOut className="h-5 w-5" aria-hidden="true" />

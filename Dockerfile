@@ -1,5 +1,4 @@
 FROM node:20-alpine AS base
-RUN apk add --no-cache openssl
 RUN npm i -g pnpm
 FROM base AS deps
 RUN apk add --no-cache libc6-compat

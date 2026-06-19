@@ -25,7 +25,7 @@ vi.mock('@modelcontextprotocol/sdk/server/index.js', () => {
 });
 
 describe('MCP Sidecar Logic', () => {
-  let handlers: Record<string, (...args: any[]) => any> = {};
+  let handlers: Record<string, Function> = {};
 
   beforeEach(() => {
     vi.clearAllMocks();
