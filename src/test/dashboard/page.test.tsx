@@ -70,7 +70,7 @@ describe('WorkspaceDashboard Page', () => {
     expect(deleteBtn).toBeInTheDocument();
 
     // Check that the Upload File button has neutral styling
-    const uploadFileBtn = screen.getByRole('button', { name: /upload file/i });
+    const uploadFileBtn = screen.getByRole('button', { name: /secure upload/i });
     expect(uploadFileBtn).toHaveClass('bg-primary');
 
     // Mock window.confirm to return true (confirm)

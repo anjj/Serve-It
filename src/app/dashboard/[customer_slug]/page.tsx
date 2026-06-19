@@ -113,7 +113,7 @@ export default function WorkspaceDashboard() {
             <input
               type="text"
               className="block w-full pl-10 pr-3 py-2 border border-border-color rounded-[var(--radius-button)] leading-5 bg-background-alternate placeholder-foreground-muted focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm text-foreground transition-colors duration-200"
-              placeholder="Search files..."
+              placeholder="Query files..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -141,7 +141,7 @@ export default function WorkspaceDashboard() {
               className="inline-flex items-center gap-2"
             >
               <Upload className="h-4 w-4" />
-              <span>Upload File</span>
+              <span>Secure Upload</span>
             </Button>
           </div>
         </div>
@@ -174,7 +174,7 @@ export default function WorkspaceDashboard() {
                       <Trash2 className="h-4 w-4" />
                     </button>
                     <a href={`/s/${customer_slug}/${file.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-[var(--radius-button)] shadow-sm text-white bg-primary hover:bg-green-700 transition-colors duration-200">
-                      View Document
+                      Access Document
                     </a>
                   </div>
                 </div>

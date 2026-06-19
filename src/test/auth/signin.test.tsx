@@ -17,7 +17,7 @@ vi.mock('next/navigation', () => ({
 describe('SignIn Page', () => {
   it('renders Entra ID login button with neutral styling', () => {
     render(<SignIn />);
-    const loginBtn = screen.getByRole('button', { name: /microsoft entra id/i });
+    const loginBtn = screen.getByRole('button', { name: /authenticate via entra id/i });
     expect(loginBtn).toBeInTheDocument();
     expect(loginBtn).toHaveClass('bg-primary');
   });

@@ -36,14 +36,14 @@ function SignInForm() {
               onClick={() => signIn("azure-ad", { callbackUrl: callbackUrl || "/dashboard" })}
               className="w-full"
             >
-              Sign in with Microsoft Entra ID
+              Authenticate via Entra ID
             </Button>
             <Button
               variant="secondary"
               onClick={() => setShowCustomerLogin(true)}
               className="w-full"
             >
-              Sign in as Customer
+              Client Authentication
             </Button>
             {process.env.NODE_ENV === "development" && (
               <Button
@@ -51,7 +51,7 @@ function SignInForm() {
                 onClick={() => signIn("credentials", { email: "dev@example.com", isAdmin: "true", callbackUrl: callbackUrl || "/dashboard" })}
                 className="w-full mt-4"
               >
-                Bypass: Sign in as Developer Admin
+                Developer Override: Admin Access
               </Button>
             )}
           </div>
@@ -90,7 +90,7 @@ function SignInForm() {
                 onClick={() => setShowCustomerLogin(false)}
                 className="text-sm font-medium text-foreground-muted hover:text-foreground text-center transition-colors cursor-pointer"
               >
-                Back to employee login
+                Return to Employee Portal
               </button>
             </div>
           </form>

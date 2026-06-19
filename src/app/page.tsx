@@ -8,9 +8,11 @@ export default function Home() {
       <main className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12">
         <div className="max-w-2xl w-full flex flex-col items-center text-center gap-8">
           <Logo className="mb-4" />
-
-          <p className="text-xl sm:text-2xl text-foreground-muted max-w-lg leading-relaxed">
-            A secure way to host and serve your AI-generated HTML files.
+          <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-foreground mb-6">
+            The Unaltered Truth.
+          </h1>
+          <p className="text-xl text-foreground-muted mb-8 max-w-2xl mx-auto">
+            Extreme performance, cybersecurity, and absolute transparency.
           </p>
 
           <div className="mt-8">
@@ -18,7 +20,7 @@ export default function Home() {
               href="/auth/signin"
               className="inline-flex items-center justify-center rounded-[var(--radius-button)] font-sans font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 px-8 py-4 bg-primary text-white hover:bg-green-700 text-base"
             >
-              Get me Inside
+              Initiate Access
             </Link>
           </div>
         </div>
