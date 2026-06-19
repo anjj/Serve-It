@@ -28,7 +28,7 @@
     - [ ] Update any layout tests if necessary.
 - [x] Task: Apply Styles to Auth Pages 9450c06
     - [ ] Refactor Auth Pages to adhere to the strict minimalist aesthetic.
-- [ ] Task: Apply Styles to Workspace
+- [x] Task: Apply Styles to Workspace 7d133da
     - [ ] Refactor Workspace layout using new background palettes and typography hierarchy.
 - [ ] Task: Review and Adjust Copy Tone
     - [ ] Audit platform copy for alignment with "The Unaltered Truth".
