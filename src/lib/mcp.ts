@@ -1,19 +1,19 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { AuthContext } from "./auth-api";
 import { prisma } from "./prisma";
 import { createDocument, patchDocument } from "./documents";
 
 /**
- * Global session registry for MCP Streamable HTTP transports.
+ * Global session registry for MCP SSE transports.
  * Uses globalThis to persist across Next.js HMR in development.
  */
 const globalForMCP = globalThis as unknown as {
-  mcpSessions: Map<string, StreamableHTTPServerTransport> | undefined;
+  mcpSessions: Map<string, SSEServerTransport> | undefined;
 };
 
-export const mcpSessions = globalForMCP.mcpSessions ?? new Map<string, StreamableHTTPServerTransport>();
+export const mcpSessions = globalForMCP.mcpSessions ?? new Map<string, SSEServerTransport>();
 
 if (process.env.NODE_ENV !== "production") {
   globalForMCP.mcpSessions = mcpSessions;

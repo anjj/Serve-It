@@ -1,8 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { mcpSessions, createMCPServer } from "@/lib/mcp";
 import { validateRawApiKey } from "@/lib/auth-api";
-import crypto from "crypto";
 
 export const config = {
   api: {
@@ -16,7 +15,7 @@ export const config = {
 /**
  * Extracts the API key from Authorization header or x-api-key header.
  */
-function extractApiKey(req: NextApiRequest): string {
+export function extractApiKey(req: NextApiRequest): string {
   const xApiKey = req.headers["x-api-key"] as string;
   if (xApiKey) return xApiKey;
 
@@ -29,28 +28,18 @@ function extractApiKey(req: NextApiRequest): string {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // CORS headers required for browser-based MCP clients (e.g. MCP Inspector)
+  // CORS headers required for browser-based MCP clients (e.g. MCP Inspector) and ChatGPT
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Authorization, x-api-key, Content-Type, mcp-session-id");
+  res.setHeader("Access-Control-Allow-Headers", "Authorization, x-api-key, Content-Type, mcp-session-id, mcp-protocol-version");
   res.setHeader("Access-Control-Expose-Headers", "mcp-session-id");
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // --- POST: Handle JSON-RPC messages (initialize + subsequent calls) ---
-  if (req.method === "POST") {
-    const sessionId = req.headers["mcp-session-id"] as string | undefined;
-
-    // Existing session: route the message to its transport
-    if (sessionId && mcpSessions.has(sessionId)) {
-      const transport = mcpSessions.get(sessionId)!;
-      await transport.handleRequest(req as any, res as any, req.body);
-      return;
-    }
-
-    // New session: authenticate first, then create transport + server
+  // --- GET: Handle SSE Handshake (initialize) ---
+  if (req.method === "GET") {
     const apiKey = extractApiKey(req);
     if (!apiKey) {
       return res.status(401).json({ error: "Unauthorized: Missing API Key" });
@@ -61,51 +50,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(401).json({ error: "Unauthorized: Invalid API Key" });
     }
 
-    const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: () => crypto.randomUUID(),
-    });
+    // Set explicit headers to prevent buffering and keep the connection alive
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache, no-transform");
+    res.setHeader("Connection", "keep-alive");
+
+    // The messages endpoint that clients should POST back to
+    // Use a relative URL to support HTTPS tunnels (like ngrok) without mixed-content issues
+    const messagesUrl = "/api/mcp/messages";
+
+    const transport = new SSEServerTransport(messagesUrl, res as any);
+    const server = createMCPServer(auth);
+
+    await server.connect(transport);
 
     // Clean up session when transport closes
     transport.onclose = () => {
-      if (transport.sessionId) {
-        mcpSessions.delete(transport.sessionId);
-      }
+      mcpSessions.delete(transport.sessionId);
     };
 
-    const server = createMCPServer(auth);
-    await server.connect(transport);
+    mcpSessions.set(transport.sessionId, transport);
 
-    // handleRequest processes the initialize message and sets transport.sessionId
-    await transport.handleRequest(req as any, res as any, req.body);
+    // Start the SSE stream, this handles initial SSE headers & sending the endpoint URL event
+    await transport.start();
 
-    // Store the session after the initialize handshake completes
-    if (transport.sessionId) {
-      mcpSessions.set(transport.sessionId, transport);
-    }
+    // Prevent Next.js from closing the response early by holding the request open.
+    // The SSEServerTransport keeps the response active.
+    res.on("close", () => {
+      transport.close();
+    });
 
     return;
-  }
-
-  // --- GET: SSE stream for server-initiated notifications (optional) ---
-  if (req.method === "GET") {
-    const sessionId = req.headers["mcp-session-id"] as string;
-    if (!sessionId || !mcpSessions.has(sessionId)) {
-      return res.status(404).json({ error: "Session not found" });
-    }
-    const transport = mcpSessions.get(sessionId)!;
-    await transport.handleRequest(req as any, res as any);
-    return;
-  }
-
-  // --- DELETE: Terminate a session ---
-  if (req.method === "DELETE") {
-    const sessionId = req.headers["mcp-session-id"] as string;
-    if (sessionId && mcpSessions.has(sessionId)) {
-      const transport = mcpSessions.get(sessionId)!;
-      await transport.close();
-      mcpSessions.delete(sessionId);
-    }
-    return res.status(200).end();
   }
 
   return res.status(405).json({ error: "Method not allowed" });
