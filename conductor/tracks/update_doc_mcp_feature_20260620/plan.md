@@ -31,4 +31,4 @@
     - [ ] Add `docs/domains/mcp.md` entry (item 6) to the existing Domain Documentation list in README.md.
     - [ ] Add a new "🤖 MCP Integration" section after the Domain Documentation section with a brief summary and link to `docs/MCP_GUIDE.md`.
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: README Update' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 3: README Update' (Protocol in workflow.md)
