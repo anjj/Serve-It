@@ -14,7 +14,7 @@
 
 ## Phase 2: MCP Setup Guide
 
-- [ ] Task: Create MCP setup guide (`docs/MCP_GUIDE.md`)
+- [x] Task: Create MCP setup guide (`docs/MCP_GUIDE.md`) `0235a9b`
     - [ ] Write the Introduction section explaining what MCP is and how Serve-it supports it.
     - [ ] Write the Prerequisites section covering API key generation and workspace setup requirements.
     - [ ] Write the Authentication Setup section detailing Access Token / API Key with Bearer configuration.
