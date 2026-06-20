@@ -10,7 +10,7 @@
     - [ ] Draft the "Diagnostics & Error Handling" table with common MCP-related errors and resolutions.
     - [ ] Write the final `docs/domains/mcp.md` file following the format of `docs/domains/apikeys.md`.
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: MCP Domain Documentation' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 1: MCP Domain Documentation' (Protocol in workflow.md)
 
 ## Phase 2: MCP Setup Guide
 

@@ -28,6 +28,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Update MCP Documentation Feature**
+- [~] **Track: Update MCP Documentation Feature**
   *Link: [./tracks/update_doc_mcp_feature_20260620/](./tracks/update_doc_mcp_feature_20260620/)*
 
