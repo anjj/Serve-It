@@ -23,7 +23,7 @@
     - [ ] Write the Available MCP Tools section listing and describing each tool exposed by Serve-it.
     - [ ] Write the Troubleshooting section with common issues and resolutions.
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: MCP Setup Guide' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 2: MCP Setup Guide' (Protocol in workflow.md)
 
 ## Phase 3: README Update
 
