@@ -2,7 +2,7 @@
 
 ## Phase 1: MCP Domain Documentation
 
-- [ ] Task: Create MCP domain document (`docs/domains/mcp.md`)
+- [x] Task: Create MCP domain document (`docs/domains/mcp.md`) `7a03316`
     - [ ] Research existing MCP-related code in `src/app/api/v1/files/route.ts`, `src/lib/storage.ts`, and the `@modelcontextprotocol/sdk` dependency to understand MCP tool capabilities.
     - [ ] Draft the "How It Works" non-technical summary section explaining MCP integration at a high level.
     - [ ] Draft the architecture section documenting how Serve-it exposes file operations (upload, update) as MCP tools, API key authentication flow, and Bearer token setup.
