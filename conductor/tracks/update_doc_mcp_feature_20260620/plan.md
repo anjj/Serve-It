@@ -12,7 +12,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: MCP Domain Documentation' (Protocol in workflow.md) `925de57`
 
-## Phase 2: MCP Setup Guide
+## Phase 2: MCP Setup Guide [checkpoint: b21cf6b]
 
 - [x] Task: Create MCP setup guide (`docs/MCP_GUIDE.md`) `0235a9b`
     - [ ] Write the Introduction section explaining what MCP is and how Serve-it supports it.
@@ -23,7 +23,7 @@
     - [ ] Write the Available MCP Tools section listing and describing each tool exposed by Serve-it.
     - [ ] Write the Troubleshooting section with common issues and resolutions.
 
-- [~] Task: Conductor - User Manual Verification 'Phase 2: MCP Setup Guide' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: MCP Setup Guide' (Protocol in workflow.md) `b21cf6b`
 
 ## Phase 3: README Update
 
