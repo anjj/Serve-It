@@ -27,7 +27,7 @@
 
 ## Phase 3: README Update
 
-- [ ] Task: Update README.md with MCP integration section
+- [x] Task: Update README.md with MCP integration section `e3963c4`
     - [ ] Add `docs/domains/mcp.md` entry (item 6) to the existing Domain Documentation list in README.md.
     - [ ] Add a new "🤖 MCP Integration" section after the Domain Documentation section with a brief summary and link to `docs/MCP_GUIDE.md`.
 
