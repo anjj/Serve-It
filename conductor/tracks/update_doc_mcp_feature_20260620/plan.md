@@ -1,6 +1,6 @@
 # Implementation Plan: Update MCP Documentation Feature
 
-## Phase 1: MCP Domain Documentation
+## Phase 1: MCP Domain Documentation [checkpoint: 925de57]
 
 - [x] Task: Create MCP domain document (`docs/domains/mcp.md`) `7a03316`
     - [ ] Research existing MCP-related code in `src/app/api/v1/files/route.ts`, `src/lib/storage.ts`, and the `@modelcontextprotocol/sdk` dependency to understand MCP tool capabilities.
@@ -10,7 +10,7 @@
     - [ ] Draft the "Diagnostics & Error Handling" table with common MCP-related errors and resolutions.
     - [ ] Write the final `docs/domains/mcp.md` file following the format of `docs/domains/apikeys.md`.
 
-- [~] Task: Conductor - User Manual Verification 'Phase 1: MCP Domain Documentation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: MCP Domain Documentation' (Protocol in workflow.md) `925de57`
 
 ## Phase 2: MCP Setup Guide
 
