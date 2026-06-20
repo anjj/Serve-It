@@ -26,3 +26,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: Fix Entra ID (Azure AD) Login Account Linkage Bug**
   *Link: [./tracks/fix_entra_login_20260617/](./tracks/fix_entra_login_20260617/)*
 
+---
+
+- [ ] **Track: Update MCP Documentation Feature**
+  *Link: [./tracks/update_doc_mcp_feature_20260620/](./tracks/update_doc_mcp_feature_20260620/)*
+
