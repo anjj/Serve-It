@@ -151,7 +151,7 @@ export default function Home() {
               Access Portal
             </Link>
             <Link
-              href="https://github.com"
+              href="https://GitHub.com/anjj/Serve-It"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 hover:text-foreground transition-colors"
