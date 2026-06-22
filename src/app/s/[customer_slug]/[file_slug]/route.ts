@@ -10,7 +10,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ customer
   const { customer_slug, file_slug } = resolvedParams;
 
   if (!session || !session.user) {
-    const loginUrl = new URL("/auth/signin", req.url);
+    const baseUrl = process.env.NEXTAUTH_URL || req.url;
+    const loginUrl = new URL("/auth/signin", baseUrl);
     loginUrl.searchParams.set("callbackUrl", `/s/${customer_slug}/${file_slug}`);
     return NextResponse.redirect(loginUrl);
   }
