@@ -96,7 +96,7 @@ describe('/api/admin/customers', () => {
       const res = await POST(req);
       const json = await res.json();
       expect(res.status).toBe(500);
-      expect(json.error).toBe('DB Error');
+      expect(json.error).toBe('Internal server error');
     });
   });
 });

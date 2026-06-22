@@ -32,7 +32,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ customer
     const files = await prisma.file.findMany({ where: { customerId: customer.id }, select: { id: true, title: true, slug: true, tags: true, createdAt: true }, orderBy: { createdAt: "desc" } });
     return NextResponse.json({ files });
   } catch (error) {
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error("API error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -122,7 +123,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ custome
 
     return NextResponse.json({ success: true, file: newFile });
   } catch (error: any) {
-    return NextResponse.json({ error: "Internal Server Error", details: error.message }, { status: 500 });
+    console.error("API error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -160,6 +162,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ custo
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    return NextResponse.json({ error: "Internal Server Error", details: error.message }, { status: 500 });
+    console.error("API error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

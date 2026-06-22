@@ -24,6 +24,7 @@ export async function POST(req: Request) {
     const customer = await prisma.customer.create({ data: { name, slug, passwordHash } });
     return NextResponse.json({ customer });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("API error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
