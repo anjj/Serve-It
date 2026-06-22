@@ -145,7 +145,7 @@ export default function CustomerDocumentsPage() {
                   <div className="mt-4 flex justify-between items-center">
                     <span className="text-xs text-gray-400">{new Date(file.createdAt).toLocaleDateString()}</span>
                     <div className="flex gap-2">
-                      <a href={`/s/${customer_slug}/${file.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700">
+                      <a href={`/s/${customer_slug}/${file.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-primary hover:bg-green-700">
                         View Document
                       </a>
                     </div>
