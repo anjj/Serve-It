@@ -39,6 +39,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ customer
 
     return new NextResponse(htmlContent, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "private, max-age=0, must-revalidate", "X-Content-Type-Options": "nosniff" } });
   } catch (error: any) {
-    return new NextResponse(`Error serving file: ${error.message}`, { status: 500 });
+    console.error("API error:", error);
+    return new NextResponse("Error serving file", { status: 500 });
   }
 }

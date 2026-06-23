@@ -11,6 +11,7 @@ export async function POST(req: Request) {
     await prisma.userCustomer.delete({ where: { userId_customerId: { userId, customerId } } });
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("API error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

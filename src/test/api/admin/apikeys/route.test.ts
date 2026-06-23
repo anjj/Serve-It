@@ -178,6 +178,6 @@ describe('POST /api/admin/apikeys', () => {
     const res = await POST(req);
     expect(res.status).toBe(500);
     const data = await res.json();
-    expect(data.error).toBe('DB Connection Timeout');
+    expect(data.error).toBe('Internal server error');
   });
 });

@@ -32,6 +32,7 @@ export async function POST(req: Request) {
     // We return the raw key ONLY once. It cannot be retrieved again.
     return NextResponse.json({ success: true, key: fullKey, record: newApiKey });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("API error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

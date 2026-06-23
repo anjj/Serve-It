@@ -69,7 +69,8 @@ export async function POST(req: Request) {
     const publicUrl = `${process.env.NEXTAUTH_URL}/s/${customer.slug}/${newFile.slug}`;
     return NextResponse.json({ success: true, file: newFile, url: publicUrl });
   } catch (error: any) {
-    return NextResponse.json({ error: "Internal server error", details: error.message }, { status: 500 });
+    console.error("API /v1/files error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -176,6 +177,7 @@ export async function PATCH(req: Request) {
     const publicUrl = `${process.env.NEXTAUTH_URL}/s/${customer.slug}/${updatedFile.slug}`;
     return NextResponse.json({ success: true, file: updatedFile, url: publicUrl });
   } catch (error: any) {
-    return NextResponse.json({ error: "Internal server error", details: error.message }, { status: 500 });
+    console.error("API /v1/files error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
