@@ -2,3 +2,8 @@
 **Vulnerability:** API routes were returning raw `error.message` strings in 500 HTTP responses, leaking internal database or system error details to clients.
 **Learning:** Returning raw internal error messages in catch blocks is a significant information disclosure vulnerability that can give attackers insight into the backend systems.
 **Prevention:** Always log the raw error internally using `console.error` and return a generic `Internal server error` message to the client.
+
+## 2024-05-20 - Fix Stored XSS in File Proxy Route
+**Vulnerability:** A Stored Cross-Site Scripting (XSS) vulnerability was found in the `src/app/s/[customer_slug]/[file_slug]/route.ts` file proxy route. The route serves user-uploaded HTML files with `Content-Type: text/html` directly to the browser without any Content Security Policy constraints.
+**Learning:** This architectural flaw allowed uploaded HTML files to execute arbitrary JavaScript within the context of the application's origin, which could lead to session hijacking, unauthorized API access, and tenant isolation bypass. The lack of a CSP `sandbox` directive meant the browser trusted the served content as part of the main application.
+**Prevention:** To prevent this, always serve user-generated or untrusted HTML content with restrictive security headers. Specifically, utilize the `Content-Security-Policy: sandbox` header (optionally allowing necessary features like `allow-scripts` if safe within the isolated context) to ensure the browser executes the content in a unique, untrusted origin context, isolated from the main application.
