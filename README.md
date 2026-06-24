@@ -31,6 +31,17 @@ The application's core functionality is organized into distinct business domains
 3. **[File Management & Storage](./docs/domains/files.md)**: Outlines file upload modal workflows, validation requirements, and storage bucket bindings.
 4. **[Document Serving Layer](./docs/domains/serving.md)**: Details the dynamic short URL serving router, HTTP content types, and cache control policies.
 5. **[API Keys & Programmatic Ingestion](./docs/domains/apikeys.md)**: Covers cryptographically secure API key generation, secure SHA-256 database hashing, and Bearer token ingestion endpoints.
+6. **[MCP Integration](./docs/domains/mcp.md)**: Explains the Model Context Protocol architecture, file operation tool exposure, and API key authentication flows.
+
+---
+
+## 🤖 MCP Integration
+
+Serve-it acts as a **Model Context Protocol (MCP)** server, allowing AI assistants (like ChatGPT, Claude, and Cursor) to list workspaces, upload new documents, and update existing ones programmatically.
+
+To connect your AI assistant to your Serve-it workspace, please follow the comprehensive step-by-step tutorial:
+
+👉 **[Read the MCP Integration Setup Guide](./docs/MCP_GUIDE.md)**
 
 ---
 

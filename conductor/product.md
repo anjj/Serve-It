@@ -28,11 +28,13 @@ Inferred context from brownfield project: A multi-tenant file-sharing and servin
 4. **Security & Authentication:**
    - Single Sign-On (SSO) and OAuth capability via NextAuth.
    - Admin roles (`isAdmin`) to manage platform-wide operations like customer provisioning.
+5. **Model Context Protocol (MCP) Integration:**
+   - Native support for MCP servers.
+   - AI assistants can list workspaces, upload files, and update files directly within client contexts.
 
 ---
 
 ## Future Enhancements / Roadmap
-- **Model Context Protocol (MCP) Server Integration:** Native support for MCP servers to allow AI tools to read and write files directly within client contexts.
 - **Granular File Access Control:** Public, private, and password-protected sharing links.
 - **Advanced File Metadata & Tagging:** Automated tagging and content extraction.
 - **Activity & Access Logs:** Auditing file views and API requests.
