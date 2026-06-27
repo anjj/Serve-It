@@ -25,7 +25,7 @@ describe('Button Component', () => {
   it('renders variant secondary', () => {
     render(<Button variant="secondary">Secondary</Button>);
     const button = screen.getByRole('button', { name: /secondary/i });
-    expect(button.className).toContain('bg-background-alternate');
+    expect(button.className).toContain('bg-surface');
     expect(button.className).toContain('text-foreground');
   });
 });

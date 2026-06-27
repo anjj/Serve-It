@@ -48,7 +48,7 @@ export default function Navbar() {
   if (!session) return null;
 
   return (
-    <nav className="bg-background border-b border-border-color transition-colors duration-200">
+    <nav className="bg-canvas border-b border-border-color transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
@@ -63,7 +63,7 @@ export default function Navbar() {
                 <select
                   value={activeSlug}
                   onChange={handleWorkspaceChange}
-                  className="block w-full pl-3 pr-10 py-2 text-base border-border-color focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-[var(--radius-button)] bg-background-alternate text-foreground transition-colors duration-200"
+                  className="block w-full pl-3 pr-10 py-2 text-base border-border-color focus:outline-none focus:ring-primary focus:border-primary sm:text-meta rounded-[var(--radius-button)] bg-surface text-foreground transition-colors duration-200"
                 >
                   <option value="" disabled>Select Workspace</option>
                   {customers.map((c) => (
@@ -83,7 +83,7 @@ export default function Navbar() {
                     pathname.includes("/dashboard")
                       ? "border-primary text-foreground"
                       : "border-transparent text-foreground-muted hover:border-border-color hover:text-foreground"
-                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200`}
+                  } inline-flex items-center px-1 pt-1 border-b-2 text-meta font-medium transition-colors duration-200`}
                 >
                   <LayoutDashboard className="w-4 h-4 mr-2" />
                   Dashboard
@@ -97,7 +97,7 @@ export default function Navbar() {
                     pathname.startsWith("/admin")
                       ? "border-primary text-foreground"
                       : "border-transparent text-foreground-muted hover:border-border-color hover:text-foreground"
-                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200`}
+                  } inline-flex items-center px-1 pt-1 border-b-2 text-meta font-medium transition-colors duration-200`}
                 >
                   <Settings className="w-4 h-4 mr-2" />
                   Admin
@@ -106,7 +106,7 @@ export default function Navbar() {
             </div>
           </div>
           <div className="flex items-center">
-            <span className="text-sm text-foreground-muted mr-4">
+            <span className="text-meta text-foreground-muted mr-4">
               {session.user?.name || session.user?.email}
             </span>
             <button
