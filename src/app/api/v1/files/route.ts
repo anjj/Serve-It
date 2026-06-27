@@ -29,6 +29,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    if (!/^[a-zA-Z0-9_-]+$/.test(slug)) {
+      return NextResponse.json({ error: "Invalid slug format" }, { status: 400 });
+    }
+
     let file = "";
     if (fileEntry instanceof File) {
       file = await fileEntry.text();
@@ -93,6 +97,10 @@ export async function PATCH(req: Request) {
     const slug = formData.get("slug") as string;
     if (!slug) {
       return NextResponse.json({ error: "Missing required field: slug" }, { status: 400 });
+    }
+
+    if (!/^[a-zA-Z0-9_-]+$/.test(slug)) {
+      return NextResponse.json({ error: "Invalid slug format" }, { status: 400 });
     }
 
     // Find the existing file
