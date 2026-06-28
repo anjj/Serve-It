@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { withAdmin } from "@/lib/auth-utils";
 
-export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session || !(session.user as any).isAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export const GET = withAdmin(async () => {
   const users = await prisma.user.findMany({
     orderBy: { email: "asc" },
     include: {
@@ -24,4 +21,4 @@ export async function GET() {
     }
   });
   return NextResponse.json({ users });
-}
+});

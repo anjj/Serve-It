@@ -1,14 +1,10 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { uploadHtmlFile, deleteFile } from "@/lib/storage";
+import { withAuth } from "@/lib/auth-utils";
 
-export async function GET(req: Request, { params }: { params: Promise<{ customer_slug: string }> }) {
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const resolvedParams = await params;
+export const GET = withAuth(async (req: Request, context: any, session: any) => {
+  const resolvedParams = await context.params;
   const customer_slug = resolvedParams.customer_slug;
   const role = (session.user as any).role;
   const userCustomerSlug = (session.user as any).customer_slug;
@@ -35,17 +31,14 @@ export async function GET(req: Request, { params }: { params: Promise<{ customer
     console.error("API error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-}
+});
 
-export async function POST(req: Request, { params }: { params: Promise<{ customer_slug: string }> }) {
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
+export const POST = withAuth(async (req: Request, context: any, session: any) => {
   if ((session.user as any).role === "CUSTOMER") {
     return NextResponse.json({ error: "Access denied" }, { status: 403 });
   }
 
-  const resolvedParams = await params;
+  const resolvedParams = await context.params;
   const customer_slug = resolvedParams.customer_slug;
   const userId = (session.user as any).id;
   const isAdmin = (session.user as any).isAdmin;
@@ -66,9 +59,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ custome
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const slugRegex = /^[a-zA-Z0-9_-]+$/;
-    if (!slugRegex.test(slug)) {
-      return NextResponse.json({ error: "Invalid slug format" }, { status: 400 });
+    const isValidSlug = /^[a-zA-Z0-9_-]+$/.test(slug);
+    if (!isValidSlug) {
+      return NextResponse.json({ error: "Invalid slug format. Only alphanumeric characters, dashes, and underscores are allowed." }, { status: 400 });
     }
 
     let file = "";
@@ -131,17 +124,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ custome
     console.error("API error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-}
+});
 
-export async function DELETE(req: Request, { params }: { params: Promise<{ customer_slug: string }> }) {
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
+export const DELETE = withAuth(async (req: Request, context: any, session: any) => {
   if ((session.user as any).role === "CUSTOMER") {
     return NextResponse.json({ error: "Access denied" }, { status: 403 });
   }
 
-  const resolvedParams = await params;
+  const resolvedParams = await context.params;
   const customer_slug = resolvedParams.customer_slug;
   const userId = (session.user as any).id;
   const isAdmin = (session.user as any).isAdmin;
@@ -170,4 +160,4 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ custo
     console.error("API error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-}
+});

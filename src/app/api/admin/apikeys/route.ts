@@ -1,13 +1,9 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
+import { withAdmin } from "@/lib/auth-utils";
 
-export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session || !(session.user as any).isAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
+export const POST = withAdmin(async (req: Request) => {
   const { name, customerId, userId } = await req.json();
   if (!name || (!customerId && !userId)) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
 
@@ -35,4 +31,4 @@ export async function POST(req: Request) {
     console.error("API error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-}
+});

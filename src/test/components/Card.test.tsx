@@ -12,12 +12,12 @@ describe('Card Component', () => {
     
     expect(card?.className).toContain('rounded-[var(--radius-card)]');
     expect(card?.className).toContain('p-8');
-    expect(card?.className).toContain('bg-background');
+    expect(card?.className).toContain('bg-surface');
   });
 
   it('renders variant alternate', () => {
     const { container } = render(<Card variant="alternate">Alternate Content</Card>);
     const card = container.firstChild as HTMLElement;
-    expect(card?.className).toContain('bg-background-alternate');
+    expect(card?.className).toContain('bg-surface-hover');
   });
 });

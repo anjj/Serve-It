@@ -26,7 +26,7 @@ function SignInForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8 transition-colors duration-200">
+    <div className="flex min-h-screen items-center justify-center bg-canvas px-4 py-12 sm:px-6 lg:px-8 transition-colors duration-200">
       <Card className="w-full max-w-md space-y-8">
         <div className="flex justify-center">
           <Logo className="scale-75 origin-center" />
@@ -63,24 +63,24 @@ function SignInForm() {
           <form onSubmit={handleCustomerLogin} className="mt-8 space-y-6">
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Customer Slug</label>
+                <label className="block text-meta font-medium text-foreground mb-1">Customer Slug</label>
                 <input
                   type="text"
                   required
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
-                  className="relative block w-full rounded-[var(--radius-button)] border border-border-color py-1.5 px-3 text-foreground bg-background-alternate placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm transition-colors duration-200"
+                  className="relative block w-full rounded-[var(--radius-button)] border border-border-color py-1.5 px-3 text-foreground bg-surface placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-primary sm:text-meta transition-colors duration-200"
                   placeholder="acme-corp"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Password</label>
+                <label className="block text-meta font-medium text-foreground mb-1">Password</label>
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="relative block w-full rounded-[var(--radius-button)] border border-border-color py-1.5 px-3 text-foreground bg-background-alternate placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm transition-colors duration-200"
+                  className="relative block w-full rounded-[var(--radius-button)] border border-border-color py-1.5 px-3 text-foreground bg-surface placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-primary sm:text-meta transition-colors duration-200"
                 />
               </div>
             </div>
@@ -92,7 +92,7 @@ function SignInForm() {
               <button
                 type="button"
                 onClick={() => setShowCustomerLogin(false)}
-                className="text-sm font-medium text-foreground-muted hover:text-foreground text-center transition-colors cursor-pointer"
+                className="text-meta font-medium text-foreground-muted hover:text-foreground text-center transition-colors cursor-pointer"
               >
                 Return to Employee Portal
               </button>
@@ -106,7 +106,7 @@ function SignInForm() {
 
 export default function SignIn() {
   return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-background text-foreground">Loading...</div>}>
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-canvas text-foreground">Loading...</div>}>
       <SignInForm />
     </Suspense>
   );

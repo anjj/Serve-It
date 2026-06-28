@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { withAuth } from "@/lib/auth-utils";
 
-export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
+export const GET = withAuth(async (req, context, session) => {
   const userId = (session.user as any).id;
   const isAdmin = (session.user as any).isAdmin;
 
@@ -27,4 +23,4 @@ export async function GET() {
     console.error("Error fetching workspaces:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
-}
+});
