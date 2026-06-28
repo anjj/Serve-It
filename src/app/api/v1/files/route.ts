@@ -29,8 +29,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    if (!/^[a-zA-Z0-9_-]+$/.test(slug)) {
-      return NextResponse.json({ error: "Invalid slug format" }, { status: 400 });
+    const isValidSlug = /^[a-zA-Z0-9_-]+$/.test(slug);
+    if (!isValidSlug) {
+      return NextResponse.json({ error: "Invalid slug format. Only alphanumeric characters, dashes, and underscores are allowed." }, { status: 400 });
     }
 
     let file = "";
@@ -99,8 +100,9 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "Missing required field: slug" }, { status: 400 });
     }
 
-    if (!/^[a-zA-Z0-9_-]+$/.test(slug)) {
-      return NextResponse.json({ error: "Invalid slug format" }, { status: 400 });
+    const isValidSlug = /^[a-zA-Z0-9_-]+$/.test(slug);
+    if (!isValidSlug) {
+      return NextResponse.json({ error: "Invalid slug format. Only alphanumeric characters, dashes, and underscores are allowed." }, { status: 400 });
     }
 
     // Find the existing file
