@@ -86,7 +86,7 @@ export default function WorkspaceDashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex flex-col transition-colors duration-200">
+      <div className="min-h-screen bg-canvas text-foreground flex flex-col transition-colors duration-200">
         <Navbar />
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-10 flex items-center justify-center">
           <p className="text-red-500">{error}</p>
@@ -102,7 +102,7 @@ export default function WorkspaceDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col transition-colors duration-200">
+    <div className="min-h-screen bg-canvas text-foreground flex flex-col transition-colors duration-200">
       <Navbar />
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -112,7 +112,7 @@ export default function WorkspaceDashboard() {
             </div>
             <input
               type="text"
-              className="block w-full pl-10 pr-3 py-2 border border-border-color rounded-[var(--radius-button)] leading-5 bg-background-alternate placeholder-foreground-muted focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm text-foreground transition-colors duration-200"
+              className="block w-full pl-10 pr-3 py-2 border border-border-color rounded-[var(--radius-button)] leading-5 bg-surface placeholder-foreground-muted focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-meta text-foreground transition-colors duration-200"
               placeholder="Query files..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -126,7 +126,7 @@ export default function WorkspaceDashboard() {
                 <select
                   value={selectedTag}
                   onChange={(e) => setSelectedTag(e.target.value)}
-                  className="block w-full pl-3 pr-10 py-2 text-base border border-border-color focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-[var(--radius-button)] bg-background-alternate text-foreground transition-colors duration-200"
+                  className="block w-full pl-3 pr-10 py-2 text-base border border-border-color focus:outline-none focus:ring-primary focus:border-primary sm:text-meta rounded-[var(--radius-button)] bg-surface text-foreground transition-colors duration-200"
                 >
                   <option value="">All Tags</option>
                   {availableTags.map(tag => (
@@ -155,25 +155,25 @@ export default function WorkspaceDashboard() {
             {filteredFiles.map((file) => (
               <Card key={file.id} className="flex flex-col hover:shadow-md transition-all duration-200">
                 <h3 className="text-lg leading-6 font-medium text-foreground mb-1 truncate" title={file.title}>{file.title}</h3>
-                <p className="text-sm text-foreground-muted mb-4 truncate">/{file.slug}</p>
+                <p className="text-meta text-foreground-muted mb-4 truncate">/{file.slug}</p>
 
                 <div className="flex flex-wrap gap-2 mb-4">
                   {file.tags.map(tag => (
-                    <span key={tag} className="inline-flex items-center px-2 py-0.5 rounded-[var(--radius-button)] text-xs font-medium bg-background-alternate border border-border-color text-foreground-muted transition-colors duration-200">{tag}</span>
+                    <span key={tag} className="inline-flex items-center px-2 py-0.5 rounded-[var(--radius-button)] text-meta font-medium bg-surface border border-border-color text-foreground-muted transition-colors duration-200">{tag}</span>
                   ))}
                 </div>
 
                 <div className="mt-auto pt-4 flex justify-between items-center">
-                  <span className="text-xs text-foreground-muted">{new Date(file.createdAt).toLocaleDateString()}</span>
+                  <span className="text-meta text-foreground-muted">{new Date(file.createdAt).toLocaleDateString()}</span>
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleDelete(file.id)}
-                      className="inline-flex items-center p-1.5 border border-transparent text-xs font-medium rounded text-red-600 hover:bg-red-50 focus:outline-none transition-colors duration-200"
+                      className="inline-flex items-center p-1.5 border border-transparent text-meta font-medium rounded text-red-600 hover:bg-red-50 focus:outline-none transition-colors duration-200"
                       aria-label="Delete File"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
-                    <a href={`/s/${customer_slug}/${file.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-[var(--radius-button)] shadow-sm text-white bg-primary hover:bg-green-700 transition-colors duration-200">
+                    <a href={`/s/${customer_slug}/${file.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-3 py-1.5 border border-transparent text-meta font-medium rounded-[var(--radius-button)] shadow-sm text-white bg-primary hover:bg-green-700 transition-colors duration-200">
                       Access Document
                     </a>
                   </div>

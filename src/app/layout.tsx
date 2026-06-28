@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Serve-It", description: "Secure, hig
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground transition-colors duration-200`}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-canvas text-foreground transition-colors duration-200`}>
         <Providers>{children}</Providers>
       </body>
     </html>
