@@ -63,7 +63,7 @@ describe('WorkspaceDashboard Page', () => {
     // Wait for the files to render
     const fileTitle = await screen.findByText('Delete Me');
     expect(fileTitle).toBeInTheDocument();
-    expect(fileTitle.closest('.min-h-screen')).toHaveClass('bg-background');
+    expect(fileTitle.closest('.min-h-screen')).toHaveClass('bg-canvas');
 
     // Check for delete button
     const deleteBtn = screen.getByRole('button', { name: /delete file/i });

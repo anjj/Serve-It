@@ -71,7 +71,7 @@ export default function CustomerDocumentsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="min-h-screen bg-surface-hover flex flex-col">
         <Navbar />
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-10 flex items-center justify-center">
           <p className="text-red-500">{error}</p>
@@ -87,7 +87,7 @@ export default function CustomerDocumentsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-surface-hover flex flex-col">
       <Navbar />
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -97,7 +97,7 @@ export default function CustomerDocumentsPage() {
             </div>
             <input
               type="text"
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="block w-full pl-10 pr-3 py-2 border border-border-color rounded-md leading-5 bg-surface placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-meta"
               placeholder="Search files..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -111,7 +111,7 @@ export default function CustomerDocumentsPage() {
                 <select
                   value={selectedTag}
                   onChange={(e) => setSelectedTag(e.target.value)}
-                  className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white text-gray-900"
+                  className="block w-full pl-3 pr-10 py-2 text-base border border-border-color focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-meta rounded-md bg-surface text-gray-900"
                 >
                   <option value="">All Tags</option>
                   {availableTags.map(tag => (
@@ -125,27 +125,27 @@ export default function CustomerDocumentsPage() {
         </div>
 
         {filteredFiles.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+          <div className="text-center py-12 bg-surface rounded-lg border border-border-color">
             <p className="text-gray-500">No files found matching your criteria.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filteredFiles.map((file) => (
-              <div key={file.id} className="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+              <div key={file.id} className="bg-surface overflow-hidden shadow-sm rounded-lg border border-border-color hover:shadow-md transition-shadow">
                 <div className="px-4 py-5 sm:p-6">
                   <h3 className="text-lg leading-6 font-medium text-gray-900 mb-1 truncate" title={file.title}>{file.title}</h3>
-                  <p className="text-sm text-gray-500 mb-4 truncate">/{file.slug}</p>
+                  <p className="text-meta text-gray-500 mb-4 truncate">/{file.slug}</p>
 
                   <div className="flex flex-wrap gap-2 mb-4">
                     {file.tags.map(tag => (
-                      <span key={tag} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">{tag}</span>
+                      <span key={tag} className="inline-flex items-center px-2 py-0.5 rounded text-meta font-medium bg-gray-100 text-gray-800">{tag}</span>
                     ))}
                   </div>
 
                   <div className="mt-4 flex justify-between items-center">
-                    <span className="text-xs text-gray-400">{new Date(file.createdAt).toLocaleDateString()}</span>
+                    <span className="text-meta text-gray-400">{new Date(file.createdAt).toLocaleDateString()}</span>
                     <div className="flex gap-2">
-                      <a href={`/s/${customer_slug}/${file.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-primary hover:bg-green-700">
+                      <a href={`/s/${customer_slug}/${file.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-3 py-1.5 border border-transparent text-meta font-medium rounded shadow-sm text-white bg-primary hover:bg-green-700">
                         View Document
                       </a>
                     </div>

@@ -1,9 +1,16 @@
-## 2026-06-22 - [Sentinel] Prevent Error Message Information Leakage
-**Vulnerability:** API routes were returning raw `error.message` strings in 500 HTTP responses, leaking internal database or system error details to clients.
-**Learning:** Returning raw internal error messages in catch blocks is a significant information disclosure vulnerability that can give attackers insight into the backend systems.
-**Prevention:** Always log the raw error internally using `console.error` and return a generic `Internal server error` message to the client.
-
 ## 2025-06-25 - Prevent Path Traversal in File Upload Slugs
 **Vulnerability:** The application was not validating the `slug` parameter in file upload routes (`/api/workspace/[customer_slug]/files` and `/api/v1/files`). This could allow a malicious user to supply path traversal sequences like `../../` in the `slug` parameter, which would then be passed to the storage layer, potentially overwriting arbitrary objects in the Supabase Storage bucket outside of their intended directory.
 **Learning:** Even when inputs are not used directly as file paths in the local filesystem, they can still be vulnerable to path traversal if they are used as keys or paths in object storage systems (like Supabase Storage or AWS S3).
 **Prevention:** Always validate and sanitize user inputs that are used to construct storage paths or keys. Enforce strict regex validation (e.g., `/^[a-zA-Z0-9_-]+$/`) on parameters like `slug` to ensure they only contain safe characters and cannot be used to traverse directories.
+## 2026-06-22 - [Sentinel] Prevent Error Message Information Leakage
+**Vulnerability:** API routes were returning raw `error.message` strings in 500 HTTP responses, leaking internal database or system error details to clients.
+**Learning:** Returning raw internal error messages in catch blocks is a significant information disclosure vulnerability that can give attackers insight into the backend systems.
+**Prevention:** Always log the raw error internally using `console.error` and return a generic `Internal server error` message to the client.
+## 2024-05-20 - Fix Stored XSS in File Proxy Route
+**Vulnerability:** A Stored Cross-Site Scripting (XSS) vulnerability was found in the `src/app/s/[customer_slug]/[file_slug]/route.ts` file proxy route. The route serves user-uploaded HTML files with `Content-Type: text/html` directly to the browser without any Content Security Policy constraints.
+**Learning:** This architectural flaw allowed uploaded HTML files to execute arbitrary JavaScript within the context of the application's origin, which could lead to session hijacking, unauthorized API access, and tenant isolation bypass. The lack of a CSP `sandbox` directive meant the browser trusted the served content as part of the main application.
+**Prevention:** To prevent this, always serve user-generated or untrusted HTML content with restrictive security headers. Specifically, utilize the `Content-Security-Policy: sandbox` header (optionally allowing necessary features like `allow-scripts` if safe within the isolated context) to ensure the browser executes the content in a unique, untrusted origin context, isolated from the main application.
+## 2026-06-22 - [Sentinel] Prevent Path Traversal in File Uploads
+**Vulnerability:** File upload endpoints (`/api/v1/files`, `/api/workspace/[customer_slug]/files`) were directly using the unsanitized `slug` parameter from the multipart form payload to form file storage paths.
+**Learning:** Directly appending user-provided parameters to file paths can lead to path traversal vulnerabilities and allow attackers to overwrite arbitrary files or create files in unintended locations within the bucket.
+**Prevention:** Always strictly validate user-provided parameters used in file paths (e.g., using regex `/^[a-zA-Z0-9_-]+$/` for slugs) before using them in file operations.

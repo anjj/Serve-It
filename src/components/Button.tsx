@@ -12,7 +12,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     if (variant === 'primary') {
       variantStyles = 'bg-primary text-white hover:bg-green-700 ';
     } else if (variant === 'secondary') {
-      variantStyles = 'bg-background-alternate text-foreground border border-border-color hover:bg-background-soft ';
+      variantStyles = 'bg-surface text-foreground border border-border-color hover:bg-surface-hover ';
     } else if (variant === 'danger') {
       variantStyles = 'bg-red-600 text-white hover:bg-red-700 ';
     }

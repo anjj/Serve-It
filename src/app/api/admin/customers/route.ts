@@ -1,22 +1,14 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { withAdmin } from "@/lib/auth-utils";
 
-async function checkAdmin() {
-  const session = await getServerSession(authOptions);
-  return session && (session.user as any).isAdmin;
-}
-
-export async function GET() {
-  if (!(await checkAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export const GET = withAdmin(async () => {
   const customers = await prisma.customer.findMany({ orderBy: { name: "asc" } });
   return NextResponse.json({ customers });
-}
+});
 
-export async function POST(req: Request) {
-  if (!(await checkAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export const POST = withAdmin(async (req: Request) => {
   const { name, slug, password } = await req.json();
   if (!name || !slug || !password) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   try {
@@ -27,4 +19,4 @@ export async function POST(req: Request) {
     console.error("API error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-}
+});
