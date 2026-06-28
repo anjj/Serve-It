@@ -1,3 +1,7 @@
+## 2026-06-26 - [Sentinel] Prevent Path Traversal in File Uploads
+**Vulnerability:** User-provided `slug` parameters in file upload/download operations (e.g., `/api/v1/files`, `/api/workspace/[customer_slug]/files`) were not strictly validated, leading to potential path traversal and arbitrary file overwrites when the file path is constructed.
+**Learning:** Always sanitize and validate user input used to construct file paths, even when relying on a database or other internal storage systems.
+**Prevention:** Use a strict regex validation `^[a-zA-Z0-9_-]+$` to ensure `slug` contains only allowed characters before passing it to path-constructing functions like `uploadHtmlFile`.
 ## 2025-06-25 - Prevent Path Traversal in File Upload Slugs
 **Vulnerability:** The application was not validating the `slug` parameter in file upload routes (`/api/workspace/[customer_slug]/files` and `/api/v1/files`). This could allow a malicious user to supply path traversal sequences like `../../` in the `slug` parameter, which would then be passed to the storage layer, potentially overwriting arbitrary objects in the Supabase Storage bucket outside of their intended directory.
 **Learning:** Even when inputs are not used directly as file paths in the local filesystem, they can still be vulnerable to path traversal if they are used as keys or paths in object storage systems (like Supabase Storage or AWS S3).
