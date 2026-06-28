@@ -12,6 +12,6 @@ describe('CodeContainer Component', () => {
     expect(code).toBeInTheDocument();
     expect(code?.className).toContain('rounded-[var(--radius-card)]');
     expect(code?.className).toContain('font-mono');
-    expect(code?.className).toContain('bg-background-alternate');
+    expect(code?.className).toContain('bg-surface');
   });
 });
