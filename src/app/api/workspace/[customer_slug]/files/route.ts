@@ -66,6 +66,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ custome
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    if (!/^[a-zA-Z0-9_-]+$/.test(slug)) {
+      return NextResponse.json({ error: "Invalid slug format" }, { status: 400 });
+    }
+
     let file = "";
     if (fileEntry instanceof File) {
       file = await fileEntry.text();
