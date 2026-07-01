@@ -9,8 +9,24 @@ export const GET = withAdmin(async () => {
 });
 
 export const POST = withAdmin(async (req: Request) => {
-  const { name, slug, password } = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch (error) {
+    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+  }
+
+  const { name, slug, password } = body;
   if (!name || !slug || !password) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+
+  if (!/^[a-zA-Z0-9_-]+$/.test(slug)) {
+    return NextResponse.json({ error: "Invalid slug format. Only alphanumeric characters, dashes, and underscores are allowed." }, { status: 400 });
+  }
+
+  if (password.length < 8) {
+    return NextResponse.json({ error: "Password must be at least 8 characters long." }, { status: 400 });
+  }
+
   try {
     const passwordHash = await bcrypt.hash(password, 10);
     const customer = await prisma.customer.create({ data: { name, slug, passwordHash } });
