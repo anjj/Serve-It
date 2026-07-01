@@ -18,3 +18,7 @@
 **Vulnerability:** File upload endpoints (`/api/v1/files`, `/api/workspace/[customer_slug]/files`) were directly using the unsanitized `slug` parameter from the multipart form payload to form file storage paths.
 **Learning:** Directly appending user-provided parameters to file paths can lead to path traversal vulnerabilities and allow attackers to overwrite arbitrary files or create files in unintended locations within the bucket.
 **Prevention:** Always strictly validate user-provided parameters used in file paths (e.g., using regex `/^[a-zA-Z0-9_-]+$/` for slugs) before using them in file operations.
+## 2024-05-24 - [Medium] Missing Input Validation on Customer Creation
+**Vulnerability:** The `/api/admin/customers` POST endpoint accepted `slug` and `password` parameters without any validation. It also placed `await req.json()` outside a `try/catch` block.
+**Learning:** This could lead to malformed slugs causing routing issues, weak passwords, and unhandled exceptions on malformed JSON leading to server errors.
+**Prevention:** Always validate user input format (e.g., regex for slugs), enforce minimum requirements (e.g., password length), and ensure payload parsing happens inside a `try/catch` block to handle bad data safely.
