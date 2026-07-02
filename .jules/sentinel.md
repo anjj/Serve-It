@@ -18,6 +18,10 @@
 **Vulnerability:** File upload endpoints (`/api/v1/files`, `/api/workspace/[customer_slug]/files`) were directly using the unsanitized `slug` parameter from the multipart form payload to form file storage paths.
 **Learning:** Directly appending user-provided parameters to file paths can lead to path traversal vulnerabilities and allow attackers to overwrite arbitrary files or create files in unintended locations within the bucket.
 **Prevention:** Always strictly validate user-provided parameters used in file paths (e.g., using regex `/^[a-zA-Z0-9_-]+$/` for slugs) before using them in file operations.
+## 2026-06-27 - [Sentinel] Prevent Unhandled JSON Parsing Rejections and Invalid Input
+**Vulnerability:** The `/api/admin/customers` endpoint lacked proper error handling for malformed JSON payloads and did not validate the format of the `slug` parameter or enforce a minimum length for passwords.
+**Learning:** Calling `await req.json()` without a `try/catch` can lead to unhandled promise rejections or information leakage if malformed data is sent. Additionally, accepting unvalidated input for sensitive fields like slugs (used in routing) and passwords degrades application security.
+**Prevention:** Always wrap `req.json()` in a `try/catch` block and return a 400 response on failure. Strictly validate all user inputs, enforcing regex for routing parameters (`/^[a-zA-Z0-9_-]+$/`) and reasonable constraints (like minimum length) for passwords.
 ## 2024-05-24 - [Medium] Missing Input Validation on Customer Creation
 **Vulnerability:** The `/api/admin/customers` POST endpoint accepted `slug` and `password` parameters without any validation. It also placed `await req.json()` outside a `try/catch` block.
 **Learning:** This could lead to malformed slugs causing routing issues, weak passwords, and unhandled exceptions on malformed JSON leading to server errors.
