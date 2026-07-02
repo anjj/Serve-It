@@ -22,3 +22,8 @@
 **Vulnerability:** The `/api/admin/customers` POST endpoint accepted `slug` and `password` parameters without any validation. It also placed `await req.json()` outside a `try/catch` block.
 **Learning:** This could lead to malformed slugs causing routing issues, weak passwords, and unhandled exceptions on malformed JSON leading to server errors.
 **Prevention:** Always validate user input format (e.g., regex for slugs), enforce minimum requirements (e.g., password length), and ensure payload parsing happens inside a `try/catch` block to handle bad data safely.
+
+## 2024-05-24 - [Medium] Fix Unhandled Exceptions on JSON Parsing in API Routes
+**Vulnerability:** Multiple API endpoints (e.g., `/api/admin/apikeys/route.ts`, `/api/admin/users/*/route.ts`) were calling `await req.json()` outside of their `try/catch` blocks.
+**Learning:** If a client sends a malformed JSON payload, the `await req.json()` method throws a SyntaxError. Because it was not enclosed within the error handling block, this would lead to an unhandled exception which might expose a stack trace to the client depending on the Next.js version or environment configuration. It also could potentially crash the node process under certain circumstances.
+**Prevention:** Always wrap request payload parsing operations, such as `await req.json()` and `await req.formData()`, within the endpoint's main `try/catch` block to ensure all parsing errors are gracefully handled and converted into standard 400/500 responses without exposing internals.
