@@ -8,6 +8,7 @@ import { Search, Tag, Upload, Trash2 } from "lucide-react";
 import UploadModal from "@/components/UploadModal";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
+import { getCsrfToken } from "@/lib/csrf-client";
 
 type File = { id: string; title: string; slug: string; tags: string[]; createdAt: string; };
 
@@ -58,6 +59,7 @@ export default function WorkspaceDashboard() {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
+          "x-csrf-token": getCsrfToken(),
         },
         body: JSON.stringify({ fileId }),
       });

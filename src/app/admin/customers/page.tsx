@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getCsrfToken } from "@/lib/csrf-client";
 
 type Customer = { id: string; name: string; slug: string; isActive: boolean };
 
@@ -33,7 +34,7 @@ export default function CustomersPage() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch("/api/admin/customers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, slug, password }) });
+    await fetch("/api/admin/customers", { method: "POST", headers: { "Content-Type": "application/json", "x-csrf-token": getCsrfToken() }, body: JSON.stringify({ name, slug, password }) });
     setName(""); setSlug(""); setPassword("");
     fetchCustomers();
   };
@@ -42,7 +43,7 @@ export default function CustomersPage() {
     if (!newKeyName) return;
     const res = await fetch("/api/admin/apikeys", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-csrf-token": getCsrfToken() },
       body: JSON.stringify({ name: newKeyName, customerId })
     });
     const data = await res.json();
