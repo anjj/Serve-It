@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { withAdmin } from "@/lib/auth-utils";
 
 export const POST = withAdmin(async (req: Request) => {
-  const { userId, customerId } = await req.json();
   try {
+    const { userId, customerId } = await req.json();
     await prisma.userCustomer.delete({ where: { userId_customerId: { userId, customerId } } });
     return NextResponse.json({ success: true });
   } catch (error: any) {

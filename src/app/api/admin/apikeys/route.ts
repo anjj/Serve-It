@@ -4,10 +4,10 @@ import crypto from "crypto";
 import { withAdmin } from "@/lib/auth-utils";
 
 export const POST = withAdmin(async (req: Request) => {
-  const { name, customerId, userId } = await req.json();
-  if (!name || (!customerId && !userId)) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
-
   try {
+    const { name, customerId, userId } = await req.json();
+    if (!name || (!customerId && !userId)) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+
     // Generate a secure random API key
     const rawKey = crypto.randomBytes(32).toString('hex');
     const keyPrefix = "sk_live_serve-it_";

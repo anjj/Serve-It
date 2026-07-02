@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { withAdmin } from "@/lib/auth-utils";
 
 export const POST = withAdmin(async (req: Request) => {
-  const { userId, isAdmin } = await req.json();
   try {
+    const { userId, isAdmin } = await req.json();
     await prisma.user.update({
       where: { id: userId },
       data: { isAdmin }
