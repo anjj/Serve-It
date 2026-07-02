@@ -22,3 +22,7 @@
 **Vulnerability:** State-changing API routes (POST, PUT, PATCH, DELETE) lacked CSRF protection, potentially allowing cross-site request forgery attacks where an authenticated user's session is hijacked to perform unauthorized actions.
 **Learning:** Third-party CSRF packages (e.g., `next-csrf`, `edge-csrf`) were found to be incompatible with the current Next.js version (16.2.9).
 **Prevention:** Implemented a custom Double Submit Cookie pattern. `src/middleware.ts` generates and sets a `csrf_token` cookie. The `withAuth` and `withAdmin` wrappers in `src/lib/auth-utils.ts` validate that the `x-csrf-token` header matches the cookie. Frontend fetch calls must include this header (retrieved via `src/lib/csrf-client.ts`).
+## 2024-05-24 - [Medium] Missing Input Validation on Customer Creation
+**Vulnerability:** The `/api/admin/customers` POST endpoint accepted `slug` and `password` parameters without any validation. It also placed `await req.json()` outside a `try/catch` block.
+**Learning:** This could lead to malformed slugs causing routing issues, weak passwords, and unhandled exceptions on malformed JSON leading to server errors.
+**Prevention:** Always validate user input format (e.g., regex for slugs), enforce minimum requirements (e.g., password length), and ensure payload parsing happens inside a `try/catch` block to handle bad data safely.
