@@ -18,3 +18,7 @@
 **Vulnerability:** File upload endpoints (`/api/v1/files`, `/api/workspace/[customer_slug]/files`) were directly using the unsanitized `slug` parameter from the multipart form payload to form file storage paths.
 **Learning:** Directly appending user-provided parameters to file paths can lead to path traversal vulnerabilities and allow attackers to overwrite arbitrary files or create files in unintended locations within the bucket.
 **Prevention:** Always strictly validate user-provided parameters used in file paths (e.g., using regex `/^[a-zA-Z0-9_-]+$/` for slugs) before using them in file operations.
+## 2024-05-23 - [Sentinel] Add CSRF Protection for Next.js API Routes
+**Vulnerability:** State-changing API routes (POST, PUT, PATCH, DELETE) lacked CSRF protection, potentially allowing cross-site request forgery attacks where an authenticated user's session is hijacked to perform unauthorized actions.
+**Learning:** Third-party CSRF packages (e.g., `next-csrf`, `edge-csrf`) were found to be incompatible with the current Next.js version (16.2.9).
+**Prevention:** Implemented a custom Double Submit Cookie pattern. `src/middleware.ts` generates and sets a `csrf_token` cookie. The `withAuth` and `withAdmin` wrappers in `src/lib/auth-utils.ts` validate that the `x-csrf-token` header matches the cookie. Frontend fetch calls must include this header (retrieved via `src/lib/csrf-client.ts`).
