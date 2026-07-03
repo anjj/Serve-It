@@ -87,7 +87,7 @@ describe('WorkspaceDashboard Page', () => {
         '/api/workspace/test-customer/files',
         expect.objectContaining({
           method: 'DELETE',
-          headers: { 'Content-Type': 'application/json', 'x-csrf-token': '' },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ fileId: 'file-1' }),
         })
       );

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Key } from "lucide-react";
-import { getCsrfToken } from "@/lib/csrf-client";
 
 type User = { id: string; name: string | null; email: string | null; isAdmin: boolean };
 type Customer = { id: string; name: string };
@@ -41,18 +40,18 @@ export default function UsersPage() {
   const handleAssign = async (userId: string) => {
     const customerId = selectedWorkspaces[userId];
     if (!customerId) return;
-    await fetch("/api/admin/users/assign", { method: "POST", headers: { "Content-Type": "application/json", "x-csrf-token": getCsrfToken() }, body: JSON.stringify({ userId, customerId }) });
+    await fetch("/api/admin/users/assign", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId, customerId }) });
     setSelectedWorkspaces(prev => ({ ...prev, [userId]: "" }));
     fetchData();
   };
 
   const handleRevoke = async (userId: string, customerId: string) => {
-    await fetch("/api/admin/users/revoke", { method: "POST", headers: { "Content-Type": "application/json", "x-csrf-token": getCsrfToken() }, body: JSON.stringify({ userId, customerId }) });
+    await fetch("/api/admin/users/revoke", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId, customerId }) });
     fetchData();
   };
 
   const handleToggleAdmin = async (userId: string, currentStatus: boolean) => {
-    await fetch("/api/admin/users/role", { method: "POST", headers: { "Content-Type": "application/json", "x-csrf-token": getCsrfToken() }, body: JSON.stringify({ userId, isAdmin: !currentStatus }) });
+    await fetch("/api/admin/users/role", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId, isAdmin: !currentStatus }) });
     fetchData();
   };
 
@@ -60,7 +59,7 @@ export default function UsersPage() {
     if (!newKeyName) return;
     const res = await fetch("/api/admin/apikeys", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-csrf-token": getCsrfToken() },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: newKeyName, userId }),
     });
     const data = await res.json();

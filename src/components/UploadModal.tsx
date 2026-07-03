@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import { X, Upload } from "lucide-react";
-import { getCsrfToken } from "@/lib/csrf-client";
 
 type UploadModalProps = {
   isOpen: boolean;
@@ -60,7 +59,6 @@ export default function UploadModal({ isOpen, onClose, onSuccess, customerSlug }
       const res = await fetch(`/api/workspace/${customerSlug}/files`, {
         method: "POST",
         body: formData,
-        headers: { "x-csrf-token": getCsrfToken() },
       });
 
       const data = await res.json();
