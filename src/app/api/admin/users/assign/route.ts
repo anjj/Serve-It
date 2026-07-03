@@ -3,7 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { withAdmin } from "@/lib/auth-utils";
 
 export const POST = withAdmin(async (req: Request) => {
-  const { userId, customerId } = await req.json();
+  let body;
+  try {
+    const text = await req.text();
+    body = JSON.parse(text);
+  } catch (error) {
+    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+  }
+  const { userId, customerId } = body;
   try {
     await prisma.userCustomer.create({ data: { userId, customerId } });
     return NextResponse.json({ success: true });

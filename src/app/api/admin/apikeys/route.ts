@@ -4,7 +4,14 @@ import crypto from "crypto";
 import { withAdmin } from "@/lib/auth-utils";
 
 export const POST = withAdmin(async (req: Request) => {
-  const { name, customerId, userId } = await req.json();
+  let body;
+  try {
+    const text = await req.text();
+    body = JSON.parse(text);
+  } catch (error) {
+    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+  }
+  const { name, customerId, userId } = body;
   if (!name || (!customerId && !userId)) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
 
   try {
