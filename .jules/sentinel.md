@@ -22,6 +22,10 @@
 **Vulnerability:** The `/api/admin/customers` endpoint lacked proper error handling for malformed JSON payloads and did not validate the format of the `slug` parameter or enforce a minimum length for passwords.
 **Learning:** Calling `await req.json()` without a `try/catch` can lead to unhandled promise rejections or information leakage if malformed data is sent. Additionally, accepting unvalidated input for sensitive fields like slugs (used in routing) and passwords degrades application security.
 **Prevention:** Always wrap `req.json()` in a `try/catch` block and return a 400 response on failure. Strictly validate all user inputs, enforcing regex for routing parameters (`/^[a-zA-Z0-9_-]+$/`) and reasonable constraints (like minimum length) for passwords.
+## 2024-05-23 - [Sentinel] Add CSRF Protection for Next.js API Routes
+**Vulnerability:** State-changing API routes (POST, PUT, PATCH, DELETE) lacked CSRF protection, potentially allowing cross-site request forgery attacks where an authenticated user's session is hijacked to perform unauthorized actions.
+**Learning:** Third-party CSRF packages (e.g., `next-csrf`, `edge-csrf`) were found to be incompatible with the current Next.js version (16.2.9).
+**Prevention:** Implemented a custom Double Submit Cookie pattern. `src/middleware.ts` generates and sets a `csrf_token` cookie. The `withAuth` and `withAdmin` wrappers in `src/lib/auth-utils.ts` validate that the `x-csrf-token` header matches the cookie. Frontend fetch calls must include this header (retrieved via `src/lib/csrf-client.ts`).
 ## 2024-05-24 - [Medium] Missing Input Validation on Customer Creation
 **Vulnerability:** The `/api/admin/customers` POST endpoint accepted `slug` and `password` parameters without any validation. It also placed `await req.json()` outside a `try/catch` block.
 **Learning:** This could lead to malformed slugs causing routing issues, weak passwords, and unhandled exceptions on malformed JSON leading to server errors.
