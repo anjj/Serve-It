@@ -3,7 +3,15 @@ import { prisma } from "@/lib/prisma";
 import { withAdmin } from "@/lib/auth-utils";
 
 export const POST = withAdmin(async (req: Request) => {
-  const { userId, isAdmin } = await req.json();
+  let data;
+  try {
+    const text = await req.text();
+    data = JSON.parse(text);
+  } catch (error) {
+    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+  }
+
+  const { userId, isAdmin } = data;
   try {
     await prisma.user.update({
       where: { id: userId },
