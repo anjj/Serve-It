@@ -141,7 +141,14 @@ export const DELETE = withAuth(async (req: Request, context: any, session: any) 
     if (!customer) return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
     if (!isAdmin && customer.users.length === 0) return NextResponse.json({ error: "Access denied" }, { status: 403 });
 
-    const data = await req.json();
+    let data;
+    try {
+      const text = await req.text();
+      data = JSON.parse(text);
+    } catch (error) {
+      return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+    }
+
     const { fileId } = data;
     if (!fileId) {
       return NextResponse.json({ error: "Missing fileId" }, { status: 400 });
