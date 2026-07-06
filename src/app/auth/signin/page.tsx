@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { Logo } from "@/components/Logo";
-import { FaMicrosoft } from "react-icons/fa";
+import { FaMicrosoft, FaGoogle } from "react-icons/fa";
 import { User } from "lucide-react";
 
 function SignInForm() {
@@ -34,6 +34,13 @@ function SignInForm() {
 
         {!showCustomerLogin ? (
           <div className="flex flex-col gap-4 mt-8">
+            <Button
+              onClick={() => signIn("google", { callbackUrl: callbackUrl || "/dashboard" })}
+              className="w-full"
+            >
+              <FaGoogle className="mr-2 h-4 w-4" />
+              Google Login
+            </Button>
             <Button
               onClick={() => signIn("azure-ad", { callbackUrl: callbackUrl || "/dashboard" })}
               className="w-full"

@@ -15,10 +15,16 @@ vi.mock('next/navigation', () => ({
 }));
 
 describe('SignIn Page', () => {
-  it('renders Microsoft login button with primary styling', () => {
+  it('renders Google login button', () => {
+    render(<SignIn />);
+    const loginBtn = screen.getByRole('button', { name: /google login/i });
+    expect(loginBtn).toBeInTheDocument();
+    expect(loginBtn).toHaveClass('bg-primary');
+  });
+
+  it('renders Microsoft login button', () => {
     render(<SignIn />);
     const loginBtn = screen.getByRole('button', { name: /microsoft login/i });
     expect(loginBtn).toBeInTheDocument();
-    expect(loginBtn).toHaveClass('bg-primary');
   });
 });
