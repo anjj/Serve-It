@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import AzureADProvider from "next-auth/providers/azure-ad";
+import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
@@ -70,6 +71,10 @@ export const authOptions: NextAuthOptions = {
           customer_slug: customer.slug,
         } as any;
       },
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
     AzureADProvider({
       clientId: process.env.AZURE_AD_CLIENT_ID!,

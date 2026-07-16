@@ -15,10 +15,31 @@ vi.mock('next/navigation', () => ({
 }));
 
 describe('SignIn Page', () => {
-  it('renders Microsoft login button with primary styling', () => {
+  beforeEach(() => {
+    vi.stubEnv('GOOGLE_CLIENT_ID', 'test-google-id');
+    vi.stubEnv('GOOGLE_CLIENT_SECRET', 'test-google-secret');
+    vi.stubEnv('AZURE_AD_CLIENT_ID', 'test-azure-id');
+    vi.stubEnv('AZURE_AD_CLIENT_SECRET', 'test-azure-secret');
+  });
+
+  it('renders Google login button', () => {
+    render(<SignIn />);
+    const loginBtn = screen.getByRole('button', { name: /google login/i });
+    expect(loginBtn).toBeInTheDocument();
+    expect(loginBtn).toHaveClass('bg-primary');
+  });
+
+  it('renders Microsoft login button', () => {
     render(<SignIn />);
     const loginBtn = screen.getByRole('button', { name: /microsoft login/i });
     expect(loginBtn).toBeInTheDocument();
-    expect(loginBtn).toHaveClass('bg-primary');
+  });
+
+  it('hides buttons when env variables are missing', () => {
+    vi.stubEnv('GOOGLE_CLIENT_ID', '');
+    vi.stubEnv('AZURE_AD_CLIENT_ID', '');
+    render(<SignIn />);
+    expect(screen.queryByRole('button', { name: /google login/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /microsoft login/i })).not.toBeInTheDocument();
   });
 });
