@@ -1,0 +1,8 @@
+{
+  "track_id": "migrate_tanstack_bun_20260719",
+  "type": "chore",
+  "status": "new",
+  "created_at": "2026-07-19T23:48:15Z",
+  "updated_at": "2026-07-19T23:48:15Z",
+  "description": "Migrate Next.js stack to TanStack Start, Router, Query, and Bun runtime/compiler"
+}
