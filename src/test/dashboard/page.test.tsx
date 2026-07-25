@@ -10,7 +10,7 @@ vi.mock('next/navigation', () => ({
   usePathname: () => '/dashboard/test-customer',
 }));
 
-vi.mock('next-auth/react', () => ({
+vi.mock('@/lib/auth-client', () => ({
   useSession: () => ({ status: 'authenticated', data: { user: { id: 'user-1' } } }),
 }));
 

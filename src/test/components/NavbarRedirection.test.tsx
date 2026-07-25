@@ -4,25 +4,19 @@ import '@testing-library/jest-dom';
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { SessionProvider } from 'next-auth/react';
 
-// Mock next-auth/react
+// Mock @/lib/auth-client
 const mockSession = {
   user: { name: 'Test User', email: 'test@example.com', isAdmin: true, id: 'user-1' },
-  expires: '2050-01-01T00:00:00.000Z',
 };
 
-vi.mock('next-auth/react', async () => {
-  const original = await vi.importActual('next-auth/react');
-  return {
-    ...original,
-    useSession: vi.fn(() => ({
-      data: mockSession,
-      status: 'authenticated',
-    })),
-    signOut: vi.fn(),
-  };
-});
+vi.mock('@/lib/auth-client', () => ({
+  useSession: vi.fn(() => ({
+    data: mockSession,
+    status: 'authenticated',
+  })),
+  signOut: vi.fn(),
+}));
 
 // Mock next/navigation
 const mockPush = vi.fn();
@@ -50,11 +44,9 @@ describe('Navbar Redirection Logic', () => {
     });
 
     render(
-      <SessionProvider session={mockSession}>
-        <ThemeProvider>
-          <Navbar />
-        </ThemeProvider>
-      </SessionProvider>
+      <ThemeProvider>
+        <Navbar />
+      </ThemeProvider>
     );
 
     // Wait for customers to be loaded

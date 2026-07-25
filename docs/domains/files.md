@@ -73,7 +73,40 @@ Workspace members can upload documents directly from their dashboards. The syste
 
 ---
 
-## 4. Diagnostics & Error Handling
+## 4. Storage Bucket Tenant Isolation (WI-6 audit, 2026-07-25)
+
+The `serve-it` Supabase Storage bucket was audited directly against the live project:
+
+- **Bucket is private** (`public: false`). There is no anonymous read path.
+- **Zero `storage.objects` policies exist.** Combined with the private bucket, this is a
+  deny-all for the `anon`/`authenticated` PostgREST-facing roles, mirroring the database
+  RLS posture in `auth.md`.
+- **The application talks to Storage exclusively via `SUPABASE_SERVICE_ROLE_KEY`**
+  (`src/lib/supabase.ts`), which — like the Prisma table-owner role for Postgres —
+  bypasses Storage's RLS entirely. This is the actual enforcement mechanism: only
+  server-side code holding the service-role key can read or write objects.
+- **Tenant isolation is by object-path convention, not by policy**: uploads always go
+  to `tenants/<customerId>/files/<fileId>.html` (`uploadHtmlFile` in `storage.ts`), and
+  every read goes through the workspace/serving routes, which already authorize the
+  caller against that same `customerId` before calling `downloadFile`. Because there is
+  no client-side/PostgREST access path at all (no policy would matter even if one
+  existed), this is an accepted tradeoff rather than a gap: the path convention only
+  needs to be trusted by the server code that already enforces workspace membership.
+- **`getSignedUrl` (60s default TTL) exists but is dead code** — nothing in the app
+  currently generates a signed URL; files are streamed through the Next.js server via
+  `downloadFile()` instead. If a signed-URL flow is added later, keep the TTL short and
+  bounded (it already is, by default) rather than introducing a long-lived link.
+
+**Conclusion:** the tenant-isolation guarantee for stored files holds today, but it
+rests on (a) the bucket being private, (b) zero permissive policies, and (c) every
+caller reaching Storage through server code that has already checked workspace
+membership. Any future feature that hands out `SUPABASE_SERVICE_ROLE_KEY`-backed access
+to a less-trusted context, or adds a public/permissive policy, would need to re-derive
+tenant isolation some other way (e.g. real per-path `storage.objects` policies).
+
+---
+
+## 5. Diagnostics & Error Handling
 
 | Technical Error / Status | Business Context / Meaning | Next Steps / Mitigation |
 |--------------------------|----------------------------|-------------------------|

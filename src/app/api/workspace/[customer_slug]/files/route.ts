@@ -1,28 +1,27 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { uploadHtmlFile, deleteFile } from "@/lib/storage";
-import { withAuth } from "@/lib/auth-utils";
+import { withAuth, type Actor } from "@/lib/auth-utils";
 
-export const GET = withAuth(async (req: Request, context: any, session: any) => {
+export const GET = withAuth(async (req: Request, context: any, actor: Actor) => {
   const resolvedParams = await context.params;
   const customer_slug = resolvedParams.customer_slug;
-  const role = (session.user as any).role;
-  const userCustomerSlug = (session.user as any).customer_slug;
-  const userId = (session.user as any).id;
-  const isAdmin = (session.user as any).isAdmin;
 
   try {
-    const customer = await prisma.customer.findUnique({ where: { slug: customer_slug }, include: { users: { where: { userId } } } });
-    if (!customer) return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
+    if (actor.kind === "customer") {
+      if (actor.customerSlug !== customer_slug) {
+        return NextResponse.json({ error: "Access denied" }, { status: 403 });
+      }
+      const customer = await prisma.customer.findUnique({ where: { slug: customer_slug } });
+      if (!customer) return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
+      const files = await prisma.file.findMany({ where: { customerId: customer.id }, select: { id: true, title: true, slug: true, tags: true, createdAt: true }, orderBy: { createdAt: "desc" } });
+      return NextResponse.json({ files });
+    }
 
-    if (role === "CUSTOMER") {
-      if (userCustomerSlug !== customer_slug) {
-        return NextResponse.json({ error: "Access denied" }, { status: 403 });
-      }
-    } else {
-      if (!isAdmin && customer.users.length === 0) {
-        return NextResponse.json({ error: "Access denied" }, { status: 403 });
-      }
+    const customer = await prisma.customer.findUnique({ where: { slug: customer_slug }, include: { users: { where: { userId: actor.userId } } } });
+    if (!customer) return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
+    if (!actor.isAdmin && customer.users.length === 0) {
+      return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
     const files = await prisma.file.findMany({ where: { customerId: customer.id }, select: { id: true, title: true, slug: true, tags: true, createdAt: true }, orderBy: { createdAt: "desc" } });
@@ -33,15 +32,15 @@ export const GET = withAuth(async (req: Request, context: any, session: any) => 
   }
 });
 
-export const POST = withAuth(async (req: Request, context: any, session: any) => {
-  if ((session.user as any).role === "CUSTOMER") {
+export const POST = withAuth(async (req: Request, context: any, actor: Actor) => {
+  if (actor.kind !== "user") {
     return NextResponse.json({ error: "Access denied" }, { status: 403 });
   }
 
   const resolvedParams = await context.params;
   const customer_slug = resolvedParams.customer_slug;
-  const userId = (session.user as any).id;
-  const isAdmin = (session.user as any).isAdmin;
+  const userId = actor.userId;
+  const isAdmin = actor.isAdmin;
 
   try {
     const customer = await prisma.customer.findUnique({ where: { slug: customer_slug }, include: { users: { where: { userId } } } });
@@ -126,15 +125,15 @@ export const POST = withAuth(async (req: Request, context: any, session: any) =>
   }
 });
 
-export const DELETE = withAuth(async (req: Request, context: any, session: any) => {
-  if ((session.user as any).role === "CUSTOMER") {
+export const DELETE = withAuth(async (req: Request, context: any, actor: Actor) => {
+  if (actor.kind !== "user") {
     return NextResponse.json({ error: "Access denied" }, { status: 403 });
   }
 
   const resolvedParams = await context.params;
   const customer_slug = resolvedParams.customer_slug;
-  const userId = (session.user as any).id;
-  const isAdmin = (session.user as any).isAdmin;
+  const userId = actor.userId;
+  const isAdmin = actor.isAdmin;
 
   try {
     const customer = await prisma.customer.findUnique({ where: { slug: customer_slug }, include: { users: { where: { userId } } } });

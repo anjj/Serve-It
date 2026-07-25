@@ -1,34 +1,32 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { downloadFile } from "@/lib/storage";
+import { resolveActor } from "@/lib/auth-utils";
 
 export async function GET(req: Request, { params }: { params: Promise<{ customer_slug: string; file_slug: string }> }) {
-  const session = await getServerSession(authOptions);
   const resolvedParams = await params;
   const { customer_slug, file_slug } = resolvedParams;
 
-  if (!session || !session.user) {
-    const baseUrl = process.env.NEXTAUTH_URL || req.url;
+  const actor = await resolveActor(req);
+  if (!actor) {
+    const baseUrl = process.env.BETTER_AUTH_URL || process.env.NEXTAUTH_URL || req.url;
     const loginUrl = new URL("/auth/signin", baseUrl);
     loginUrl.searchParams.set("callbackUrl", `/s/${customer_slug}/${file_slug}`);
     return NextResponse.redirect(loginUrl);
   }
 
-  const role = (session.user as any).role;
-  const userCustomerSlug = (session.user as any).customer_slug;
-  const userId = (session.user as any).id;
-  const isAdmin = (session.user as any).isAdmin;
-
   try {
-    const customer = await prisma.customer.findUnique({ where: { slug: customer_slug }, include: { users: { where: { userId } } } });
+    const customer = await prisma.customer.findUnique({
+      where: { slug: customer_slug },
+      include: actor.kind === "user" ? { users: { where: { userId: actor.userId } } } : undefined,
+    });
     if (!customer) return new NextResponse("Workspace not found", { status: 404 });
 
-    if (role === "CUSTOMER") {
-      if (userCustomerSlug !== customer_slug) return new NextResponse("Access Denied to Workspace", { status: 403 });
+    if (actor.kind === "customer") {
+      if (actor.customerSlug !== customer_slug) return new NextResponse("Access Denied to Workspace", { status: 403 });
     } else {
-      if (!isAdmin && customer.users.length === 0) return new NextResponse("Access Denied to Workspace", { status: 403 });
+      const hasMembership = (customer as any).users?.length > 0;
+      if (!actor.isAdmin && !hasMembership) return new NextResponse("Access Denied to Workspace", { status: 403 });
     }
 
     const file = await prisma.file.findUnique({ where: { customerId_slug: { customerId: customer.id, slug: file_slug } } });

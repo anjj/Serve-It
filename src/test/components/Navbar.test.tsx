@@ -5,8 +5,8 @@ import React from 'react';
 import Navbar from '@/components/Navbar';
 import { ThemeProvider } from '@/components/ThemeProvider';
 
-// Mock next-auth/react
-vi.mock('next-auth/react', () => ({
+// Mock @/lib/auth-client
+vi.mock('@/lib/auth-client', () => ({
   useSession: () => ({
     data: { user: { name: 'Test User', email: 'test@example.com', isAdmin: true } },
     status: 'authenticated',

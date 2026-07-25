@@ -12,10 +12,13 @@ export const POST = withAdmin(async (req: Request) => {
     return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
   }
 
-  const { name, customerId, userId } = data;
-  if (!name || (!customerId && !userId)) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  const { name, userId } = data;
+  if (!name || !userId) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
 
   try {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
     // Generate a secure random API key
     const rawKey = crypto.randomBytes(32).toString('hex');
     const keyPrefix = "sk_live_serve-it_";
@@ -28,8 +31,7 @@ export const POST = withAdmin(async (req: Request) => {
       data: {
         name,
         keyHash,
-        customerId: customerId || null,
-        userId: userId || null
+        userId,
       }
     });
 

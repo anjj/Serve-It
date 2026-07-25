@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from '@/app/api/admin/users/route';
-import { getServerSession } from 'next-auth/next';
+import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-vi.mock('next-auth/next', () => ({
-  getServerSession: vi.fn(),
+vi.mock('@/lib/auth', () => ({
+  auth: { api: { getSession: vi.fn() } },
 }));
+
+const adminUser = { id: 'admin-1', isAdmin: true, name: 'Admin', email: 'admin@example.com' };
 
 vi.mock('@/lib/prisma', () => ({
   prisma: {
@@ -22,7 +24,7 @@ describe('/api/admin/users', () => {
 
   describe('GET', () => {
     it('returns 401 if unauthorized', async () => {
-      vi.mocked(getServerSession).mockResolvedValueOnce(null);
+      vi.mocked(auth.api.getSession).mockResolvedValueOnce(null as any);
       const res = await GET();
       const json = await res.json();
       expect(res.status).toBe(401);
@@ -30,7 +32,7 @@ describe('/api/admin/users', () => {
     });
 
     it('returns users if authorized as admin', async () => {
-      vi.mocked(getServerSession).mockResolvedValueOnce({ user: { isAdmin: true } } as any);
+      vi.mocked(auth.api.getSession).mockResolvedValueOnce({ user: adminUser } as any);
       vi.mocked(prisma.user.findMany).mockResolvedValueOnce([{ id: '1', name: 'User 1' } as any]);
       const res = await GET();
       const json = await res.json();

@@ -1,13 +1,13 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { Logo } from "@/components/Logo";
 import { FaMicrosoft, FaGoogle } from "react-icons/fa";
 import { User } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 interface SignInFormProps {
   showGoogle: boolean;
@@ -18,16 +18,33 @@ export function SignInForm({ showGoogle, showAzure }: SignInFormProps) {
   const [showCustomerLogin, setShowCustomerLogin] = useState(false);
   const [slug, setSlug] = useState("");
   const [password, setPassword] = useState("");
+  const [customerLoginError, setCustomerLoginError] = useState("");
+  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
 
   const handleCustomerLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    await signIn("customer-auth", {
-      slug,
-      password,
-      callbackUrl: callbackUrl || `/documents/${slug}`
+    setCustomerLoginError("");
+    const res = await fetch("/api/auth/customer-portal", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug, password }),
     });
+    if (!res.ok) {
+      setCustomerLoginError("Invalid workspace slug or password.");
+      return;
+    }
+    router.push(callbackUrl || `/documents/${slug}`);
+  };
+
+  const handleDevBypass = async () => {
+    await fetch("/api/auth/dev-bypass", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: "dev@example.com", isAdmin: true }),
+    });
+    router.push(callbackUrl || "/dashboard");
   };
 
   return (
@@ -41,7 +58,7 @@ export function SignInForm({ showGoogle, showAzure }: SignInFormProps) {
           <div className="flex flex-col gap-4 mt-8">
             {showGoogle && (
               <Button
-                onClick={() => signIn("google", { callbackUrl: callbackUrl || "/dashboard" })}
+                onClick={() => authClient.signIn.social({ provider: "google", callbackURL: callbackUrl || "/dashboard" })}
                 className="w-full"
               >
                 <FaGoogle className="mr-2 h-4 w-4" />
@@ -50,7 +67,7 @@ export function SignInForm({ showGoogle, showAzure }: SignInFormProps) {
             )}
             {showAzure && (
               <Button
-                onClick={() => signIn("azure-ad", { callbackUrl: callbackUrl || "/dashboard" })}
+                onClick={() => authClient.signIn.social({ provider: "microsoft", callbackURL: callbackUrl || "/dashboard" })}
                 className="w-full"
               >
                 <FaMicrosoft className="mr-2 h-4 w-4" />
@@ -68,7 +85,7 @@ export function SignInForm({ showGoogle, showAzure }: SignInFormProps) {
             {process.env.NODE_ENV === "development" && (
               <Button
                 variant="danger"
-                onClick={() => signIn("credentials", { email: "dev@example.com", isAdmin: "true", callbackUrl: callbackUrl || "/dashboard" })}
+                onClick={handleDevBypass}
                 className="w-full mt-4"
               >
                 Developer Override: Admin Access
@@ -99,6 +116,9 @@ export function SignInForm({ showGoogle, showAzure }: SignInFormProps) {
                   className="relative block w-full rounded-[var(--radius-button)] border border-border-color py-1.5 px-3 text-foreground bg-surface placeholder:text-foreground-muted focus:outline-none focus:ring-1 focus:ring-primary sm:text-meta transition-colors duration-200"
                 />
               </div>
+              {customerLoginError && (
+                <p className="text-meta text-red-500">{customerLoginError}</p>
+              )}
             </div>
 
             <div className="flex flex-col gap-3">

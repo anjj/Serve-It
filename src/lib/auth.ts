@@ -1,111 +1,46 @@
-import NextAuth from "next-auth";
-import AzureADProvider from "next-auth/providers/azure-ad";
-import GoogleProvider from "next-auth/providers/google";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@auth/prisma-adapter";
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "@/lib/prisma";
-import type { NextAuthOptions } from "next-auth";
-import bcrypt from "bcryptjs";
 
-export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
-  providers: [
-    ...(process.env.NODE_ENV === "development"
-      ? [
-          CredentialsProvider({
-            name: "Developer Bypass",
-            credentials: {
-              email: { label: "Email", type: "text", placeholder: "dev@example.com" },
-              isAdmin: { label: "Admin? (true/false)", type: "text", placeholder: "true" },
-            },
-            async authorize(credentials) {
-              const email = credentials?.email || "dev@example.com";
-              const isAdmin = credentials?.isAdmin === "true";
-
-              // Find or create test user
-              let user = await prisma.user.findUnique({ where: { email } });
-              if (!user) {
-                user = await prisma.user.create({
-                  data: {
-                    email,
-                    name: "Developer User",
-                    isAdmin,
-                  },
-                });
-              } else if (user.isAdmin !== isAdmin) {
-                user = await prisma.user.update({
-                  where: { id: user.id },
-                  data: { isAdmin }
-                });
-              }
-              return { ...user, role: "FULL" } as any;
-            },
-          }),
-        ]
-      : []),
-    CredentialsProvider({
-      id: "customer-auth",
-      name: "Customer Portal",
-      credentials: {
-        slug: { label: "Customer Slug", type: "text", placeholder: "acme-corp" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        if (!credentials?.slug || !credentials?.password) return null;
-
-        const customer = await prisma.customer.findUnique({
-          where: { slug: credentials.slug },
-        });
-
-        if (!customer) return null;
-        if (!customer.isActive) return null;
-        if (!customer.passwordHash) return null;
-
-        const isPasswordValid = await bcrypt.compare(credentials.password, customer.passwordHash);
-        if (!isPasswordValid) return null;
-
-        return {
-          id: customer.id,
-          name: customer.name,
-          role: "CUSTOMER",
-          customer_slug: customer.slug,
-        } as any;
-      },
-    }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-    AzureADProvider({
-      clientId: process.env.AZURE_AD_CLIENT_ID!,
-      clientSecret: process.env.AZURE_AD_CLIENT_SECRET!,
-      tenantId: process.env.AZURE_AD_TENANT_ID,
-    }),
-  ],
-  session: { strategy: "jwt" },
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.role = (user as any).role || "FULL";
-        token.isAdmin = (user as any).isAdmin || false;
-        if ((user as any).customer_slug) {
-          token.customer_slug = (user as any).customer_slug;
+export const auth = betterAuth({
+  database: prismaAdapter(prisma, { provider: "postgresql" }),
+  secret: process.env.BETTER_AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  baseURL: process.env.BETTER_AUTH_URL || process.env.NEXTAUTH_URL,
+  // Only used by the local developer-bypass sign-in (see
+  // src/app/api/auth/dev-bypass/route.ts). Real users authenticate via the
+  // social providers below; there is no email/password login in production.
+  emailAndPassword: {
+    enabled: process.env.NODE_ENV === "development",
+    requireEmailVerification: false,
+  },
+  socialProviders: {
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? {
+          google: {
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          },
         }
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        (session.user as any).id = token.id as string;
-        (session.user as any).role = token.role as string;
-        (session.user as any).isAdmin = token.isAdmin as boolean;
-        if (token.customer_slug) {
-          (session.user as any).customer_slug = token.customer_slug as string;
+      : {}),
+    ...(process.env.AZURE_AD_CLIENT_ID && process.env.AZURE_AD_CLIENT_SECRET
+      ? {
+          microsoft: {
+            clientId: process.env.AZURE_AD_CLIENT_ID,
+            clientSecret: process.env.AZURE_AD_CLIENT_SECRET,
+            tenantId: process.env.AZURE_AD_TENANT_ID || "common",
+          },
         }
-      }
-      return session;
+      : {}),
+  },
+  user: {
+    additionalFields: {
+      isAdmin: {
+        type: "boolean",
+        defaultValue: false,
+        // Never settable from client input; only ever changed server-side
+        // via /api/admin/users/role.
+        input: false,
+      },
     },
   },
-  pages: { signIn: "/auth/signin" },
-};
+});

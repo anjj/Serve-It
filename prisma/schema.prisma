@@ -8,109 +8,130 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// NextAuth models
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  ext_expires_in    Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
+// better-auth models
+model User {
+  id            String   @id(map: "User_pkey") @default(cuid())
+  name          String
+  email         String   @unique(map: "User_email_key")
+  emailVerified Boolean  @default(false)
+  image         String?
+  isAdmin       Boolean  @default(false)
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime @updatedAt @db.Timestamptz(3)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accounts  Account[]
+  sessions  Session[]
+  customers UserCustomer[]
+  apiKeys   ApiKey[]
 
-  @@unique([provider, providerAccountId])
+  @@map("user")
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id(map: "Session_pkey") @default(cuid())
+  token     String   @unique(map: "Session_sessionToken_key")
+  userId    String
+  expiresAt DateTime @db.Timestamptz(3)
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Session_userId_fkey")
+
+  @@index([userId])
+  @@map("session")
 }
 
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  isAdmin       Boolean   @default(false)
+model Account {
+  id                    String    @id(map: "Account_pkey") @default(cuid())
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime? @db.Timestamptz(3)
+  refreshTokenExpiresAt DateTime? @db.Timestamptz(3)
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime  @updatedAt @db.Timestamptz(3)
 
-  accounts      Account[]
-  sessions      Session[]
-  customers     UserCustomer[]
-  apiKeys       ApiKey[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Account_userId_fkey")
+
+  @@unique([providerId, accountId], map: "Account_provider_providerAccountId_key")
+  @@index([userId])
+  @@map("account")
 }
 
-model VerificationToken {
+model Verification {
+  id         String   @id @default(cuid())
   identifier String
-  token      String   @unique
-  expires    DateTime
+  value      String
+  expiresAt  DateTime @db.Timestamptz(3)
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
 
-  @@unique([identifier, token])
+  @@index([identifier])
+  @@map("verification")
 }
 
 // Application models
 model Customer {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
   passwordHash String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
 
-  users     UserCustomer[]
-  files     File[]
-  apiKeys   ApiKey[]
+  users UserCustomer[]
+  files File[]
 }
 
+// Belongs to exactly one User (the MCP/API caller); workspace scope is
+// resolved per-request against that user's UserCustomer memberships, not
+// pinned to a single Customer at key-creation time. See docs/domains/apikeys.md.
 model ApiKey {
-  id         String   @id @default(cuid())
-  keyHash    String   @unique
-  name       String
-  customerId String?
-  userId     String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(cuid())
+  keyHash   String   @unique
+  name      String
+  userId    String
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
 
-  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model UserCustomer {
   id         String   @id @default(cuid())
   userId     String
   customerId String
-  createdAt  DateTime @default(now())
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   @@unique([userId, customerId])
+  @@index([customerId])
 }
 
 model File {
-  id           String   @id @default(cuid())
-  title        String
-  slug         String
-  tags         String[]
-  metadata     Json?
-  storagePath  String
-  customerId   String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String   @id @default(cuid())
+  title       String
+  slug        String
+  tags        String[]
+  metadata    Json?
+  storagePath String
+  customerId  String
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
 
-  customer     Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   @@unique([customerId, slug])
 }
