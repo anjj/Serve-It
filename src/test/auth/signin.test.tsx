@@ -4,13 +4,20 @@ import '@testing-library/jest-dom';
 import React from 'react';
 import SignIn from '@/app/auth/signin/page';
 
-vi.mock('next-auth/react', () => ({
-  signIn: vi.fn(),
+vi.mock('@/lib/auth-client', () => ({
+  authClient: {
+    signIn: {
+      social: vi.fn(),
+    },
+  },
 }));
 
 vi.mock('next/navigation', () => ({
   useSearchParams: () => ({
     get: () => null,
+  }),
+  useRouter: () => ({
+    push: vi.fn(),
   }),
 }));
 

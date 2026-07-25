@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import Navbar from "@/components/Navbar";
@@ -13,7 +13,7 @@ export default function CustomerDocumentsPage() {
   const rawCustomerSlug = params.customer_slug;
   const customer_slug = Array.isArray(rawCustomerSlug) ? rawCustomerSlug[0] : rawCustomerSlug;
 
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
 
   const [files, setFiles] = useState<File[]>([]);
@@ -22,6 +22,11 @@ export default function CustomerDocumentsPage() {
   const [selectedTag, setSelectedTag] = useState<string>("");
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [error, setError] = useState("");
+  // The Customer Portal login (D3) is a separate grant path from the
+  // better-auth user session; it isn't visible via useSession() at all, so
+  // it's checked independently against /api/auth/customer-portal.
+  const [customerPortalChecked, setCustomerPortalChecked] = useState(false);
+  const [hasCustomerPortalSession, setHasCustomerPortalSession] = useState(false);
 
   const fetchFiles = useCallback(async () => {
     setLoading(true);
@@ -48,26 +53,33 @@ export default function CustomerDocumentsPage() {
   }, [customer_slug]);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push(`/auth/signin?callbackUrl=/documents/${customer_slug}`);
+    if (status === "authenticated") {
+      setCustomerPortalChecked(true);
+      return;
     }
-  }, [status, router, customer_slug]);
+    if (status !== "unauthenticated") return;
+
+    fetch("/api/auth/customer-portal")
+      .then((res) => res.json())
+      .then((data) => setHasCustomerPortalSession(!!data.session))
+      .finally(() => setCustomerPortalChecked(true));
+  }, [status]);
 
   useEffect(() => {
-    if (status === "authenticated" && customer_slug) {
-       // Validate that the user should be here
-       const role = (session?.user as any)?.role;
-       const userCustomerSlug = (session?.user as any)?.customer_slug;
-       if (role === "CUSTOMER" && userCustomerSlug !== customer_slug) {
-          setError("You do not have access to this dashboard.");
-          setLoading(false);
-          return;
-       }
-       fetchFiles();
+    if (!customerPortalChecked) return;
+    if (status === "unauthenticated" && !hasCustomerPortalSession) {
+      router.push(`/auth/signin?callbackUrl=/documents/${customer_slug}`);
     }
-  }, [status, customer_slug, fetchFiles, session]);
+  }, [status, customerPortalChecked, hasCustomerPortalSession, router, customer_slug]);
 
-  if (status === "loading" || loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  useEffect(() => {
+    if (!customerPortalChecked || !customer_slug) return;
+    if (status === "authenticated" || hasCustomerPortalSession) {
+      fetchFiles();
+    }
+  }, [status, customerPortalChecked, hasCustomerPortalSession, customer_slug, fetchFiles]);
+
+  if (status === "loading" || !customerPortalChecked || loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
   if (error) {
     return (

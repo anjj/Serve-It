@@ -15,10 +15,10 @@ Serve-it is a high-performance, multi-tenant file sharing and serving platform. 
    ![Next.js](https://img.shields.io/badge/Next.js-16.2.9-black?style=flat-square&logo=next.js&logoColor=white)
    ![React](https://img.shields.io/badge/React-19.2.4-blue?style=flat-square&logo=react&logoColor=white)
    ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=flat-square&logo=tailwindcss&logoColor=white)
-   ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+   ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?style=flat-square&logo=postgresql&logoColor=white)
    ![Prisma](https://img.shields.io/badge/Prisma-5.22.0-2D3748?style=flat-square&logo=prisma&logoColor=white)
    ![Supabase](https://img.shields.io/badge/Supabase-Storage-3ECF8E?style=flat-square&logo=supabase&logoColor=white)
-   ![NextAuth](https://img.shields.io/badge/NextAuth.js-v4-5C2D91?style=flat-square&logo=nextauth&logoColor=white)
+   ![better-auth](https://img.shields.io/badge/better--auth-1.6-5C2D91?style=flat-square&logoColor=white)
 
 ---
 

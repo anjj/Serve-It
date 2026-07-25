@@ -1,12 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET, POST } from '@/app/api/admin/customers/route';
-import { getServerSession } from 'next-auth/next';
+import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
-vi.mock('next-auth/next', () => ({
-  getServerSession: vi.fn(),
+vi.mock('@/lib/auth', () => ({
+  auth: { api: { getSession: vi.fn() } },
 }));
+
+const adminUser = { id: 'admin-1', isAdmin: true, name: 'Admin', email: 'admin@example.com' };
 
 vi.mock('@/lib/prisma', () => ({
   prisma: {
@@ -30,7 +32,7 @@ describe('/api/admin/customers', () => {
 
   describe('GET', () => {
     it('returns 401 if unauthorized', async () => {
-      vi.mocked(getServerSession).mockResolvedValueOnce(null);
+      vi.mocked(auth.api.getSession).mockResolvedValueOnce(null as any);
       const res = await GET();
       const json = await res.json();
       expect(res.status).toBe(401);
@@ -38,7 +40,7 @@ describe('/api/admin/customers', () => {
     });
 
     it('returns customers if authorized as admin', async () => {
-      vi.mocked(getServerSession).mockResolvedValueOnce({ user: { isAdmin: true } } as any);
+      vi.mocked(auth.api.getSession).mockResolvedValueOnce({ user: adminUser } as any);
       vi.mocked(prisma.customer.findMany).mockResolvedValueOnce([{ id: '1', name: 'Test' } as any]);
       const res = await GET();
       const json = await res.json();
@@ -49,7 +51,7 @@ describe('/api/admin/customers', () => {
 
   describe('POST', () => {
     it('returns 401 if unauthorized', async () => {
-      vi.mocked(getServerSession).mockResolvedValueOnce(null);
+      vi.mocked(auth.api.getSession).mockResolvedValueOnce(null as any);
       const req = new Request('http://localhost', { method: 'POST', body: JSON.stringify({}) });
       const res = await POST(req);
       const json = await res.json();
@@ -57,7 +59,7 @@ describe('/api/admin/customers', () => {
     });
 
     it('returns 400 if missing fields', async () => {
-      vi.mocked(getServerSession).mockResolvedValueOnce({ user: { isAdmin: true } } as any);
+      vi.mocked(auth.api.getSession).mockResolvedValueOnce({ user: adminUser } as any);
       const req = new Request('http://localhost', { method: 'POST', body: JSON.stringify({ name: 'Only Name' }) });
       const res = await POST(req);
       const json = await res.json();
@@ -66,7 +68,7 @@ describe('/api/admin/customers', () => {
     });
 
     it('creates customer and returns 200 on success', async () => {
-      vi.mocked(getServerSession).mockResolvedValueOnce({ user: { isAdmin: true } } as any);
+      vi.mocked(auth.api.getSession).mockResolvedValueOnce({ user: adminUser } as any);
       vi.mocked(bcrypt.hash).mockResolvedValueOnce('hashed_pw' as any);
       vi.mocked(prisma.customer.create).mockResolvedValueOnce({ id: '2', name: 'New', slug: 'new' } as any);
 
@@ -85,7 +87,7 @@ describe('/api/admin/customers', () => {
     });
 
     it('returns 500 on db error', async () => {
-      vi.mocked(getServerSession).mockResolvedValueOnce({ user: { isAdmin: true } } as any);
+      vi.mocked(auth.api.getSession).mockResolvedValueOnce({ user: adminUser } as any);
       vi.mocked(bcrypt.hash).mockResolvedValueOnce('hashed_pw' as any);
       vi.mocked(prisma.customer.create).mockRejectedValueOnce(new Error('DB Error'));
 

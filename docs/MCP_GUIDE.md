@@ -12,7 +12,17 @@ The **Model Context Protocol (MCP)** is an open standard that allows AI assistan
 - **Upload new documents** (HTML files) to a workspace with metadata and tags.
 - **Update existing documents** — modify content, titles, tags, or metadata.
 
-All operations are authenticated via API keys and scoped to the workspace associated with the key.
+All operations are authenticated via API keys. An API key belongs to one user and can act
+in any workspace that user has access to (or, for admins, any active workspace) — every
+call must name its target workspace via a `customer_slug` parameter; nothing is implied
+by the key alone. See `docs/domains/apikeys.md` for the underlying model.
+
+> **Note on this guide's scope:** today the only implemented MCP-adjacent surface is the
+> REST endpoint `/api/v1/files` (`POST`/`PATCH`), documented below as `post_file` /
+> `patch_file`. `get_customers` and a dedicated `/api/mcp` server endpoint described
+> further down are the target shape for MCP clients that speak the protocol directly,
+> but are not yet implemented in this codebase — treat those sections as the intended
+> design, not a guarantee of what exists today.
 
 ---
 
@@ -21,7 +31,7 @@ All operations are authenticated via API keys and scoped to the workspace associ
 Before configuring MCP, ensure the following:
 
 1. **Active Workspace:** Your organization must have an active customer workspace in Serve-it. Contact your platform administrator if you don't have one.
-2. **API Key:** You need a valid API key (`sk_serve_...`) generated from the admin panel. API keys are shown **once** at creation — store it securely.
+2. **API Key:** You need a valid API key (`sk_live_serve-it_...`) generated from the admin panel. API keys are shown **once** at creation — store it securely.
 3. **MCP Server URL:** Your Serve-it deployment's MCP endpoint. The URL follows the pattern:
    ```
    https://<your-serve-it-domain>/api/mcp
@@ -39,11 +49,11 @@ Serve-it uses **Access Token / API Key** authentication with the **Bearer** head
 |----------------------|--------------------------------|
 | **Authentication**   | `Access token / API key`       |
 | **Header Scheme**    | `Bearer`                       |
-| **Token Value**      | Your API key (`sk_serve_...`)  |
+| **Token Value**      | Your API key (`sk_live_serve-it_...`)  |
 
 The MCP client sends this token with every tool call:
 ```
-Authorization: Bearer sk_serve_<your_key_here>
+Authorization: Bearer sk_live_serve-it_<your_key_here>
 ```
 
 The server hashes the token with SHA-256 and looks up the matching record in the database. If valid, the tool call proceeds within the workspace associated with that API key.
@@ -90,7 +100,7 @@ The completed setup dialog should look like this:
 
 ### Step 5: Enter Your API Key
 
-After creating the app, ChatGPT will prompt you to enter your API key. Paste your full API key (`sk_serve_...`) into the token input field.
+After creating the app, ChatGPT will prompt you to enter your API key. Paste your full API key (`sk_live_serve-it_...`) into the token input field.
 
 ### Step 6: Verify Available Tools
 
@@ -122,7 +132,7 @@ Creates a new document in a specific workspace.
 | Property       | Details                                                          |
 |----------------|------------------------------------------------------------------|
 | **Method**     | Write (POST)                                                     |
-| **Required**   | `title` (string), `slug` (string), `file` (HTML content)        |
+| **Required**   | `customer_slug` (string), `title` (string), `slug` (string), `file` (HTML content) |
 | **Optional**   | `tags` (JSON array), `metadata` (JSON object)                   |
 | **Returns**    | Created file record with public URL (`/s/<workspace>/<slug>`)    |
 | **Constraints**| Slug must be unique within the workspace. Returns `409` if duplicate. |
@@ -134,7 +144,7 @@ Updates an existing document in a specific workspace.
 | Property       | Details                                                          |
 |----------------|------------------------------------------------------------------|
 | **Method**     | Write (PATCH)                                                    |
-| **Required**   | `slug` (string) — identifies the file to update                 |
+| **Required**   | `customer_slug` (string), `slug` (string) — identifies the workspace and file to update |
 | **Optional**   | `title`, `file` (new content), `tags`, `metadata`               |
 | **Returns**    | Updated file record with public URL                              |
 | **Constraints**| At least one optional field must be provided. Returns `404` if slug not found. |

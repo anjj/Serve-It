@@ -3,22 +3,59 @@ import { prisma } from "@/lib/prisma";
 import { uploadHtmlFile } from "@/lib/storage";
 import crypto from "crypto";
 
+const BASE_URL = process.env.BETTER_AUTH_URL || process.env.NEXTAUTH_URL;
+
+/**
+ * Resolves the caller's ApiKey and the target Customer workspace.
+ *
+ * An ApiKey belongs to exactly one User (D4); it is not pinned to a single
+ * workspace at creation time. Every request must therefore name which
+ * workspace it targets via `customer_slug`, and the caller's user must have
+ * a UserCustomer membership there (or be a platform admin).
+ */
+async function resolveKeyAndCustomer(req: Request, customerSlug: string | null) {
+  const authHeader = req.headers.get("authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+  }
+
+  const apiKey = authHeader.split(" ")[1];
+  const keyHash = crypto.createHash("sha256").update(apiKey).digest("hex");
+
+  const apiKeyRecord = await prisma.apiKey.findUnique({ where: { keyHash }, include: { user: true } });
+  if (!apiKeyRecord) {
+    return { error: NextResponse.json({ error: "Invalid API Key" }, { status: 403 }) };
+  }
+
+  if (!customerSlug) {
+    return { error: NextResponse.json({ error: "Missing required field: customer_slug" }, { status: 400 }) };
+  }
+
+  const customer = await prisma.customer.findUnique({
+    where: { slug: customerSlug },
+    include: { users: { where: { userId: apiKeyRecord.userId } } },
+  });
+  if (!customer) {
+    return { error: NextResponse.json({ error: "Workspace not found" }, { status: 404 }) };
+  }
+  if (!customer.isActive) {
+    return { error: NextResponse.json({ error: "Customer workspace is inactive" }, { status: 403 }) };
+  }
+  if (!apiKeyRecord.user.isAdmin && customer.users.length === 0) {
+    return { error: NextResponse.json({ error: "User is not a member of this workspace" }, { status: 403 }) };
+  }
+
+  return { customer };
+}
+
 export async function POST(req: Request) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-    const apiKey = authHeader.split(" ")[1];
-    const keyHash = crypto.createHash("sha256").update(apiKey).digest("hex");
-
-    const apiKeyRecord = await prisma.apiKey.findUnique({ where: { keyHash }, include: { customer: true } });
-    if (!apiKeyRecord) return NextResponse.json({ error: "Invalid API Key" }, { status: 403 });
-
-    const customer = apiKeyRecord.customer;
-    if (!customer) return NextResponse.json({ error: "API Key not associated with a customer" }, { status: 403 });
-    if (!customer.isActive) return NextResponse.json({ error: "Customer workspace is inactive" }, { status: 403 });
-
     const formData = await req.formData();
+    const customerSlug = formData.get("customer_slug") as string | null;
+    const resolved = await resolveKeyAndCustomer(req, customerSlug);
+    if (resolved.error) return resolved.error;
+    const { customer } = resolved;
+
     const title = formData.get("title") as string;
     const slug = formData.get("slug") as string;
     const fileEntry = formData.get("file");
@@ -71,7 +108,7 @@ export async function POST(req: Request) {
     const storagePath = await uploadHtmlFile(customer.id, slug, file);
     const newFile = await prisma.file.create({ data: { title, slug, tags: tags || [], metadata: metadata || {}, storagePath, customerId: customer.id } });
 
-    const publicUrl = `${process.env.NEXTAUTH_URL}/s/${customer.slug}/${newFile.slug}`;
+    const publicUrl = `${BASE_URL}/s/${customer.slug}/${newFile.slug}`;
     return NextResponse.json({ success: true, file: newFile, url: publicUrl });
   } catch (error: any) {
     console.error("API /v1/files error:", error);
@@ -81,20 +118,12 @@ export async function POST(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-    const apiKey = authHeader.split(" ")[1];
-    const keyHash = crypto.createHash("sha256").update(apiKey).digest("hex");
-
-    const apiKeyRecord = await prisma.apiKey.findUnique({ where: { keyHash }, include: { customer: true } });
-    if (!apiKeyRecord) return NextResponse.json({ error: "Invalid API Key" }, { status: 403 });
-
-    const customer = apiKeyRecord.customer;
-    if (!customer) return NextResponse.json({ error: "API Key not associated with a customer" }, { status: 403 });
-    if (!customer.isActive) return NextResponse.json({ error: "Customer workspace is inactive" }, { status: 403 });
-
     const formData = await req.formData();
+    const customerSlug = formData.get("customer_slug") as string | null;
+    const resolved = await resolveKeyAndCustomer(req, customerSlug);
+    if (resolved.error) return resolved.error;
+    const { customer } = resolved;
+
     const slug = formData.get("slug") as string;
     if (!slug) {
       return NextResponse.json({ error: "Missing required field: slug" }, { status: 400 });
@@ -184,7 +213,7 @@ export async function PATCH(req: Request) {
       data: updateData
     });
 
-    const publicUrl = `${process.env.NEXTAUTH_URL}/s/${customer.slug}/${updatedFile.slug}`;
+    const publicUrl = `${BASE_URL}/s/${customer.slug}/${updatedFile.slug}`;
     return NextResponse.json({ success: true, file: updatedFile, url: publicUrl });
   } catch (error: any) {
     console.error("API /v1/files error:", error);
