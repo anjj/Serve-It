@@ -1,5 +1,5 @@
 # Initial Concept
-Inferred context from brownfield project: A multi-tenant file-sharing and serving application with custom workspace URL slugs, API key management, and NextAuth authentication.
+Inferred context from brownfield project: A multi-tenant file-sharing and serving application with custom workspace URL slugs, API key management, and Better Auth authentication.
 
 # Product Guide: Serve-it
 
@@ -21,12 +21,12 @@ Inferred context from brownfield project: A multi-tenant file-sharing and servin
    - User-to-Customer mapping (many-to-many relationship) to support users participating in multiple workspaces.
 2. **File Sharing & Short URLs:**
    - File uploads backed by cloud-native storage (Supabase).
-   - Custom slugs for files, exposing clean public/authenticated access paths: `/s/[customer_slug]/[file_slug]`.
+   - Custom slugs for files, exposing clean public/authenticated access paths (`src/routes/s/`): `/s/$customerSlug/$fileSlug`.
 3. **API Key Management:**
    - Secure generation and hashing of API keys (`ApiKey`) per Customer.
    - Programmatic authentication for APIs.
 4. **Security & Authentication:**
-   - Single Sign-On (SSO) and OAuth capability via NextAuth.
+   - Single Sign-On (SSO) and OAuth capability via Better Auth.
    - Admin roles (`isAdmin`) to manage platform-wide operations like customer provisioning.
 5. **Model Context Protocol (MCP) Integration:**
    - Native support for MCP servers.
