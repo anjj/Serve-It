@@ -1,24 +1,28 @@
 # Technology Stack: Serve-it
 
 ## Core Architecture & Frameworks
-- **Language:** **TypeScript / JavaScript** (ESNext, Node.js environment)
-- **Framework:** **Next.js 16** with **React 19** using the App Router (`src/app/`)
-- **Styling:** **Tailwind CSS v4** with `@tailwindcss/postcss` for component styling
+- **Language:** **TypeScript / JavaScript** (ESNext, Bun runtime)
+- **Runtime & Package Manager:** **Bun** (`bun`)
+- **Framework:** **TanStack Start** with **React 19** using TanStack Router (`src/routes/`) & **Vite**
+- **Styling:** **Tailwind CSS v4** with `@tailwindcss/vite` for component styling
 
 ## Infrastructure & Deployment
-- **Hosting:** **Google Cloud Run** (Docker containerized)
+- **Hosting:** **Google Cloud Run** (Docker containerized using Bun base image)
 - **CI/CD:** **GitHub Actions** with automated deployment and environment secret injection
 
 ## Database & Data Access
 - **Database Engine:** **PostgreSQL**
 - **ORM / Client:** **Prisma Client** (using schema at `prisma/schema.prisma`)
-- **Adapter:** `@auth/prisma-adapter` for database-backed authentication storage
 
 ## Third-Party Services & Storage
 - **Object Storage & Client:** **Supabase** via `@supabase/supabase-js` for file upload and storage backing
-- **Authentication Provider:** **NextAuth.js** (`next-auth`) for user sign-in and session management
+- **Authentication Provider:** **Better Auth** (`better-auth`) for user sign-in and session management
+
+## Testing & Quality Assurance
+- **Test Runner:** **Vitest** (`vitest`) with `happy-dom` and `@testing-library/react`
+- **Coverage:** Vitest V8 coverage (`@vitest/coverage-v8`)
 
 ## Additional Integration Libraries
 - **Model Context Protocol (MCP) SDK:** `@modelcontextprotocol/sdk` for exposing/interacting with MCP servers
 - **Data Validation:** **Zod** (`zod`) for API parameter and schema validation
-- **Icons:** **Lucide React** (`lucide-react`)
+- **Icons:** **Lucide React** (`lucide-react`) & **React Icons** (`react-icons`)
