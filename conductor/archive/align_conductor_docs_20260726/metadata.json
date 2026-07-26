@@ -1,0 +1,8 @@
+{
+  "track_id": "align_conductor_docs_20260726",
+  "type": "chore",
+  "status": "new",
+  "created_at": "2026-07-26T17:40:00Z",
+  "updated_at": "2026-07-26T17:40:00Z",
+  "description": "Review and align Conductor definition/track with the new Bun and TanStack implementation"
+}
