@@ -9,8 +9,8 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Tech Stack and Product Definition Alignment' (Protocol in workflow.md)
 
 ## Phase 2: Workflow and Code Styleguides Alignment
-- [ ] Task: Update Workflow Development Commands
-    - [ ] Modify `conductor/workflow.md` to replace npm/pnpm/Next.js commands with Bun commands (`bun install`, `bun run dev`, `vitest`, etc.)
+- [x] Task: Update Workflow Development Commands (d6a7a18)
+    - [x] Modify `conductor/workflow.md` to replace npm/pnpm/Next.js commands with Bun commands (`bun install`, `bun run dev`, `vitest`, etc.)
 - [ ] Task: Update Code Styleguides
     - [ ] Review and update `conductor/code_styleguides/typescript.md` and related styleguides to align with Vite, Vitest, and Bun runtime conventions
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Workflow and Code Styleguides Alignment' (Protocol in workflow.md)
