@@ -28,12 +28,12 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Migrate Next.js Stack to TanStack & Bun**
+- [x] **Track: Migrate Next.js Stack to TanStack & Bun**
   *Link: [./tracks/migrate_tanstack_bun_20260719/](./tracks/migrate_tanstack_bun_20260719/)*
 
 ---
 
-- [ ] **Track: Review and align Conductor definition/track with the new Bun and TanStack implementation**
+- [~] **Track: Review and align Conductor definition/track with the new Bun and TanStack implementation**
 *Link: [./tracks/align_conductor_docs_20260726/](./tracks/align_conductor_docs_20260726/)*
 
 
