@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { POST } from '@/app/api/admin/apikeys/route';
+import { POST } from '@/routes/api/admin/apikeys';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 
@@ -20,6 +20,10 @@ vi.mock('@/lib/auth', () => ({
 
 const adminUser = { id: 'admin-1', isAdmin: true, name: 'Admin', email: 'admin@example.com' };
 
+function req(body: unknown) {
+  return new Request('http://localhost/api/admin/apikeys', { method: 'POST', body: JSON.stringify(body) });
+}
+
 describe('POST /api/admin/apikeys', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -28,12 +32,7 @@ describe('POST /api/admin/apikeys', () => {
   it('should return 401 if unauthorized (no session)', async () => {
     vi.mocked(auth.api.getSession).mockResolvedValueOnce(null as any);
 
-    const req = new Request('http://localhost/api/admin/apikeys', {
-      method: 'POST',
-      body: JSON.stringify({ name: 'Test Key', userId: 'user-1' }),
-    });
-
-    const res = await POST(req);
+    const res = await POST({ request: req({ name: 'Test Key', userId: 'user-1' }), params: {} } as any);
     expect(res.status).toBe(401);
     const data = await res.json();
     expect(data.error).toBe('Unauthorized');
@@ -42,12 +41,7 @@ describe('POST /api/admin/apikeys', () => {
   it('should return 401 if user is not an admin', async () => {
     vi.mocked(auth.api.getSession).mockResolvedValueOnce({ user: { id: 'user-1', isAdmin: false, name: null, email: 'user@example.com' } } as any);
 
-    const req = new Request('http://localhost/api/admin/apikeys', {
-      method: 'POST',
-      body: JSON.stringify({ name: 'Test Key', userId: 'user-1' }),
-    });
-
-    const res = await POST(req);
+    const res = await POST({ request: req({ name: 'Test Key', userId: 'user-1' }), params: {} } as any);
     expect(res.status).toBe(401);
     const data = await res.json();
     expect(data.error).toBe('Unauthorized');
@@ -56,12 +50,7 @@ describe('POST /api/admin/apikeys', () => {
   it('should return 400 if name is missing', async () => {
     vi.mocked(auth.api.getSession).mockResolvedValueOnce({ user: adminUser } as any);
 
-    const req = new Request('http://localhost/api/admin/apikeys', {
-      method: 'POST',
-      body: JSON.stringify({ userId: 'user-1' }),
-    });
-
-    const res = await POST(req);
+    const res = await POST({ request: req({ userId: 'user-1' }), params: {} } as any);
     expect(res.status).toBe(400);
     const data = await res.json();
     expect(data.error).toBe('Missing fields');
@@ -70,12 +59,7 @@ describe('POST /api/admin/apikeys', () => {
   it('should return 400 if userId is missing', async () => {
     vi.mocked(auth.api.getSession).mockResolvedValueOnce({ user: adminUser } as any);
 
-    const req = new Request('http://localhost/api/admin/apikeys', {
-      method: 'POST',
-      body: JSON.stringify({ name: 'Test Key' }),
-    });
-
-    const res = await POST(req);
+    const res = await POST({ request: req({ name: 'Test Key' }), params: {} } as any);
     expect(res.status).toBe(400);
     const data = await res.json();
     expect(data.error).toBe('Missing fields');
@@ -85,12 +69,7 @@ describe('POST /api/admin/apikeys', () => {
     vi.mocked(auth.api.getSession).mockResolvedValueOnce({ user: adminUser } as any);
     vi.mocked(prisma.user.findUnique).mockResolvedValueOnce(null);
 
-    const req = new Request('http://localhost/api/admin/apikeys', {
-      method: 'POST',
-      body: JSON.stringify({ name: 'Test Key', userId: 'missing-user' }),
-    });
-
-    const res = await POST(req);
+    const res = await POST({ request: req({ name: 'Test Key', userId: 'missing-user' }), params: {} } as any);
     expect(res.status).toBe(404);
     const data = await res.json();
     expect(data.error).toBe('User not found');
@@ -111,12 +90,7 @@ describe('POST /api/admin/apikeys', () => {
 
     vi.mocked(prisma.apiKey.create).mockResolvedValueOnce(createdRecord);
 
-    const req = new Request('http://localhost/api/admin/apikeys', {
-      method: 'POST',
-      body: JSON.stringify({ name: 'Test Key', userId: 'user-123' }),
-    });
-
-    const res = await POST(req);
+    const res = await POST({ request: req({ name: 'Test Key', userId: 'user-123' }), params: {} } as any);
     expect(res.status).toBe(200);
     const data = await res.json();
 
@@ -139,12 +113,7 @@ describe('POST /api/admin/apikeys', () => {
     vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ id: 'user-123' } as any);
     vi.mocked(prisma.apiKey.create).mockRejectedValueOnce(new Error('DB Connection Timeout'));
 
-    const req = new Request('http://localhost/api/admin/apikeys', {
-      method: 'POST',
-      body: JSON.stringify({ name: 'Test Key', userId: 'user-123' }),
-    });
-
-    const res = await POST(req);
+    const res = await POST({ request: req({ name: 'Test Key', userId: 'user-123' }), params: {} } as any);
     expect(res.status).toBe(500);
     const data = await res.json();
     expect(data.error).toBe('Internal server error');

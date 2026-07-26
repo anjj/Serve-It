@@ -43,8 +43,8 @@ The application serves documents via simple, human-friendly URLs: `/s/[customer_
 ## 3. Technical Implementation & Business Rules
 
 ### Core Components
-- **Dynamic App Router**: `/s/[customer_slug]/[file_slug]/route.ts` (Handles `GET` requests).
-- **Storage Service Utility**: `downloadFile` function in [storage.ts](file:///home/andres.julian/github/serve-it/src/lib/storage.ts).
+- **Dynamic Server Route**: `src/routes/s/$customer_slug/$file_slug.tsx` (Handles `GET` requests).
+- **Storage Service Utility**: `downloadFile` function in [storage.ts](../../src/lib/storage.ts).
 
 ### HTTP Headers and Caching Policies
 To ensure security and up-to-date document serving, the route returns the HTML with the following headers:
@@ -61,7 +61,7 @@ Standard users must belong to the workspace associated with the `customer_slug` 
 
 | Technical Error / Status | Business Context / Meaning | Next Steps / Mitigation |
 |--------------------------|----------------------------|-------------------------|
-| `302 Found / Redirect`   | Missing active NextAuth session. | Redirects user to `/auth/signin`. |
+| `302 Found / Redirect`   | Missing active session. | Redirects user to `/auth/signin`. |
 | `403 Access Denied`      | Authenticated user is not a member of this workspace. | Log in with an authorized account. |
 | `404 Workspace not found`| No Customer exists with the provided `customer_slug`. | Check the URL spelling. |
 | `404 File not found`     | The document slug does not exist in this workspace. | Check the file slug spelling. |

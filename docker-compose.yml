@@ -156,12 +156,11 @@ services:
       - "3000:3000"
     environment:
       - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/postgres?schema=public
-      - NEXTAUTH_URL=http://localhost:3000
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - BETTER_AUTH_URL=http://localhost:3000
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
       - SUPABASE_URL=http://kong:8000
       - SUPABASE_SERVICE_ROLE_KEY=${SERVICE_ROLE_KEY}
       - SUPABASE_STORAGE_BUCKET=${SUPABASE_STORAGE_BUCKET}
-      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
     depends_on:
       db:
         condition: service_healthy

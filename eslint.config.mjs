@@ -1,15 +1,19 @@
 import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+import js from "@eslint/js";
+import tseslint from "typescript-eslint";
+import reactHooks from "eslint-plugin-react-hooks";
 
 const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  reactHooks.configs.flat["recommended-latest"],
   globalIgnores([
-    ".next/**",
-    "out/**",
+    ".output/**",
+    ".vinxi/**",
+    ".tanstack/**",
+    ".nitro/**",
     "build/**",
-    "next-env.d.ts",
+    "src/routeTree.gen.ts",
   ]),
   {
     rules: {
@@ -18,11 +22,8 @@ const eslintConfig = defineConfig([
       "react-hooks/exhaustive-deps": "off",
       "react-hooks/set-state-in-effect": "off",
       "react-hooks/immutability": "off",
-      "react/no-unescaped-entities": "off",
-      "@next/next/no-img-element": "off",
-      "@next/next/no-html-link-for-pages": "off"
-    }
-  }
+    },
+  },
 ]);
 
 export default eslintConfig;

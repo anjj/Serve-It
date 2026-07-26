@@ -1,6 +1,8 @@
 node_modules
-.next
-out
+.output
+.vinxi
+.tanstack
+.nitro
 .git
 .gitignore
 README.md

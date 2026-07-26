@@ -64,7 +64,7 @@ Serve-it exposes its file management capabilities as MCP-compatible tools, allow
 
 ### Core Components
 - **MCP SDK:** `@modelcontextprotocol/sdk` (v1.29.0+) provides the server-side protocol handling for tool registration and request/response marshalling.
-- **File Operations Endpoint:** `src/app/api/v1/files/route.ts` — handles both `POST` (upload) and `PATCH` (update) operations.
+- **File Operations Endpoint:** `src/routes/api/v1/files.tsx` — handles both `POST` (upload) and `PATCH` (update) operations.
 - **Storage Layer:** `src/lib/storage.ts` — manages file persistence to Supabase object storage under tenant-isolated paths (`tenants/<customerId>/files/<slug>.html`).
 
 ### Authentication & Workspace Scoping

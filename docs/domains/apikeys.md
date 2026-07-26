@@ -52,8 +52,8 @@ Admins can generate an API key for any user. The system generates a cryptographi
 ## 3. Technical Implementation & Business Rules
 
 ### Core Components
-- **API Key Generation Router**: `/api/admin/apikeys/route.ts` (Handles `POST`; requires `{ name, userId }`).
-- **Programmatic Ingestion Router**: `/api/v1/files/route.ts` (Handles `POST` uploads and `PATCH` updates; requires a `customer_slug` form field on every call).
+- **API Key Generation Router**: `src/routes/api/admin/apikeys.tsx` (Handles `POST`; requires `{ name, userId }`).
+- **Programmatic Ingestion Router**: `src/routes/api/v1/files.tsx` (Handles `POST` uploads and `PATCH` updates; requires a `customer_slug` form field on every call).
 
 ### API Key Constraints & Hashing Scheme
 1. **Uniqueness & Entropy**: API keys are built using 32 bytes of secure random bytes, formatted as hex (`64` characters).

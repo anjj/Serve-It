@@ -7,7 +7,7 @@ describe('Prisma Schema Account model', () => {
       id: 'acc-1',
       userId: 'user-1',
       accountId: 'prov-1',
-      providerId: 'azure-ad',
+      providerId: 'microsoft',
       refreshToken: null,
       accessToken: null,
       idToken: null,
@@ -18,7 +18,7 @@ describe('Prisma Schema Account model', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    expect(account.providerId).toBe('azure-ad');
+    expect(account.providerId).toBe('microsoft');
     expect(account.accountId).toBe('prov-1');
   });
 });

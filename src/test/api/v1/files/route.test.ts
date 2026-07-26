@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { POST, PATCH } from '@/app/api/v1/files/route';
+import { POST, PATCH } from '@/routes/api/v1/files';
 import { prisma } from '@/lib/prisma';
 import { uploadHtmlFile } from '@/lib/storage';
 
@@ -49,7 +49,7 @@ describe('POST /api/v1/files', () => {
       method: 'POST',
       body: new FormData(),
     });
-    const res = await POST(req);
+    const res = await POST({ request: req } as any);
     expect(res.status).toBe(401);
     const data = await res.json();
     expect(data.error).toBe('Unauthorized');
@@ -65,7 +65,7 @@ describe('POST /api/v1/files', () => {
       },
       body: new FormData(),
     });
-    const res = await POST(req);
+    const res = await POST({ request: req } as any);
     expect(res.status).toBe(403);
     const data = await res.json();
     expect(data.error).toBe('Invalid API Key');
@@ -79,7 +79,7 @@ describe('POST /api/v1/files', () => {
       headers: { 'Authorization': 'Bearer valid-key' },
       body: new FormData(),
     });
-    const res = await POST(req);
+    const res = await POST({ request: req } as any);
     expect(res.status).toBe(400);
     const data = await res.json();
     expect(data.error).toBe('Missing required field: customer_slug');
@@ -96,7 +96,7 @@ describe('POST /api/v1/files', () => {
       headers: { 'Authorization': 'Bearer valid-key' },
       body: formData,
     });
-    const res = await POST(req);
+    const res = await POST({ request: req } as any);
     expect(res.status).toBe(403);
     const data = await res.json();
     expect(data.error).toBe('Customer workspace is inactive');
@@ -113,7 +113,7 @@ describe('POST /api/v1/files', () => {
       headers: { 'Authorization': 'Bearer valid-key' },
       body: formData,
     });
-    const res = await POST(req);
+    const res = await POST({ request: req } as any);
     expect(res.status).toBe(403);
     const data = await res.json();
     expect(data.error).toBe('User is not a member of this workspace');
@@ -134,7 +134,7 @@ describe('POST /api/v1/files', () => {
       },
       body: formData,
     });
-    const res = await POST(req);
+    const res = await POST({ request: req } as any);
     expect(res.status).toBe(400);
     const data = await res.json();
     expect(data.error).toBe('Missing required fields');
@@ -158,7 +158,7 @@ describe('POST /api/v1/files', () => {
       },
       body: formData,
     });
-    const res = await POST(req);
+    const res = await POST({ request: req } as any);
     expect(res.status).toBe(409);
     const data = await res.json();
     expect(data.error).toBe('A file with this slug already exists for this customer');
@@ -196,7 +196,7 @@ describe('POST /api/v1/files', () => {
       },
       body: formData,
     });
-    const res = await POST(req);
+    const res = await POST({ request: req } as any);
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.success).toBe(true);
@@ -215,7 +215,7 @@ describe('PATCH /api/v1/files', () => {
       method: 'PATCH',
       body: new FormData(),
     });
-    const res = await PATCH(req);
+    const res = await PATCH({ request: req } as any);
     expect(res.status).toBe(401);
     const data = await res.json();
     expect(data.error).toBe('Unauthorized');
@@ -231,7 +231,7 @@ describe('PATCH /api/v1/files', () => {
       },
       body: new FormData(),
     });
-    const res = await PATCH(req);
+    const res = await PATCH({ request: req } as any);
     expect(res.status).toBe(403);
     const data = await res.json();
     expect(data.error).toBe('Invalid API Key');
@@ -250,7 +250,7 @@ describe('PATCH /api/v1/files', () => {
       },
       body: formData,
     });
-    const res = await PATCH(req);
+    const res = await PATCH({ request: req } as any);
     expect(res.status).toBe(403);
     const data = await res.json();
     expect(data.error).toBe('Customer workspace is inactive');
@@ -271,7 +271,7 @@ describe('PATCH /api/v1/files', () => {
       },
       body: formData,
     });
-    const res = await PATCH(req);
+    const res = await PATCH({ request: req } as any);
     expect(res.status).toBe(400);
     const data = await res.json();
     expect(data.error).toBe('Missing required field: slug');
@@ -293,7 +293,7 @@ describe('PATCH /api/v1/files', () => {
       },
       body: formData,
     });
-    const res = await PATCH(req);
+    const res = await PATCH({ request: req } as any);
     expect(res.status).toBe(400);
     const data = await res.json();
     expect(data.error).toBe('No fields to update provided');
@@ -316,7 +316,7 @@ describe('PATCH /api/v1/files', () => {
       },
       body: formData,
     });
-    const res = await PATCH(req);
+    const res = await PATCH({ request: req } as any);
     expect(res.status).toBe(404);
     const data = await res.json();
     expect(data.error).toBe('File not found');
@@ -360,7 +360,7 @@ describe('PATCH /api/v1/files', () => {
       },
       body: formData,
     });
-    const res = await PATCH(req);
+    const res = await PATCH({ request: req } as any);
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.success).toBe(true);
@@ -414,7 +414,7 @@ describe('PATCH /api/v1/files', () => {
       },
       body: formData,
     });
-    const res = await PATCH(req);
+    const res = await PATCH({ request: req } as any);
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.success).toBe(true);
@@ -467,7 +467,7 @@ describe('PATCH /api/v1/files', () => {
       },
       body: formData,
     });
-    const res = await PATCH(req);
+    const res = await PATCH({ request: req } as any);
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.success).toBe(true);

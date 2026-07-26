@@ -1,48 +1,42 @@
-"use client";
-
 import { useSession, signOut } from "@/lib/auth-client";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { Link, useNavigate, useLocation } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { LogOut, LayoutDashboard, Settings, Sun, Moon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTheme } from "./ThemeProvider";
 import { Logo } from "./Logo";
 
-type Customer = { id: string; name: string; slug: string; };
+type Customer = { id: string; name: string; slug: string };
 
 export default function Navbar() {
   const { data: session } = useSession();
-  const pathname = usePathname();
-  const router = useRouter();
+  const location = useLocation();
+  const pathname = location.pathname;
+  const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-  const [customers, setCustomers] = useState<Customer[]>([]);
   const [activeSlug, setActiveSlug] = useState<string>("");
+
+  const { data: customers = [] } = useQuery({
+    queryKey: ["workspaces"],
+    queryFn: async () => {
+      const res = await fetch("/api/user/workspaces");
+      const data = await res.json();
+      return (data.customers as Customer[]) || [];
+    },
+    enabled: !!session,
+  });
 
   useEffect(() => {
     if (pathname.startsWith("/dashboard/")) {
       const slug = pathname.split("/")[2];
-      if (slug) {
-         setTimeout(() => setActiveSlug(slug), 0);
-      }
+      if (slug) setActiveSlug(slug);
     }
   }, [pathname]);
-
-  useEffect(() => {
-    if (session) {
-      fetch("/api/user/workspaces")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.customers) {
-            setCustomers(data.customers);
-          }
-        });
-    }
-  }, [session, router, activeSlug, pathname]);
 
   const handleWorkspaceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const slug = e.target.value;
     setActiveSlug(slug);
-    router.push(`/dashboard/${slug}`);
+    navigate({ to: "/dashboard/$customer_slug", params: { customer_slug: slug } });
   };
 
   if (!session) return null;
@@ -78,7 +72,8 @@ export default function Navbar() {
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               {activeSlug && (
                 <Link
-                  href={`/dashboard/${activeSlug}`}
+                  to="/dashboard/$customer_slug"
+                  params={{ customer_slug: activeSlug }}
                   className={`${
                     pathname.includes("/dashboard")
                       ? "border-primary text-foreground"
@@ -90,9 +85,9 @@ export default function Navbar() {
                 </Link>
               )}
 
-              {(session.user as any).isAdmin && (
+              {session.user.isAdmin && (
                 <Link
-                  href="/admin"
+                  to="/admin"
                   className={`${
                     pathname.startsWith("/admin")
                       ? "border-primary text-foreground"
@@ -118,7 +113,7 @@ export default function Navbar() {
               {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
             <button
-              onClick={() => signOut({ fetchOptions: { onSuccess: () => router.push("/auth/signin") } })}
+              onClick={() => signOut({ fetchOptions: { onSuccess: () => navigate({ to: "/auth/signin" }) } })}
               className="p-2 rounded-full text-foreground-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200"
             >
               <span className="sr-only">Sign out</span>

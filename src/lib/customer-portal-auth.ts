@@ -1,10 +1,10 @@
 import crypto from "crypto";
 
-// The Customer Portal login (D3) is a deliberate second, independent grant
-// path alongside the User/UserCustomer better-auth session: a workspace can
-// be entered directly with its shared slug+password, with no corresponding
-// User or UserCustomer row. It intentionally does NOT reuse better-auth's
-// session table (which requires a real userId), so it is a small, separate,
+// The Customer Portal login is a deliberate second, independent grant path
+// alongside the User/UserCustomer better-auth session: a workspace can be
+// entered directly with its shared slug+password, with no corresponding User
+// or UserCustomer row. It intentionally does NOT reuse better-auth's session
+// table (which requires a real userId), so it is a small, separate,
 // HMAC-signed cookie instead. See docs/domains/auth.md.
 export const CUSTOMER_PORTAL_COOKIE = "customer_portal_session";
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days, matching typical session lifetime
@@ -16,7 +16,7 @@ type CustomerPortalPayload = {
 };
 
 function getSecret(): string {
-  const secret = process.env.BETTER_AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+  const secret = process.env.BETTER_AUTH_SECRET;
   if (!secret) throw new Error("BETTER_AUTH_SECRET is not configured");
   return secret;
 }
@@ -60,10 +60,25 @@ export function verifyCustomerPortalToken(token: string | undefined | null): Cus
   }
 }
 
-export const customerPortalCookieOptions = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax" as const,
-  path: "/",
-  maxAge: MAX_AGE_SECONDS,
-};
+function serializeCookie(name: string, value: string, maxAge: number): string {
+  const parts = [`${name}=${value}`, "Path=/", `Max-Age=${maxAge}`, "SameSite=Lax", "HttpOnly"];
+  if (process.env.NODE_ENV === "production") parts.push("Secure");
+  return parts.join("; ");
+}
+
+export function customerPortalSetCookieHeader(token: string): string {
+  return serializeCookie(CUSTOMER_PORTAL_COOKIE, token, MAX_AGE_SECONDS);
+}
+
+export function customerPortalClearCookieHeader(): string {
+  return serializeCookie(CUSTOMER_PORTAL_COOKIE, "", 0);
+}
+
+export function getCustomerPortalCookie(request: Request): string | undefined {
+  const cookieHeader = request.headers.get("cookie") || "";
+  return cookieHeader
+    .split(";")
+    .map((c) => c.trim())
+    .find((c) => c.startsWith(`${CUSTOMER_PORTAL_COOKIE}=`))
+    ?.slice(CUSTOMER_PORTAL_COOKIE.length + 1);
+}

@@ -86,13 +86,13 @@ developers sign in instantly as a pre-configured user.
 ### Core Components
 - **better-auth server config**: `src/lib/auth.ts` (`betterAuth(...)`), backed by the
   Prisma adapter against the `user` / `session` / `account` / `verification` tables.
-- **Catch-all route**: `src/app/api/auth/[...all]/route.ts` (`toNextJsHandler(auth)`)
+- **Catch-all route**: `src/routes/api/auth/$.tsx` (`auth.handler(request)`)
   handles all better-auth endpoints (OAuth callbacks, session, sign-out, ...).
 - **Client hooks**: `src/lib/auth-client.ts` wraps `better-auth/react`'s `useSession()`
   to also expose a `status` field (`"loading" | "authenticated" | "unauthenticated"`)
   for components that branch on it.
 - **Customer Portal**: `src/lib/customer-portal-auth.ts` (sign/verify) and
-  `src/app/api/auth/customer-portal/route.ts` (login / logout / status).
+  `src/routes/api/auth/customer-portal.tsx` (login / logout / status).
 - **Unified request-time resolution**: `src/lib/auth-utils.ts` exports `resolveActor()`,
   `withAuth()`, `withAdmin()`. Every authenticated route resolves to exactly one
   `Actor`: `{ kind: "user", userId, isAdmin, ... }` or
@@ -106,7 +106,7 @@ developers sign in instantly as a pre-configured user.
    User/UserCustomer tenancy model (see `workspaces.md`). It is its own signed cookie,
    independently verified, scoped to exactly one `Customer` by slug. A Customer Portal
    session can never become `isAdmin` and can only read files for its own workspace
-   (`src/app/api/workspace/[customer_slug]/files/route.ts` GET, and the serving route);
+   (`src/routes/api/workspace/$customer_slug/files.tsx` GET, and the serving route);
    it cannot upload or delete files.
 3. **Developer Bypass (Development Only)**: only registered when
    `process.env.NODE_ENV === "development"` (`emailAndPassword.enabled` in

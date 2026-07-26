@@ -14,12 +14,16 @@ package-lock.json
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
+# tanstack start / vite / nitro
+.tanstack/
+.nitro/
+.output/
+.vinxi/
+/src/routeTree.gen.ts
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
@@ -39,7 +43,6 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
 
 # AI Things
 graphify-out/

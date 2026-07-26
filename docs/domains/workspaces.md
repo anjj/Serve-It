@@ -76,7 +76,7 @@ to compete with it are gone or were never part of it:
   `customerSlug`, and only ever read-only).
 
 ### Controllers & Endpoints
-- **Workspace Verification & Listing**: `/api/user/workspaces` ([Navbar.tsx](file:///home/andres.julian/github/serve-it/src/components/Navbar.tsx) reads this to populate selection list).
+- **Workspace Verification & Listing**: `/api/user/workspaces` (`src/components/Navbar.tsx` reads this to populate selection list).
 - **Workspace Administration**:
   - `POST /api/admin/customers`: Create a new workspace.
   - `POST /api/admin/users/assign`: Associate a user to a workspace.
