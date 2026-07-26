@@ -60,11 +60,11 @@ Workspace members can upload documents directly from their dashboards. The syste
 ## 3. Technical Implementation & Business Rules
 
 ### Core Components
-- **API Router**: `/api/workspace/[customer_slug]/files/route.ts` (Handles `GET`, `POST`, and `DELETE` requests).
-- **Programmatic API Router**: `/api/v1/files/route.ts` (Handles `POST` uploads and `PATCH` updates).
-- **Storage Wrapper**: [storage.ts](file:///home/andres.julian/github/serve-it/src/lib/storage.ts) (Wraps Supabase SDK calls `uploadHtmlFile`, `downloadFile`, and `deleteFile`).
-- **Upload Component**: [UploadModal.tsx](file:///home/andres.julian/github/serve-it/src/components/UploadModal.tsx).
-- **Workspace Dashboard**: [page.tsx](file:///home/andres.julian/github/serve-it/src/app/dashboard/[customer_slug]/page.tsx).
+- **API Route**: `src/routes/api/workspace/$customer_slug/files.tsx` (Handles `GET`, `POST`, and `DELETE` requests).
+- **Programmatic API Route**: `src/routes/api/v1/files.tsx` (Handles `POST` uploads and `PATCH` updates).
+- **Storage Wrapper**: [storage.ts](../../src/lib/storage.ts) (Wraps Supabase SDK calls `uploadHtmlFile`, `downloadFile`, and `deleteFile`).
+- **Upload Component**: [UploadModal.tsx](../../src/components/UploadModal.tsx).
+- **Workspace Dashboard**: [$customer_slug.tsx](../../src/routes/dashboard/$customer_slug.tsx).
 
 ### Validation and Constraints
 1. **File Type Restraint**: Only `.html` (or `text/html`) file types are accepted. The upload modal validates this extension locally, and the storage layer enforces `contentType: 'text/html'`.

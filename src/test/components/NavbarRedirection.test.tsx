@@ -2,35 +2,24 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import React from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Navbar from '@/components/Navbar';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { SessionProvider } from 'next-auth/react';
 
-// Mock next-auth/react
 const mockSession = {
   user: { name: 'Test User', email: 'test@example.com', isAdmin: true, id: 'user-1' },
-  expires: '2050-01-01T00:00:00.000Z',
 };
 
-vi.mock('next-auth/react', async () => {
-  const original = await vi.importActual('next-auth/react');
-  return {
-    ...original,
-    useSession: vi.fn(() => ({
-      data: mockSession,
-      status: 'authenticated',
-    })),
-    signOut: vi.fn(),
-  };
-});
+const mockNavigate = vi.fn();
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({ children, ...props }: any) => <a {...props}>{children}</a>,
+  useNavigate: () => mockNavigate,
+  useLocation: () => ({ pathname: '/dashboard' }),
+}));
 
-// Mock next/navigation
-const mockPush = vi.fn();
-vi.mock('next/navigation', () => ({
-  usePathname: vi.fn(() => '/dashboard'),
-  useRouter: () => ({
-    push: mockPush,
-  }),
+vi.mock('@/lib/auth-client', () => ({
+  useSession: () => ({ data: mockSession }),
+  signOut: vi.fn(),
 }));
 
 describe('Navbar Redirection Logic', () => {
@@ -49,12 +38,13 @@ describe('Navbar Redirection Logic', () => {
       json: async () => ({ customers: mockCustomers }),
     });
 
+    const queryClient = new QueryClient();
     render(
-      <SessionProvider session={mockSession}>
+      <QueryClientProvider client={queryClient}>
         <ThemeProvider>
           <Navbar />
         </ThemeProvider>
-      </SessionProvider>
+      </QueryClientProvider>,
     );
 
     // Wait for customers to be loaded
@@ -62,7 +52,9 @@ describe('Navbar Redirection Logic', () => {
       expect(screen.getByText('Customer A')).toBeInTheDocument();
     });
 
-    // Verify that router.push was NOT called to redirect to customer-a
-    expect(mockPush).not.toHaveBeenCalledWith('/dashboard/customer-a');
+    // Verify that navigation was NOT triggered to redirect to customer-a
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      expect.objectContaining({ params: expect.objectContaining({ customer_slug: 'customer-a' }) }),
+    );
   });
 });

@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "@fontsource-variable/inter/wght.css";
+@import "@fontsource-variable/jetbrains-mono/wght.css";
 
 :root {
   --background: #fafafa;
@@ -9,6 +11,8 @@
   --border-color: rgba(0, 0, 0, 0.06);
   --border-color-soft: rgba(0, 0, 0, 0.04);
   --primary: #1a8744;
+  --font-inter: "Inter Variable";
+  --font-jetbrains-mono: "JetBrains Mono Variable";
 }
 
 .dark {

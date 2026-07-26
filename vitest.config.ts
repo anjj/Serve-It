@@ -7,6 +7,8 @@ export default defineConfig({
   test: {
     environment: 'happy-dom',
     globals: true,
+    setupFiles: ['./src/test/setup.ts'],
+    exclude: ['node_modules/**', '.output/**', '.tanstack/**'],
   },
   resolve: {
     alias: {

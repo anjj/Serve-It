@@ -2,25 +2,23 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import React from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Navbar from '@/components/Navbar';
 import { ThemeProvider } from '@/components/ThemeProvider';
 
-// Mock next-auth/react
-vi.mock('next-auth/react', () => ({
-  useSession: () => ({
-    data: { user: { name: 'Test User', email: 'test@example.com', isAdmin: true } },
-    status: 'authenticated',
-  }),
-  signOut: vi.fn(),
+const mockUseLocation = vi.fn(() => ({ pathname: '/dashboard' }));
+const mockNavigate = vi.fn();
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({ children, ...props }: any) => <a {...props}>{children}</a>,
+  useNavigate: () => mockNavigate,
+  useLocation: () => mockUseLocation(),
 }));
 
-// Mock next/navigation
-const mockPush = vi.fn();
-vi.mock('next/navigation', () => ({
-  usePathname: () => '/dashboard',
-  useRouter: () => ({
-    push: mockPush,
+vi.mock('@/lib/auth-client', () => ({
+  useSession: () => ({
+    data: { user: { name: 'Test User', email: 'test@example.com', isAdmin: true } },
   }),
+  signOut: vi.fn(),
 }));
 
 // Mock global fetch
@@ -30,28 +28,32 @@ const mockFetch = vi.fn().mockResolvedValue({
 });
 global.fetch = mockFetch;
 
-describe('Navbar Component', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('renders brand name and user information', () => {
-    render(
+function renderNavbar() {
+  const queryClient = new QueryClient();
+  return render(
+    <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <Navbar />
       </ThemeProvider>
-    );
+    </QueryClientProvider>,
+  );
+}
+
+describe('Navbar Component', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockUseLocation.mockReturnValue({ pathname: '/dashboard' });
+  });
+
+  it('renders brand name and user information', () => {
+    renderNavbar();
 
     expect(screen.getByText('Serve-It')).toBeInTheDocument();
     expect(screen.getByText('Test User')).toBeInTheDocument();
   });
 
   it('renders a theme toggle button and handles theme switching', () => {
-    render(
-      <ThemeProvider>
-        <Navbar />
-      </ThemeProvider>
-    );
+    renderNavbar();
 
     // Look for the theme toggle button by its accessible label or title
     const toggleBtn = screen.getByRole('button', { name: /toggle theme/i });

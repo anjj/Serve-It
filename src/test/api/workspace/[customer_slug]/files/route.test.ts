@@ -1,8 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { POST, DELETE } from '@/app/api/workspace/[customer_slug]/files/route';
+import { POST, DELETE } from '@/routes/api/workspace/$customer_slug/files';
 import { prisma } from '@/lib/prisma';
 import { uploadHtmlFile, deleteFile } from '@/lib/storage';
-import { getServerSession } from 'next-auth/next';
+import { auth } from '@/lib/auth';
+import { verifyCustomerPortalToken } from '@/lib/customer-portal-auth';
+
+vi.mock('@/lib/customer-portal-auth', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/customer-portal-auth')>();
+  return { ...actual, verifyCustomerPortalToken: vi.fn() };
+});
 
 vi.mock('@/lib/prisma', () => ({
   prisma: {
@@ -22,17 +28,19 @@ vi.mock('@/lib/storage', () => ({
   deleteFile: vi.fn(),
 }));
 
-vi.mock('next-auth/next', () => ({
-  getServerSession: vi.fn(),
+vi.mock('@/lib/auth', () => ({
+  auth: { api: { getSession: vi.fn() } },
 }));
 
-describe('POST /api/workspace/[customer_slug]/files', () => {
+const params = { customer_slug: 'test-customer' };
+
+describe('POST /api/workspace/$customer_slug/files', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('should return 401 if unauthorized (no session)', async () => {
-    vi.mocked(getServerSession).mockResolvedValueOnce(null);
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(null as any);
     const formData = new FormData();
     formData.append('title', 'Test');
     formData.append('slug', 'test-file');
@@ -41,16 +49,16 @@ describe('POST /api/workspace/[customer_slug]/files', () => {
       method: 'POST',
       body: formData,
     });
-    const res = await POST(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
+    const res = await POST({ request: req, params } as any);
     expect(res.status).toBe(401);
     const data = await res.json();
     expect(data.error).toBe('Unauthorized');
   });
 
   it('should return 404 if workspace does not exist', async () => {
-    vi.mocked(getServerSession).mockResolvedValueOnce({
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce({
       user: { id: 'user-1', name: 'John Doe', email: 'john@example.com' },
-    });
+    } as any);
     vi.mocked(prisma.customer.findUnique).mockResolvedValueOnce(null);
 
     const formData = new FormData();
@@ -61,16 +69,16 @@ describe('POST /api/workspace/[customer_slug]/files', () => {
       method: 'POST',
       body: formData,
     });
-    const res = await POST(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
+    const res = await POST({ request: req, params } as any);
     expect(res.status).toBe(404);
     const data = await res.json();
     expect(data.error).toBe('Workspace not found');
   });
 
   it('should return 403 if user has no access to workspace and is not admin', async () => {
-    vi.mocked(getServerSession).mockResolvedValueOnce({
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce({
       user: { id: 'user-1', name: 'John Doe', email: 'john@example.com', isAdmin: false },
-    });
+    } as any);
     vi.mocked(prisma.customer.findUnique).mockResolvedValueOnce({
       id: 'cust-1',
       name: 'Test Customer',
@@ -89,16 +97,16 @@ describe('POST /api/workspace/[customer_slug]/files', () => {
       method: 'POST',
       body: formData,
     });
-    const res = await POST(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
+    const res = await POST({ request: req, params } as any);
     expect(res.status).toBe(403);
     const data = await res.json();
     expect(data.error).toBe('Access denied');
   });
 
   it('should return 400 if required fields are missing', async () => {
-    vi.mocked(getServerSession).mockResolvedValueOnce({
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce({
       user: { id: 'user-1', name: 'John Doe', email: 'john@example.com' },
-    });
+    } as any);
     vi.mocked(prisma.customer.findUnique).mockResolvedValueOnce({
       id: 'cust-1',
       name: 'Test Customer',
@@ -115,28 +123,27 @@ describe('POST /api/workspace/[customer_slug]/files', () => {
       method: 'POST',
       body: formData,
     });
-    const res = await POST(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
+    const res = await POST({ request: req, params } as any);
     expect(res.status).toBe(400);
     const data = await res.json();
     expect(data.error).toBe('Missing required fields');
   });
 
-  it('should return 403 if user is a CUSTOMER', async () => {
-    vi.mocked(getServerSession).mockResolvedValueOnce({
-      user: { id: 'user-1', name: 'John Doe', email: 'john@example.com', role: "CUSTOMER" },
-    });
+  it('should return 403 if actor is a Customer Portal login', async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(null as any);
+    vi.mocked(verifyCustomerPortalToken).mockReturnValueOnce({ customerId: 'cust-1', slug: 'test-customer', exp: Date.now() + 100000 });
     const req = new Request('http://localhost/api/workspace/test-customer/files', {
       method: 'POST',
+      headers: { Cookie: 'customer_portal_session=faketoken' },
     });
-    const res = await POST(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
+    const res = await POST({ request: req, params } as any);
     expect(res.status).toBe(403);
   });
 
-
   it('should return 409 if a file with same slug already exists', async () => {
-    vi.mocked(getServerSession).mockResolvedValueOnce({
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce({
       user: { id: 'user-1', name: 'John Doe', email: 'john@example.com' },
-    });
+    } as any);
     vi.mocked(prisma.customer.findUnique).mockResolvedValueOnce({
       id: 'cust-1',
       name: 'Test Customer',
@@ -156,16 +163,16 @@ describe('POST /api/workspace/[customer_slug]/files', () => {
       method: 'POST',
       body: formData,
     });
-    const res = await POST(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
+    const res = await POST({ request: req, params } as any);
     expect(res.status).toBe(409);
     const data = await res.json();
     expect(data.error).toBe('A file with this slug already exists for this customer');
   });
 
   it('should successfully upload file and create record', async () => {
-    vi.mocked(getServerSession).mockResolvedValueOnce({
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce({
       user: { id: 'user-1', name: 'John Doe', email: 'john@example.com' },
-    });
+    } as any);
     vi.mocked(prisma.customer.findUnique).mockResolvedValueOnce({
       id: 'cust-1',
       name: 'Test Customer',
@@ -198,7 +205,7 @@ describe('POST /api/workspace/[customer_slug]/files', () => {
       method: 'POST',
       body: formData,
     });
-    const res = await POST(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
+    const res = await POST({ request: req, params } as any);
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.success).toBe(true);
@@ -207,43 +214,43 @@ describe('POST /api/workspace/[customer_slug]/files', () => {
   });
 });
 
-describe('DELETE /api/workspace/[customer_slug]/files', () => {
+describe('DELETE /api/workspace/$customer_slug/files', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('should return 401 if unauthorized (no session)', async () => {
-    vi.mocked(getServerSession).mockResolvedValueOnce(null);
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(null as any);
     const req = new Request('http://localhost/api/workspace/test-customer/files', {
       method: 'DELETE',
       body: JSON.stringify({ fileId: 'file-1' }),
     });
-    const res = await DELETE(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
+    const res = await DELETE({ request: req, params } as any);
     expect(res.status).toBe(401);
     const data = await res.json();
     expect(data.error).toBe('Unauthorized');
   });
 
   it('should return 404 if workspace does not exist', async () => {
-    vi.mocked(getServerSession).mockResolvedValueOnce({
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce({
       user: { id: 'user-1', name: 'John Doe', email: 'john@example.com' },
-    });
+    } as any);
     vi.mocked(prisma.customer.findUnique).mockResolvedValueOnce(null);
 
     const req = new Request('http://localhost/api/workspace/test-customer/files', {
       method: 'DELETE',
       body: JSON.stringify({ fileId: 'file-1' }),
     });
-    const res = await DELETE(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
+    const res = await DELETE({ request: req, params } as any);
     expect(res.status).toBe(404);
     const data = await res.json();
     expect(data.error).toBe('Workspace not found');
   });
 
   it('should return 403 if user has no access to workspace and is not admin', async () => {
-    vi.mocked(getServerSession).mockResolvedValueOnce({
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce({
       user: { id: 'user-1', name: 'John Doe', email: 'john@example.com', isAdmin: false },
-    });
+    } as any);
     vi.mocked(prisma.customer.findUnique).mockResolvedValueOnce({
       id: 'cust-1',
       name: 'Test Customer',
@@ -258,16 +265,16 @@ describe('DELETE /api/workspace/[customer_slug]/files', () => {
       method: 'DELETE',
       body: JSON.stringify({ fileId: 'file-1' }),
     });
-    const res = await DELETE(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
+    const res = await DELETE({ request: req, params } as any);
     expect(res.status).toBe(403);
     const data = await res.json();
     expect(data.error).toBe('Access denied');
   });
 
   it('should return 400 if fileId is missing', async () => {
-    vi.mocked(getServerSession).mockResolvedValueOnce({
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce({
       user: { id: 'user-1', name: 'John Doe', email: 'john@example.com' },
-    });
+    } as any);
     vi.mocked(prisma.customer.findUnique).mockResolvedValueOnce({
       id: 'cust-1',
       name: 'Test Customer',
@@ -282,16 +289,16 @@ describe('DELETE /api/workspace/[customer_slug]/files', () => {
       method: 'DELETE',
       body: JSON.stringify({}),
     });
-    const res = await DELETE(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
+    const res = await DELETE({ request: req, params } as any);
     expect(res.status).toBe(400);
     const data = await res.json();
     expect(data.error).toBe('Missing fileId');
   });
 
   it('should return 404 if file does not exist or does not belong to customer workspace', async () => {
-    vi.mocked(getServerSession).mockResolvedValueOnce({
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce({
       user: { id: 'user-1', name: 'John Doe', email: 'john@example.com' },
-    });
+    } as any);
     vi.mocked(prisma.customer.findUnique).mockResolvedValueOnce({
       id: 'cust-1',
       name: 'Test Customer',
@@ -307,16 +314,16 @@ describe('DELETE /api/workspace/[customer_slug]/files', () => {
       method: 'DELETE',
       body: JSON.stringify({ fileId: 'file-1' }),
     });
-    const res = await DELETE(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
+    const res = await DELETE({ request: req, params } as any);
     expect(res.status).toBe(404);
     const data = await res.json();
     expect(data.error).toBe('File not found');
   });
 
   it('should return 404 if file exists but belongs to a different customer', async () => {
-    vi.mocked(getServerSession).mockResolvedValueOnce({
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce({
       user: { id: 'user-1', name: 'John Doe', email: 'john@example.com' },
-    });
+    } as any);
     vi.mocked(prisma.customer.findUnique).mockResolvedValueOnce({
       id: 'cust-1',
       name: 'Test Customer',
@@ -335,16 +342,16 @@ describe('DELETE /api/workspace/[customer_slug]/files', () => {
       method: 'DELETE',
       body: JSON.stringify({ fileId: 'file-1' }),
     });
-    const res = await DELETE(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
+    const res = await DELETE({ request: req, params } as any);
     expect(res.status).toBe(404);
     const data = await res.json();
     expect(data.error).toBe('File not found');
   });
 
   it('should successfully delete file from storage and database', async () => {
-    vi.mocked(getServerSession).mockResolvedValueOnce({
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce({
       user: { id: 'user-1', name: 'John Doe', email: 'john@example.com' },
-    });
+    } as any);
     vi.mocked(prisma.customer.findUnique).mockResolvedValueOnce({
       id: 'cust-1',
       name: 'Test Customer',
@@ -366,7 +373,7 @@ describe('DELETE /api/workspace/[customer_slug]/files', () => {
       method: 'DELETE',
       body: JSON.stringify({ fileId: 'file-1' }),
     });
-    const res = await DELETE(req, { params: Promise.resolve({ customer_slug: 'test-customer' }) });
+    const res = await DELETE({ request: req, params } as any);
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.success).toBe(true);
