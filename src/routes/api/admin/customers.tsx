@@ -3,9 +3,17 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { withAdmin } from "@/lib/auth-utils";
 import { parseJsonBody, SLUG_PATTERN } from "@/lib/http";
+import { deleteCustomerStorage } from "@/lib/storage";
 
 export const GET = withAdmin(async () => {
-  const customers = await prisma.customer.findMany({ orderBy: { name: "asc" } });
+  const customers = await prisma.customer.findMany({
+    orderBy: { name: "asc" },
+    include: {
+      _count: {
+        select: { files: true },
+      },
+    },
+  });
   return Response.json({ customers });
 });
 
@@ -37,6 +45,46 @@ export const POST = withAdmin(async ({ request }: { request: Request }) => {
   }
 });
 
+export const DELETE = withAdmin(async ({ request }: { request: Request }) => {
+  const body = (await parseJsonBody(request)) as { customerId?: string; confirmSlug?: string } | null;
+  if (!body) return Response.json({ error: "Invalid JSON payload" }, { status: 400 });
+
+  const { customerId, confirmSlug } = body;
+  if (!customerId || !confirmSlug) {
+    return Response.json({ error: "Missing fields" }, { status: 400 });
+  }
+
+  try {
+    const customer = await prisma.customer.findUnique({ where: { id: customerId } });
+    if (!customer) {
+      return Response.json({ error: "Workspace not found" }, { status: 404 });
+    }
+
+    if (confirmSlug !== customer.slug) {
+      return Response.json({ error: "Confirmation does not match" }, { status: 400 });
+    }
+
+    const fileCount = await prisma.file.count({ where: { customerId } });
+
+    // Delete customer storage files first. If this fails/throws, we abort before DB deletion.
+    const deletedObjectsCount = await deleteCustomerStorage(customer.id);
+
+    // Cascades File and UserCustomer rows via FK cascades
+    await prisma.customer.delete({ where: { id: customerId } });
+
+    return Response.json({
+      success: true,
+      deleted: {
+        files: fileCount,
+        objects: deletedObjectsCount,
+      },
+    });
+  } catch (error) {
+    console.error("API error:", error);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
+  }
+});
+
 export const Route = createFileRoute("/api/admin/customers")({
-  server: { handlers: { GET, POST } },
+  server: { handlers: { GET, POST, DELETE } },
 });

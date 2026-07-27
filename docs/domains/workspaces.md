@@ -48,6 +48,28 @@ The application acts as a multi-tenant platform where files are siloed inside is
      [Access Denied (403)]
 ```
 
+### Permanent Workspace Deletion Flow
+
+```
+   [Platform Administrator]
+              |
+     (Clicks Delete & Confirms Slug)
+              |
+     DELETE /api/admin/customers
+              |
+     Does workspace exist? --(No)--> [404 Not Found]
+              | (Yes)
+     Does confirmSlug match? --(No)--> [400 Confirmation does not match]
+              | (Yes)
+     List & Purge Tenants Bucket storage prefix recursively (tenants/<customerId>/)
+              |
+     Prisma: Delete [Customer] record from database
+              |
+     (Cascading DELETE removes related Files & UserCustomers)
+              |
+     Return success JSON
+```
+
 ---
 
 ## 3. Technical Implementation & Business Rules
@@ -79,6 +101,7 @@ to compete with it are gone or were never part of it:
 - **Workspace Verification & Listing**: `/api/user/workspaces` (`src/components/Navbar.tsx` reads this to populate selection list).
 - **Workspace Administration**:
   - `POST /api/admin/customers`: Create a new workspace.
+  - `DELETE /api/admin/customers`: Irreversibly delete a workspace, purging all database rows and recursive cloud storage.
   - `POST /api/admin/users/assign`: Associate a user to a workspace.
   - `POST /api/admin/users/role`: Modify user platform roles (i.e. toggling `isAdmin`; this is the only remaining role flag).
   - `POST /api/admin/users/revoke`: Remove a user's membership from a workspace.
@@ -99,4 +122,5 @@ Any endpoint requesting workspace data MUST verify:
 | `401 Unauthorized`       | User is not authenticated. | Re-direct to login. |
 | `403 Access denied`      | User is authenticated but is not a member of the requested workspace. | Show access warning/workspace request page. |
 | `404 Workspace not found`| The requested customer slug does not exist in the database. | Redirect to general dashboard or select page. |
+| `400 Confirmation does not match` | The provided confirmation slug does not match the workspace's actual slug. | Enter the exact slug in the UI confirmation text box. |
 | `500 Internal Error`     | Database unique constraint violation (e.g. user already assigned). | Display specific descriptive error to Admin. |
