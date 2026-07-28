@@ -14,7 +14,7 @@ export const Logo: React.FC<{ className?: string }> = ({ className = '' }) => {
         <span className="text-foreground">]</span>
         <span className="ml-2">Serve-It</span>
       </div>
-      <div className="text-meta text-foreground-muted text-right mt-1">
+      <div className="text-meta text-foreground-muted text-right mt-1 hidden sm:block">
         UNMODIFIED HTML SERVING LAYER
       </div>
     </div>
