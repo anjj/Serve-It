@@ -78,7 +78,7 @@ function Home() {
               </div>
               <div className="p-6 text-foreground bg-primary/5 md:border-t border-border-color">
                 <span className="md:hidden font-semibold mr-2 block mb-2 text-primary">With Serve-it ⚡:</span>
-                Instant enterprise <strong>Entra ID</strong> verification.
+                Instant enterprise <strong>Microsoft and Google</strong> authentication.
               </div>
 
               {/* Row 3 */}
@@ -205,8 +205,66 @@ function Home() {
         </div>
       </section>
 
-      {/* Practical Use Cases Section */}
+      {/* Customer Portal Section */}
       <section className="w-full py-24 bg-canvas border-t border-border-color">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-4">Dedicated Customer Portals</h2>
+            <p className="text-lg text-foreground-muted max-w-2xl mx-auto">
+              Deliver a unified, secure experience for your clients.
+            </p>
+          </div>
+
+          <div className="flex flex-col md:flex-row gap-12 items-center">
+            <div className="flex-1 space-y-6">
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold text-foreground">Password-Protected Workspaces</h3>
+                <p className="text-foreground-muted leading-relaxed">
+                  Provide your customers with a secure, centralized portal to access all their shared documents.
+                  Instead of sending multiple disparate links, grant them a single password-protected entry point where all their data lives.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold text-foreground">Tenant Tagging & Powerful Search</h3>
+                <p className="text-foreground-muted leading-relaxed">
+                  Documents are rigorously tenant-tagged by customer, ensuring strict data isolation.
+                  Built-in search functionality helps clients instantly find the specific artifacts they need,
+                  eliminating friction and improving their overall experience.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex-1 w-full">
+              <div className="rounded-[var(--radius-card)] bg-surface border border-border-color p-8 shadow-sm">
+                <div className="space-y-6">
+                  <div>
+                    <div className="h-5 w-32 bg-border-color rounded mb-4"></div>
+                    <div className="flex gap-2">
+                      <div className="h-10 w-full bg-canvas border border-border-color rounded flex items-center px-3 text-foreground-muted text-sm shadow-inner">
+                        🔍 Search tenant documents...
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="p-4 bg-canvas border border-border-color rounded flex items-center justify-between hover:border-primary transition-colors cursor-pointer">
+                      <span className="text-sm font-medium text-foreground">Q3 Financial Report.html</span>
+                      <span className="text-[10px] uppercase font-mono bg-primary/10 text-primary px-2 py-1 rounded border border-primary/20">Acme Corp</span>
+                    </div>
+                    <div className="p-4 bg-canvas border border-border-color rounded flex items-center justify-between hover:border-primary transition-colors cursor-pointer">
+                      <span className="text-sm font-medium text-foreground">Project Alpha Timeline.html</span>
+                      <span className="text-[10px] uppercase font-mono bg-primary/10 text-primary px-2 py-1 rounded border border-primary/20">Acme Corp</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Practical Use Cases Section */}
+      <section className="w-full py-24 bg-surface border-t border-border-color">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold tracking-tight text-foreground mb-4">Practical Applications</h2>
@@ -215,10 +273,10 @@ function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <Card className="hover:shadow-md transition-shadow duration-300 group flex flex-col">
               <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                <span className="text-2xl">🤖</span> From AI Prompt to Client-Ready in Seconds
+                <span className="text-2xl">🤖</span> From AI Prompt to Client-Ready
               </h3>
               <div className="flex-grow space-y-4">
                 <div>
@@ -243,7 +301,7 @@ function Home() {
                 </div>
                 <div>
                   <span className="font-semibold text-primary block mb-1">Solution:</span>
-                  <p className="text-foreground text-meta">Automatic enforcement of <strong>Entra ID authentication</strong> so only the intended clients view it.</p>
+                  <p className="text-foreground text-meta">Automatic enforcement of <strong>Microsoft and Google authentication</strong> so only the intended clients view it.</p>
                 </div>
               </div>
             </Card>
@@ -260,6 +318,22 @@ function Home() {
                 <div>
                   <span className="font-semibold text-primary block mb-1">Solution:</span>
                   <p className="text-foreground text-meta">Cryptographically signed deployments guarantee an unaltered single source of truth.</p>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="hover:shadow-md transition-shadow duration-300 group flex flex-col">
+              <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
+                <span className="text-2xl">🕵️</span> Prevent AI Artifact Scraping
+              </h3>
+              <div className="flex-grow space-y-4">
+                <div>
+                  <span className="font-semibold text-foreground-muted block mb-1">Problem:</span>
+                  <p className="text-foreground text-meta">Shared AI artifacts can be publicly indexed and leaked by search engine crawlers.</p>
+                </div>
+                <div>
+                  <span className="font-semibold text-primary block mb-1">Solution:</span>
+                  <p className="text-foreground text-meta">Serve-It completely isolates artifacts behind strict authentication, preventing unauthorized scraping.</p>
                 </div>
               </div>
             </Card>
