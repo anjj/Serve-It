@@ -45,19 +45,19 @@ export default function Navbar() {
     <nav className="bg-canvas border-b border-border-color transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
+          <div className="flex flex-1 min-w-0">
+            <div className="flex-shrink-0 flex items-center w-24 sm:w-auto overflow-hidden sm:overflow-visible">
               <div className="transform scale-[0.5] sm:scale-75 origin-left">
                 <Logo />
               </div>
             </div>
 
             {customers.length > 0 && (
-              <div className="ml-6 flex items-center">
+              <div className="ml-2 sm:ml-6 flex items-center flex-1 sm:flex-initial min-w-0">
                 <select
                   value={activeSlug}
                   onChange={handleWorkspaceChange}
-                  className="block w-full pl-3 pr-10 py-2 text-base border-border-color focus:outline-none focus:ring-primary focus:border-primary sm:text-meta rounded-[var(--radius-button)] bg-surface text-foreground transition-colors duration-200"
+                  className="block w-full max-w-full truncate pl-3 pr-10 py-2 text-base border-border-color focus:outline-none focus:ring-primary focus:border-primary sm:text-meta rounded-[var(--radius-button)] bg-surface text-foreground transition-colors duration-200"
                 >
                   <option value="" disabled>Select Workspace</option>
                   {customers.map((c) => (
@@ -100,8 +100,8 @@ export default function Navbar() {
               )}
             </div>
           </div>
-          <div className="flex items-center">
-            <span className="text-meta text-foreground-muted mr-4">
+          <div className="flex items-center flex-shrink-0">
+            <span className="hidden sm:inline text-meta text-foreground-muted mr-4">
               {session.user?.name || session.user?.email}
             </span>
             <button
