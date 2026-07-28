@@ -55,6 +55,20 @@ Workspace members can upload documents directly from their dashboards. The syste
    Refresh Dashboard File List
 ```
 
+### Bulk Workspace Deletion (Storage Purge) Flow
+
+```
+   [DELETE /api/admin/customers]
+                |
+     Walk & List tenants/<customerId>/ recursively
+                |
+     Batch remove collected files (batch size <= 100)
+                |
+     If Storage Deletion fails --(Yes)--> [Abort & return 500 (DB untouched)]
+                | (No)
+     Prisma Customer Delete (Cascading deletes File and UserCustomer rows)
+```
+
 ---
 
 ## 3. Technical Implementation & Business Rules
@@ -62,7 +76,7 @@ Workspace members can upload documents directly from their dashboards. The syste
 ### Core Components
 - **API Route**: `src/routes/api/workspace/$customer_slug/files.tsx` (Handles `GET`, `POST`, and `DELETE` requests).
 - **Programmatic API Route**: `src/routes/api/v1/files.tsx` (Handles `POST` uploads and `PATCH` updates).
-- **Storage Wrapper**: [storage.ts](../../src/lib/storage.ts) (Wraps Supabase SDK calls `uploadHtmlFile`, `downloadFile`, and `deleteFile`).
+- **Storage Wrapper**: [storage.ts](../../src/lib/storage.ts) (Wraps Supabase SDK calls `uploadHtmlFile`, `downloadFile`, `deleteFile`, and `deleteCustomerStorage`).
 - **Upload Component**: [UploadModal.tsx](../../src/components/UploadModal.tsx).
 - **Workspace Dashboard**: [$customer_slug.tsx](../../src/routes/dashboard/$customer_slug.tsx).
 
@@ -92,17 +106,21 @@ The `serve-it` Supabase Storage bucket was audited directly against the live pro
   no client-side/PostgREST access path at all (no policy would matter even if one
   existed), this is an accepted tradeoff rather than a gap: the path convention only
   needs to be trusted by the server code that already enforces workspace membership.
+- **Bulk deletion via prefix-matching (`deleteCustomerStorage` in `storage.ts`)** is the
+  second consumer of the `tenants/<customerId>/` path convention. It walks the entire prefix
+  recursively and deletes all nested files in batches of <= 100 before the database record
+  is removed. This ensures no orphaned assets remain in the bucket.
 - **`getSignedUrl` (60s default TTL) exists but is dead code** — nothing in the app
   currently generates a signed URL; files are streamed through the Next.js server via
   `downloadFile()` instead. If a signed-URL flow is added later, keep the TTL short and
   bounded (it already is, by default) rather than introducing a long-lived link.
 
-**Conclusion:** the tenant-isolation guarantee for stored files holds today, but it
-rests on (a) the bucket being private, (b) zero permissive policies, and (c) every
-caller reaching Storage through server code that has already checked workspace
-membership. Any future feature that hands out `SUPABASE_SERVICE_ROLE_KEY`-backed access
-to a less-trusted context, or adds a public/permissive policy, would need to re-derive
-tenant isolation some other way (e.g. real per-path `storage.objects` policies).
+### Ordering Rationale (Storage-before-DB)
+When deleting workspaces or individual files, storage assets are purged *before* database records are deleted.
+Since no cross-system transaction exists between Supabase and Postgres, this sequence guarantees:
+1. If storage deletion fails, the operation aborts with the database intact, allowing administrators to safely retry.
+2. If database deletion fails after storage succeeded, we are left with transient database metadata referencing non-existent files. Retrying the operation converges cleanly (since storage purge is idempotent and fails gracefully).
+3. If database records were deleted first and storage failed, unreachable orphans would remain permanently inside the storage bucket with no metadata records left to reference or clean them up.
 
 ---
 

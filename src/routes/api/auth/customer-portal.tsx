@@ -40,7 +40,17 @@ export const GET = async ({ request }: { request: Request }) => {
   const token = getCustomerPortalCookie(request);
   const payload = verifyCustomerPortalToken(token);
   if (!payload) return Response.json({ session: null });
-  return Response.json({ session: { customerId: payload.customerId, slug: payload.slug } });
+
+  try {
+    const customer = await prisma.customer.findUnique({ where: { id: payload.customerId } });
+    if (!customer || !customer.isActive) {
+      return Response.json({ session: null });
+    }
+    return Response.json({ session: { customerId: payload.customerId, slug: payload.slug } });
+  } catch (error) {
+    console.error("GET customer-portal error:", error);
+    return Response.json({ session: null });
+  }
 };
 
 export const DELETE = async () => {
