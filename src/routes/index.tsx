@@ -1,11 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import { FaGithub, FaServer, FaShieldAlt, FaBolt, FaRobot } from "react-icons/fa";
 import { Logo } from "@/components/Logo";
 import { Card } from "@/components/Card";
 
-export const Route = createFileRoute("/")({ component: Home });
+const getDemoConfig = createServerFn({ method: "GET" }).handler(async () => ({
+  demoEnabled: process.env.DEMO_ENABLED !== "false",
+}));
+
+export const Route = createFileRoute("/")({
+  loader: () => getDemoConfig(),
+  component: Home,
+});
 
 function Home() {
+  const { demoEnabled } = Route.useLoaderData();
+
   return (
     <div className="flex flex-col min-h-screen bg-canvas text-foreground font-sans selection:bg-primary selection:text-white">
       {/* Hero Section */}
@@ -26,6 +36,14 @@ function Home() {
             >
               Initiate Access
             </Link>
+            {demoEnabled && (
+              <Link
+                to="/demo"
+                className="inline-flex items-center justify-center rounded-[var(--radius-button)] font-sans font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-border-color focus:ring-offset-2 px-8 py-4 bg-surface text-foreground border border-border-color hover:bg-zinc-100 dark:hover:bg-zinc-800 text-base w-full sm:w-auto"
+              >
+                Try the Demo
+              </Link>
+            )}
             <a
               href="#architecture"
               className="inline-flex items-center justify-center rounded-[var(--radius-button)] font-sans font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-border-color focus:ring-offset-2 px-8 py-4 bg-surface text-foreground border border-border-color hover:bg-border-color-soft text-base w-full sm:w-auto"

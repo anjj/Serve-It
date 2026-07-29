@@ -30,7 +30,7 @@ export async function deleteCustomerStorage(customerId: string): Promise<number>
   let deletedCount = 0;
 
   async function walk(prefix: string): Promise<string[]> {
-    let allPaths: string[] = [];
+    const allPaths: string[] = [];
     let offset = 0;
     const limit = 100;
 
