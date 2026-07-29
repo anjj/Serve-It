@@ -112,6 +112,10 @@ developers sign in instantly as a pre-configured user.
    `process.env.NODE_ENV === "development"` (`emailAndPassword.enabled` in
    `src/lib/auth.ts` is gated the same way, so it doesn't exist as an attack surface in
    production at all).
+4. **Admin User Deletion**: platform administrators (`isAdmin`) can permanently and irreversibly delete a user account (`POST /api/admin/users/delete`). Deletion cascades via Postgres foreign key constraints, safely purging the User row itself, along with all matching `Session`, `Account`, `ApiKey`, and `UserCustomer` workspace membership rows. The following checks are strictly enforced server-side:
+   - Self-deletion is denied (cannot delete own active user account).
+   - If the target user is an administrator, the platform must have at least one other administrator remaining (cannot delete the last remaining admin).
+   - The admin must type and confirm the target's email address exactly to execute the delete payload.
 
 ### Row Level Security posture (deliberate, not an oversight)
 All nine tables in `public` (`user`, `session`, `account`, `verification`, `Customer`,
