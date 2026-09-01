@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { GET, POST, DELETE } from '@/routes/api/admin/customers';
+import { GET, POST, PATCH, DELETE } from '@/routes/api/admin/customers';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { deleteCustomerStorage } from '@/lib/storage';
@@ -15,6 +15,7 @@ vi.mock('@/lib/prisma', () => ({
       findMany: vi.fn(),
       create: vi.fn(),
       findUnique: vi.fn(),
+      update: vi.fn(),
       delete: vi.fn(),
     },
     file: {
@@ -97,6 +98,69 @@ describe('/api/admin/customers', () => {
       vi.mocked(prisma.customer.create).mockRejectedValueOnce(new Error('DB Error'));
 
       const res = await POST({ request: req({ name: 'New', slug: 'new', password: 'password123' }), params: {} } as any);
+      const json = await res.json();
+      expect(res.status).toBe(500);
+      expect(json.error).toBe('Internal server error');
+    });
+  });
+
+  describe('PATCH', () => {
+    it('returns 401 if unauthorized', async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValueOnce(null as any);
+      const res = await PATCH({ request: req({ customerId: '123', password: 'newpassword123' }, 'PATCH'), params: {} } as any);
+      expect(res.status).toBe(401);
+    });
+
+    it('returns 400 if missing fields', async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValueOnce({ user: { isAdmin: true } } as any);
+      const res = await PATCH({ request: req({ customerId: '123' }, 'PATCH'), params: {} } as any);
+      const json = await res.json();
+      expect(res.status).toBe(400);
+      expect(json.error).toBe('Missing fields');
+    });
+
+    it('returns 400 if password is less than 8 characters', async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValueOnce({ user: { isAdmin: true } } as any);
+      const res = await PATCH({ request: req({ customerId: '123', password: 'short' }, 'PATCH'), params: {} } as any);
+      const json = await res.json();
+      expect(res.status).toBe(400);
+      expect(json.error).toBe('Password must be at least 8 characters long.');
+    });
+
+    it('returns 404 for non-existent customer', async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValueOnce({ user: { isAdmin: true } } as any);
+      vi.mocked(prisma.customer.findUnique).mockResolvedValueOnce(null);
+
+      const res = await PATCH({ request: req({ customerId: 'non-existent', password: 'newpassword123' }, 'PATCH'), params: {} } as any);
+      const json = await res.json();
+      expect(res.status).toBe(404);
+      expect(json.error).toBe('Workspace not found');
+    });
+
+    it('updates customer password hash and returns 200 on success', async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValueOnce({ user: { isAdmin: true } } as any);
+      vi.mocked(prisma.customer.findUnique).mockResolvedValueOnce({ id: '123', name: 'Test' } as any);
+      vi.mocked(bcrypt.hash).mockResolvedValueOnce('new_hashed_pw' as any);
+      vi.mocked(prisma.customer.update).mockResolvedValueOnce({ id: '123', passwordHash: 'new_hashed_pw' } as any);
+
+      const res = await PATCH({ request: req({ customerId: '123', password: 'newpassword123' }, 'PATCH'), params: {} } as any);
+      const json = await res.json();
+      expect(res.status).toBe(200);
+      expect(json.success).toBe(true);
+      expect(bcrypt.hash).toHaveBeenCalledWith('newpassword123', 10);
+      expect(prisma.customer.update).toHaveBeenCalledWith({
+        where: { id: '123' },
+        data: { passwordHash: 'new_hashed_pw' },
+      });
+    });
+
+    it('returns 500 on db update error', async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValueOnce({ user: { isAdmin: true } } as any);
+      vi.mocked(prisma.customer.findUnique).mockResolvedValueOnce({ id: '123', name: 'Test' } as any);
+      vi.mocked(bcrypt.hash).mockResolvedValueOnce('new_hashed_pw' as any);
+      vi.mocked(prisma.customer.update).mockRejectedValueOnce(new Error('DB Error'));
+
+      const res = await PATCH({ request: req({ customerId: '123', password: 'newpassword123' }, 'PATCH'), params: {} } as any);
       const json = await res.json();
       expect(res.status).toBe(500);
       expect(json.error).toBe('Internal server error');
