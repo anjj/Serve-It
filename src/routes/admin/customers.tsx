@@ -22,6 +22,11 @@ function CustomersPage() {
   const [newKeyName, setNewKeyName] = useState("");
   const [displayedKey, setDisplayedKey] = useState<{ customerId: string; key: string } | null>(null);
 
+  const [changingPasswordFor, setChangingPasswordFor] = useState<string | null>(null);
+  const [newPasswordInput, setNewPasswordInput] = useState("");
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
+
   const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
   const [confirmSlugInput, setConfirmSlugInput] = useState("");
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -77,6 +82,34 @@ function CustomersPage() {
         setGeneratingFor(null);
         setNewKeyName("");
       }
+    },
+  });
+
+  const changePasswordMutation = useMutation({
+    mutationFn: async ({ customerId, password }: { customerId: string; password: string }) => {
+      setPasswordError(null);
+      setPasswordSuccess(null);
+      const res = await fetch("/api/admin/customers", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customerId, password }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to update password");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      setChangingPasswordFor(null);
+      setNewPasswordInput("");
+      setPasswordError(null);
+      setPasswordSuccess("Password updated successfully.");
+      setTimeout(() => setPasswordSuccess(null), 4000);
+      queryClient.invalidateQueries({ queryKey: ["admin", "customers"] });
+    },
+    onError: (err: any) => {
+      setPasswordError(err.message);
     },
   });
 
@@ -174,8 +207,35 @@ function CustomersPage() {
 
                   <div className="flex flex-col items-end gap-2">
                     {confirmingDeleteId !== c.id && (
-                      <div className="flex items-center gap-2">
-                        {generatingFor === c.id ? (
+                      <div className="flex items-center gap-2 flex-wrap justify-end">
+                        {changingPasswordFor === c.id ? (
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <input
+                              type="password"
+                              placeholder="New password (min 8 chars)"
+                              value={newPasswordInput}
+                              onChange={(e) => setNewPasswordInput(e.target.value)}
+                              className="border border-border-color dark:border-zinc-700 bg-surface text-zinc-900 dark:text-zinc-100 rounded px-2 py-1 text-meta focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 dark:focus:ring-zinc-100 dark:focus:border-zinc-100 transition-colors duration-200"
+                            />
+                            <button
+                              onClick={() => changePasswordMutation.mutate({ customerId: c.id, password: newPasswordInput })}
+                              disabled={newPasswordInput.length < 8 || changePasswordMutation.isPending}
+                              className="bg-primary hover:bg-green-700 dark:hover:bg-green-800 text-white px-3 py-1 rounded text-meta font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                            >
+                              {changePasswordMutation.isPending ? "Saving..." : "Save Password"}
+                            </button>
+                            <button
+                              onClick={() => {
+                                setChangingPasswordFor(null);
+                                setNewPasswordInput("");
+                                setPasswordError(null);
+                              }}
+                              className="text-zinc-500 dark:text-zinc-400 text-meta hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : generatingFor === c.id ? (
                           <div className="flex items-center gap-2">
                             <input
                               type="text"
@@ -184,11 +244,21 @@ function CustomersPage() {
                               onChange={(e) => setNewKeyName(e.target.value)}
                               className="border border-border-color dark:border-zinc-700 bg-surface text-zinc-900 dark:text-zinc-100 rounded px-2 py-1 text-meta focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 dark:focus:ring-zinc-100 dark:focus:border-zinc-100 transition-colors duration-200"
                             />
-                            <button onClick={() => generateKey.mutate(c.id)} className="bg-primary dark:hover:bg-green-700 text-white px-2 py-1 rounded text-meta hover:bg-green-700 dark:hover:bg-green-800 transition-colors">Save</button>
-                            <button onClick={() => setGeneratingFor(null)} className="text-zinc-500 dark:text-zinc-400 text-meta hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors">Cancel</button>
+                            <button onClick={() => generateKey.mutate(c.id)} className="bg-primary dark:hover:bg-green-700 text-white px-2 py-1 rounded text-meta hover:bg-green-700 dark:hover:bg-green-800 transition-colors cursor-pointer">Save</button>
+                            <button onClick={() => setGeneratingFor(null)} className="text-zinc-500 dark:text-zinc-400 text-meta hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer">Cancel</button>
                           </div>
                         ) : (
                           <>
+                            <button
+                              onClick={() => {
+                                setChangingPasswordFor(c.id);
+                                setNewPasswordInput("");
+                                setPasswordError(null);
+                              }}
+                              className="bg-surface-hover dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded border border-border-color dark:border-zinc-700 text-meta hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors duration-200 cursor-pointer"
+                            >
+                              Change Password
+                            </button>
                             <button onClick={() => setGeneratingFor(c.id)} className="bg-surface-hover dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded border border-border-color dark:border-zinc-700 text-meta hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors duration-200 cursor-pointer">
                               Generate API Key
                             </button>
@@ -205,6 +275,10 @@ function CustomersPage() {
                           </>
                         )}
                       </div>
+                    )}
+
+                    {changingPasswordFor === c.id && passwordError && (
+                      <p className="text-red-600 dark:text-red-400 font-medium text-meta mt-1">{passwordError}</p>
                     )}
 
                     {displayedKey?.customerId === c.id && (

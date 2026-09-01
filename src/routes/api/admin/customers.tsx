@@ -45,6 +45,36 @@ export const POST = withAdmin(async ({ request }: { request: Request }) => {
   }
 });
 
+export const PATCH = withAdmin(async ({ request }: { request: Request }) => {
+  const body = (await parseJsonBody(request)) as { customerId?: string; password?: string } | null;
+  if (!body) return Response.json({ error: "Invalid JSON payload" }, { status: 400 });
+
+  const { customerId, password } = body;
+  if (!customerId || !password) return Response.json({ error: "Missing fields" }, { status: 400 });
+
+  if (password.length < 8) {
+    return Response.json({ error: "Password must be at least 8 characters long." }, { status: 400 });
+  }
+
+  try {
+    const customer = await prisma.customer.findUnique({ where: { id: customerId } });
+    if (!customer) {
+      return Response.json({ error: "Workspace not found" }, { status: 404 });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    await prisma.customer.update({
+      where: { id: customerId },
+      data: { passwordHash },
+    });
+
+    return Response.json({ success: true });
+  } catch (error) {
+    console.error("API error:", error);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
+  }
+});
+
 export const DELETE = withAdmin(async ({ request }: { request: Request }) => {
   const body = (await parseJsonBody(request)) as { customerId?: string; confirmSlug?: string } | null;
   if (!body) return Response.json({ error: "Invalid JSON payload" }, { status: 400 });
@@ -86,5 +116,5 @@ export const DELETE = withAdmin(async ({ request }: { request: Request }) => {
 });
 
 export const Route = createFileRoute("/api/admin/customers")({
-  server: { handlers: { GET, POST, DELETE } },
+  server: { handlers: { GET, POST, PATCH, DELETE } },
 });
