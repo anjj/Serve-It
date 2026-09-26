@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { getAuthSessionFn } from "@/lib/auth-session";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { Logo } from "@/components/Logo";
@@ -18,7 +19,21 @@ export const Route = createFileRoute("/auth/signin")({
   validateSearch: (search: Record<string, unknown>): { callbackUrl?: string } => ({
     ...(typeof search.callbackUrl === "string" ? { callbackUrl: search.callbackUrl } : {}),
   }),
-  loader: () => getAuthProviders(),
+  loader: async ({ search }) => {
+    const [providers, { actor }] = await Promise.all([
+      getAuthProviders(),
+      getAuthSessionFn(),
+    ]);
+
+    if (actor) {
+      if (actor.kind === "customer") {
+        throw redirect({ to: search.callbackUrl || `/documents/${actor.customerSlug}` });
+      }
+      throw redirect({ to: search.callbackUrl || "/dashboard" });
+    }
+
+    return providers;
+  },
   component: SignInPage,
 });
 

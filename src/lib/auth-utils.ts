@@ -6,7 +6,7 @@ export type Actor =
   | { kind: "customer"; customerId: string; customerSlug: string };
 
 function getCookie(request: Request, name: string): string | undefined {
-  const cookieHeader = request.headers.get("cookie") || "";
+  const cookieHeader = request.headers.get("cookie") || request.headers.get("Cookie") || "";
   return cookieHeader
     .split(";")
     .map((c) => c.trim())
