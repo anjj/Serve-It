@@ -33,6 +33,20 @@ async function main() {
   });
   console.log("Created customer workspace:", testCustomer.slug);
 
+  // Create Demo Customer Workspace
+  const demoCustomer = await prisma.customer.upsert({
+    where: { slug: "demo" },
+    update: {},
+    create: {
+      name: "Demo Workspace",
+      slug: "demo",
+      passwordHash: null,
+      isActive: true,
+      isDemo: true,
+    },
+  });
+  console.log("Created demo customer workspace:", demoCustomer.slug);
+
   // 3. Map User to Customer Workspace
   const userCustomer = await prisma.userCustomer.upsert({
     where: {
