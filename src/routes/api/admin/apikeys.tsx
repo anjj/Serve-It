@@ -20,9 +20,12 @@ export const POST = withAdmin(async ({ request }: { request: Request }) => {
     const fullKey = `${keyPrefix}${rawKey}`;
     const keyHash = crypto.createHash("sha256").update(fullKey).digest("hex");
 
-    const newApiKey = await prisma.apiKey.create({
-      data: { name, keyHash, userId },
-    });
+    const [_, newApiKey] = await prisma.$transaction([
+      prisma.apiKey.deleteMany({ where: { userId } }),
+      prisma.apiKey.create({
+        data: { name, keyHash, userId },
+      }),
+    ]);
 
     // We return the raw key ONLY once. It cannot be retrieved again.
     return Response.json({ success: true, key: fullKey, record: newApiKey });

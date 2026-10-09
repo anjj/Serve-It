@@ -10,7 +10,14 @@ vi.mock('@/lib/prisma', () => ({
     },
     apiKey: {
       create: vi.fn(),
+      deleteMany: vi.fn(),
     },
+    $transaction: vi.fn((args) => {
+      if (Array.isArray(args)) {
+        return Promise.all(args);
+      }
+      return args(prisma);
+    }),
   },
 }));
 
@@ -75,7 +82,7 @@ describe('POST /api/admin/apikeys', () => {
     expect(data.error).toBe('User not found');
   });
 
-  it('should generate, hash, persist, and return the key on success', async () => {
+  it('should delete existing keys, generate, hash, persist, and return the new key on success', async () => {
     vi.mocked(auth.api.getSession).mockResolvedValueOnce({ user: adminUser } as any);
     vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ id: 'user-123' } as any);
 
@@ -88,6 +95,7 @@ describe('POST /api/admin/apikeys', () => {
       updatedAt: new Date(),
     };
 
+    vi.mocked(prisma.apiKey.deleteMany).mockResolvedValueOnce({ count: 1 });
     vi.mocked(prisma.apiKey.create).mockResolvedValueOnce(createdRecord);
 
     const res = await POST({ request: req({ name: 'Test Key', userId: 'user-123' }), params: {} } as any);
@@ -99,6 +107,9 @@ describe('POST /api/admin/apikeys', () => {
     expect(data.record.id).toBe('key-123');
     expect(data.record.name).toBe('Test Key');
 
+    expect(prisma.apiKey.deleteMany).toHaveBeenCalledWith({
+      where: { userId: 'user-123' },
+    });
     expect(prisma.apiKey.create).toHaveBeenCalledWith({
       data: {
         name: 'Test Key',
@@ -108,10 +119,10 @@ describe('POST /api/admin/apikeys', () => {
     });
   });
 
-  it('should return 500 when database insertion fails', async () => {
+  it('should return 500 when database transaction fails', async () => {
     vi.mocked(auth.api.getSession).mockResolvedValueOnce({ user: adminUser } as any);
     vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ id: 'user-123' } as any);
-    vi.mocked(prisma.apiKey.create).mockRejectedValueOnce(new Error('DB Connection Timeout'));
+    vi.mocked(prisma.$transaction).mockRejectedValueOnce(new Error('DB Connection Timeout'));
 
     const res = await POST({ request: req({ name: 'Test Key', userId: 'user-123' }), params: {} } as any);
     expect(res.status).toBe(500);

@@ -17,8 +17,8 @@ function UsersPage() {
   const currentUserId = session?.user?.id;
 
   const [selectedWorkspaces, setSelectedWorkspaces] = useState<Record<string, string>>({});
-  const [generatingKeyFor, setGeneratingKeyFor] = useState<string | null>(null);
-  const [newKeyName, setNewKeyName] = useState("");
+  const [resettingKeyForUser, setResettingKeyForUser] = useState<UserWithWorkspaces | null>(null);
+  const [resetKeyName, setResetKeyName] = useState("");
   const [displayedKey, setDisplayedKey] = useState<{ userId: string; key: string } | null>(null);
 
   const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
@@ -70,19 +70,20 @@ function UsersPage() {
   });
 
   const generateKey = useMutation({
-    mutationFn: async (userId: string) => {
+    mutationFn: async ({ userId, name }: { userId: string; name: string }) => {
       const res = await fetch("/api/admin/apikeys", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newKeyName, userId }),
+        body: JSON.stringify({ name, userId }),
       });
       return { userId, data: await res.json() };
     },
     onSuccess: ({ userId, data }) => {
       if (data.success) {
         setDisplayedKey({ userId, key: data.key });
-        setGeneratingKeyFor(null);
-        setNewKeyName("");
+        setResettingKeyForUser(null);
+        setResetKeyName("");
+        invalidate();
       }
     },
   });
@@ -184,42 +185,21 @@ function UsersPage() {
                         ))}
                       </div>
                       <div className="mt-4 flex flex-col items-end gap-2 border-t border-border-color dark:border-zinc-800 pt-4 w-full">
-                        {generatingKeyFor === u.id ? (
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              placeholder="Key Label (e.g. My Key)"
-                              value={newKeyName}
-                              onChange={(e) => setNewKeyName(e.target.value)}
-                              className="border border-border-color dark:border-zinc-700 bg-surface text-zinc-900 dark:text-zinc-100 rounded px-2 py-1 text-meta focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 dark:focus:ring-zinc-100 dark:focus:border-zinc-100 transition-colors duration-200"
-                            />
-                            <button
-                              onClick={() => generateKey.mutate(u.id)}
-                              className="bg-primary dark:hover:bg-green-700 text-white px-2 py-1 rounded text-meta hover:bg-green-700 dark:hover:bg-green-800 transition-colors"
-                            >
-                              Save
-                            </button>
-                            <button
-                              onClick={() => setGeneratingKeyFor(null)}
-                              className="text-zinc-500 dark:text-zinc-400 text-meta hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => setGeneratingKeyFor(u.id)}
-                            className="bg-surface-hover dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded border border-border-color dark:border-zinc-700 text-meta hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors duration-200 cursor-pointer"
-                          >
-                            Generate API Key
-                          </button>
-                        )}
+                        <button
+                          onClick={() => {
+                            setResettingKeyForUser(u);
+                            setResetKeyName("");
+                          }}
+                          className="bg-surface-hover dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded border border-border-color dark:border-zinc-700 text-meta hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors duration-200 cursor-pointer"
+                        >
+                          {u.apiKeys && u.apiKeys.length > 0 ? "Reset API Key" : "Generate API Key"}
+                        </button>
 
                         {displayedKey?.userId === u.id && (
                           <div className="mt-2 p-3 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-900/30 rounded text-meta max-w-sm">
                             <p className="font-bold text-yellow-800 dark:text-yellow-450 mb-1">Save this key now! It will not be shown again.</p>
                             <code className="block bg-yellow-100 dark:bg-yellow-900/40 p-2 rounded break-all text-yellow-900 dark:text-yellow-250">{displayedKey.key}</code>
-                            <button onClick={() => setDisplayedKey(null)} className="mt-2 text-yellow-800 dark:text-yellow-450 underline text-meta">
+                            <button onClick={() => setDisplayedKey(null)} className="mt-2 text-yellow-800 dark:text-yellow-450 underline text-meta cursor-pointer">
                               Dismiss
                             </button>
                           </div>
@@ -268,6 +248,72 @@ function UsersPage() {
               );
             })}
           </ul>
+        </div>
+      )}
+
+      {resettingKeyForUser && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#121827] border border-border-color dark:border-zinc-800 rounded-lg p-6 max-w-md w-full shadow-lg transition-colors duration-200">
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+              {resettingKeyForUser.apiKeys && resettingKeyForUser.apiKeys.length > 0
+                ? "Reset API Key"
+                : "Generate API Key"}
+            </h3>
+
+            {resettingKeyForUser.apiKeys && resettingKeyForUser.apiKeys.length > 0 ? (
+              <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 rounded text-meta text-amber-800 dark:text-amber-400">
+                <p className="font-medium">
+                  Warning: Resetting this API key will permanently revoke all existing API keys for {resettingKeyForUser.name || resettingKeyForUser.email}. Any active MCP sidecars or automated integrations using the previous key will stop working immediately.
+                </p>
+              </div>
+            ) : (
+              <p className="text-meta text-zinc-600 dark:text-zinc-400 mb-4">
+                Generate a new API key for {resettingKeyForUser.name || resettingKeyForUser.email}. The key will be displayed only once.
+              </p>
+            )}
+
+            <div className="mb-4">
+              <label className="block text-meta font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                Key Label
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Primary Key"
+                value={resetKeyName}
+                onChange={(e) => setResetKeyName(e.target.value)}
+                className="w-full border border-border-color dark:border-zinc-700 bg-surface text-zinc-900 dark:text-zinc-100 rounded px-3 py-1.5 text-meta focus:outline-none focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-100 transition-colors duration-200"
+                autoFocus
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 text-meta">
+              <button
+                type="button"
+                onClick={() => {
+                  setResettingKeyForUser(null);
+                  setResetKeyName("");
+                }}
+                className="px-3 py-1.5 rounded border border-border-color dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={!resetKeyName.trim() || generateKey.isPending}
+                onClick={() => {
+                  if (!resetKeyName.trim()) return;
+                  generateKey.mutate({ userId: resettingKeyForUser.id, name: resetKeyName.trim() });
+                }}
+                className="px-3 py-1.5 rounded bg-primary text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium cursor-pointer"
+              >
+                {generateKey.isPending
+                  ? "Processing..."
+                  : resettingKeyForUser.apiKeys && resettingKeyForUser.apiKeys.length > 0
+                  ? "Reset API Key"
+                  : "Generate Key"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
