@@ -1,24 +1,34 @@
-import { createFileRoute, Link, Outlet, useNavigate, useLocation } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useNavigate, useLocation, redirect } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useSession } from "@/lib/auth-client";
+import { getAuthSessionFn } from "@/lib/auth-session";
 import Navbar from "@/components/Navbar";
 
-export const Route = createFileRoute("/admin")({ component: AdminLayout });
+export const Route = createFileRoute("/admin")({
+  loader: async () => {
+    const { actor } = await getAuthSessionFn();
+    if (!actor) {
+      throw redirect({ to: "/auth/signin", search: { callbackUrl: "/admin" } });
+    }
+    if (actor.kind !== "user" || !actor.isAdmin) {
+      throw redirect({ to: "/dashboard" });
+    }
+    return { actor };
+  },
+  component: AdminLayout,
+});
 
 function AdminLayout() {
+  const { actor } = Route.useLoaderData();
   const { data: session, isPending } = useSession();
   const navigate = useNavigate();
   const location = useLocation();
   const pathname = location.pathname;
 
   useEffect(() => {
-    if (!isPending && !session) navigate({ to: "/auth/signin" });
-    else if (!isPending && session && !session.user.isAdmin) navigate({ to: "/dashboard" });
-  }, [isPending, session, navigate]);
-
-  if (isPending || !session || !session.user.isAdmin) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
+    if (!actor && !isPending && !session) navigate({ to: "/auth/signin" });
+    else if (!actor && !isPending && session && !session.user.isAdmin) navigate({ to: "/dashboard" });
+  }, [actor, isPending, session, navigate]);
 
   return (
     <div className="min-h-screen bg-surface-hover flex flex-col">

@@ -1,7 +1,8 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "@/lib/auth-client";
+import { getAuthSessionFn } from "@/lib/auth-session";
 import Navbar from "@/components/Navbar";
 import { Search, Tag, Upload, Trash2 } from "lucide-react";
 import UploadModal from "@/components/UploadModal";
@@ -10,10 +11,23 @@ import { Card } from "@/components/Card";
 
 type FileRecord = { id: string; title: string; slug: string; tags: string[]; createdAt: string };
 
-export const Route = createFileRoute("/dashboard/$customer_slug")({ component: WorkspaceDashboard });
+export const Route = createFileRoute("/dashboard/$customer_slug")({
+  loader: async ({ params }) => {
+    const { actor } = await getAuthSessionFn();
+    if (!actor) {
+      throw redirect({
+        to: "/auth/signin",
+        search: { callbackUrl: `/dashboard/${params.customer_slug}` },
+      });
+    }
+    return { actor };
+  },
+  component: WorkspaceDashboard,
+});
 
 function WorkspaceDashboard() {
   const { customer_slug } = Route.useParams();
+  const { actor } = Route.useLoaderData();
   const { data: session, isPending } = useSession();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -23,8 +37,8 @@ function WorkspaceDashboard() {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
 
   useEffect(() => {
-    if (!isPending && !session) navigate({ to: "/auth/signin" });
-  }, [isPending, session, navigate]);
+    if (!actor && !isPending && !session) navigate({ to: "/auth/signin" });
+  }, [actor, isPending, session, navigate]);
 
   const filesQuery = useQuery({
     queryKey: ["workspace", customer_slug, "files"],
@@ -37,7 +51,7 @@ function WorkspaceDashboard() {
       const data = await res.json();
       return (data.files as FileRecord[]) || [];
     },
-    enabled: !!session,
+    enabled: !!actor || !!session,
   });
 
   const deleteFile = useMutation({
@@ -63,7 +77,7 @@ function WorkspaceDashboard() {
     return Array.from(tags).sort();
   }, [files]);
 
-  if (isPending || filesQuery.isLoading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if ((!actor && isPending) || filesQuery.isLoading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
   if (filesQuery.isError) {
     return (

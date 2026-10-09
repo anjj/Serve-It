@@ -1,25 +1,43 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "@/lib/auth-client";
+import { getAuthSessionFn } from "@/lib/auth-session";
 import Navbar from "@/components/Navbar";
 import { Search, Tag } from "lucide-react";
 
 type FileRecord = { id: string; title: string; slug: string; tags: string[]; createdAt: string };
 
-export const Route = createFileRoute("/documents/$customer_slug")({ component: CustomerDocumentsPage });
+export const Route = createFileRoute("/documents/$customer_slug")({
+  loader: async ({ params }) => {
+    const { actor } = await getAuthSessionFn();
+    if (!actor) {
+      throw redirect({
+        to: "/auth/signin",
+        search: { callbackUrl: `/documents/${params.customer_slug}` },
+      });
+    }
+    // If it's a customer portal login, verify it's for this workspace slug
+    if (actor.kind === "customer" && actor.customerSlug !== params.customer_slug) {
+      throw redirect({
+        to: "/auth/signin",
+        search: { callbackUrl: `/documents/${params.customer_slug}` },
+      });
+    }
+    return { actor };
+  },
+  component: CustomerDocumentsPage,
+});
 
 function CustomerDocumentsPage() {
   const { customer_slug } = Route.useParams();
+  const { actor } = Route.useLoaderData();
   const { status } = useSession();
   const navigate = useNavigate();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState<string>("");
 
-  // The Customer Portal login is a separate grant path from the better-auth
-  // user session; it isn't visible via useSession() at all, so it's checked
-  // independently against /api/auth/customer-portal.
   const customerPortalQuery = useQuery({
     queryKey: ["customer-portal-session"],
     queryFn: async () => {
@@ -27,12 +45,12 @@ function CustomerDocumentsPage() {
       const data = await res.json();
       return data.session as { customerId: string; slug: string } | null;
     },
-    enabled: status === "unauthenticated",
+    enabled: !actor && status === "unauthenticated",
   });
 
-  const customerPortalChecked = status === "authenticated" || customerPortalQuery.isFetched;
-  const hasCustomerPortalSession = !!customerPortalQuery.data;
-  const authorized = status === "authenticated" || hasCustomerPortalSession;
+  const customerPortalChecked = !!actor || status === "authenticated" || customerPortalQuery.isFetched;
+  const hasCustomerPortalSession = (actor && actor.kind === "customer" && actor.customerSlug === customer_slug) || !!customerPortalQuery.data;
+  const authorized = !!actor || status === "authenticated" || hasCustomerPortalSession;
 
   useEffect(() => {
     if (!customerPortalChecked) return;
@@ -61,10 +79,6 @@ function CustomerDocumentsPage() {
     files.forEach((f) => f.tags.forEach((t) => tags.add(t)));
     return Array.from(tags).sort();
   }, [files]);
-
-  if (status === "loading" || !customerPortalChecked || (authorized && filesQuery.isLoading)) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
 
   if (!authorized || filesQuery.isError) {
     const message = !authorized ? "You do not have access to this dashboard." : (filesQuery.error as Error)?.message;
