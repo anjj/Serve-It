@@ -4,8 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useSession } from "@/lib/auth-client";
 import { getAuthSessionFn } from "@/lib/auth-session";
 import Navbar from "@/components/Navbar";
-import { Search, Tag, Upload, Trash2 } from "lucide-react";
+import { Search, Tag, Upload, Trash2, Edit3 } from "lucide-react";
 import UploadModal from "@/components/UploadModal";
+import UpdateFileModal from "@/components/UpdateFileModal";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 
@@ -35,6 +36,7 @@ function WorkspaceDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState<string>("");
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [editingFile, setEditingFile] = useState<FileRecord | null>(null);
 
   useEffect(() => {
     if (!actor && !isPending && !session) navigate({ to: "/auth/signin" });
@@ -162,6 +164,14 @@ function WorkspaceDashboard() {
                   <span className="text-meta text-foreground-muted">{new Date(file.createdAt).toLocaleDateString()}</span>
                   <div className="flex gap-2">
                     <button
+                      onClick={() => setEditingFile(file)}
+                      className="inline-flex items-center p-1.5 border border-transparent text-meta font-medium rounded text-foreground-muted hover:text-foreground hover:bg-surface-hover focus:outline-none transition-colors duration-200"
+                      aria-label="Edit File"
+                      title="Update Document File"
+                    >
+                      <Edit3 className="h-4 w-4" />
+                    </button>
+                    <button
                       onClick={() => {
                         if (confirm("Are you sure you want to delete this file?")) deleteFile.mutate(file.id);
                       }}
@@ -184,6 +194,14 @@ function WorkspaceDashboard() {
       <UploadModal
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}
+        onSuccess={() => queryClient.invalidateQueries({ queryKey: ["workspace", customer_slug, "files"] })}
+        customerSlug={customer_slug}
+      />
+
+      <UpdateFileModal
+        isOpen={!!editingFile}
+        fileRecord={editingFile}
+        onClose={() => setEditingFile(null)}
         onSuccess={() => queryClient.invalidateQueries({ queryKey: ["workspace", customer_slug, "files"] })}
         customerSlug={customer_slug}
       />

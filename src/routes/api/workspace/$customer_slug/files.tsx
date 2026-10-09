@@ -159,6 +159,63 @@ export const DELETE = withAuth(async ({ request, params }: { request: Request; p
   }
 });
 
+export const PATCH = withAuth(async ({ request, params }: { request: Request; params: { customer_slug: string } }, actor: Actor) => {
+  if (actor.kind !== "user") {
+    return Response.json({ error: "Access denied" }, { status: 403 });
+  }
+
+  const { customer_slug } = params;
+  const { userId, isAdmin } = actor;
+
+  try {
+    const customer = await prisma.customer.findUnique({ where: { slug: customer_slug }, include: { users: { where: { userId } } } });
+    if (!customer) return Response.json({ error: "Workspace not found" }, { status: 404 });
+    if (!isAdmin && customer.users.length === 0) return Response.json({ error: "Access denied" }, { status: 403 });
+
+    const formData = await request.formData();
+    const fileId = formData.get("fileId") as string | null;
+    const slug = formData.get("slug") as string | null;
+    const fileEntry = formData.get("file");
+
+    if ((!fileId && !slug) || !fileEntry) {
+      return Response.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    let fileToUpdate = null;
+    if (fileId) {
+      fileToUpdate = await prisma.file.findUnique({ where: { id: fileId } });
+    } else if (slug) {
+      fileToUpdate = await prisma.file.findUnique({ where: { customerId_slug: { customerId: customer.id, slug } } });
+    }
+
+    if (!fileToUpdate || fileToUpdate.customerId !== customer.id) {
+      return Response.json({ error: "File not found" }, { status: 404 });
+    }
+
+    let fileContent = "";
+    if (fileEntry instanceof File) {
+      fileContent = await fileEntry.text();
+    } else if (typeof fileEntry === "string") {
+      fileContent = fileEntry;
+    }
+
+    if (!fileContent) {
+      return Response.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    await uploadHtmlFile(customer.id, fileToUpdate.slug, fileContent);
+    const updatedFile = await prisma.file.update({
+      where: { id: fileToUpdate.id },
+      data: { updatedAt: new Date() },
+    });
+
+    return Response.json({ success: true, file: updatedFile });
+  } catch (error) {
+    console.error("API error:", error);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
+  }
+});
+
 export const Route = createFileRoute("/api/workspace/$customer_slug/files")({
-  server: { handlers: { GET, POST, DELETE } },
+  server: { handlers: { GET, POST, DELETE, PATCH } },
 });
